@@ -48,16 +48,14 @@ const Enumerators = () => {
           <span>+</span>
         </Link>
 
-        <Link
+        {/* <Link
           to="/new-lga"
           onClick={() => {}}
           className="rounded bg-white border border-primary text-primary flex items-center p-3 gap-12 sm:ml-auto cursor-pointer sm:flex-initial xs:flex-1 xs:justify-between"
         >
-          {/* <div> */}
           <p>Enroll new Lga</p>
           <span>+</span>
-          {/* </div> */}
-        </Link>
+        </Link> */}
       </div>
 
       {/* table */}

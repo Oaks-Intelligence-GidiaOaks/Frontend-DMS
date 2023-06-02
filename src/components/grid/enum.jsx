@@ -193,12 +193,12 @@ const Enum = ({ enumData }) => {
 
   return (
     <div className="w-full" ref={wrapperRef}>
-      <button
+      {/* <button
         className="p-3 text-white rounded-md border bg-primary"
         onClick={handleOnExport}
       >
         Download
-      </button>
+      </button> */}
 
       <div className="w-full overflow-x-scroll">
         <table {...getTableProps()} className="w-full my-5 bg-white">

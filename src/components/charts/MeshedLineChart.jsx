@@ -35,7 +35,7 @@ const formatTime = (time) => {
 console.log(formatTime("2023-05-25T20:24:32.318Z"));
 
 const MeshedLineChart = ({ data: MeshedLineD }) => {
-  // console.log(MeshedLineD);
+  console.log(MeshedLineD);
 
   const transformedData =
     MeshedLineD?.length > 0 &&
@@ -52,7 +52,7 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
 
   // console.log(transformedData);
 
-  return MeshedLineD ? (
+  return MeshedLineD?.length > 0 ? (
     <ResponsiveLine
       data={transformedData}
       margin={{ top: 50, right: 110, bottom: 50, left: 70 }}
@@ -118,7 +118,7 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
       ]}
     />
   ) : (
-    <div>loading..</div>
+    <div>No chart data..</div>
   );
 };
 
