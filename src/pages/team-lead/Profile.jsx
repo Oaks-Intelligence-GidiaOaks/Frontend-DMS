@@ -1,17 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { EditNote } from "@mui/icons-material";
 import { DisplayInput, FormInput } from "../../components/form";
 import axios from "axios";
+import { useAuth } from "../../context";
 
 const Profile = () => {
-  useEffect(() => {
-    axios
-      .get("me")
-      .then((res) => console.log(res.data))
-      .catch((err) => console.error(err));
-  }, []);
+  const { user } = useAuth();
+
+  console.log(user);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  // useEffect(() => {
+  //   axios
+  //     .get("me")
+  //     .then((res) => console.log(res.data))
+  //     .catch((err) => console.error(err));
+  // }, []);
 
   const handleClick = (e) => {
+    e.preventDefault();
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
   };
 
@@ -39,24 +52,19 @@ const Profile = () => {
           </p>
         </div>
 
-        <form action="" className="flex-1 lg:pr-16">
+        <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>
           <FormInput placeholder="Maria" label="First name" />
           <FormInput placeholder="Grey" label="Last name" />
           <FormInput placeholder="mariagrey@demo.com" label="Email" />
           <FormInput placeholder="+234 81674***" label="Contact number" />
-          <FormInput placeholder="" label="State" />
-          <FormInput placeholder="Maria" label="LGA" />
-          <DisplayInput label="State" data={["Lagos", "Delta", "Abia"]} />
-          <DisplayInput
-            label="LGA"
-            data={["Eti-osa", "Isoko North", "Arochukwu"]}
-          />
+
+          <DisplayInput label="State" data={user.state} />
+          <DisplayInput label="LGA" data={user.LGA} />
 
           <input
             type="submit"
             value="Update"
             className="w-full mt-4 text-white p-3 rounded bg-oaksgreen cursor-pointer"
-            onClick={handleClick}
           />
         </form>
       </div>

@@ -20,7 +20,7 @@ const Enumerators = () => {
 
   useEffect(() => memoizedEnumerators, []);
 
-  return tableData ? (
+  return tableData && tableData.enumerators.length > 0 ? (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-2 xs:text-[10px]">
         <div className="rounded bg-primary p-3 flex items-center gap-2 text-xs">
@@ -86,7 +86,7 @@ const Enumerators = () => {
     </div>
   ) : (
     <p className="w-full h-screen grid place-items-center text-center">
-      <span>loading.....</span>
+      <span>you have no enumerators yet...</span>
     </p>
   );
 };
