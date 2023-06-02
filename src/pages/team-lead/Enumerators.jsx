@@ -20,7 +20,7 @@ const Enumerators = () => {
 
   useEffect(() => memoizedEnumerators, []);
 
-  return tableData && tableData.enumerators.length > 0 ? (
+  return tableData ? (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-2 xs:text-[10px]">
         <div className="rounded bg-primary p-3 flex items-center gap-2 text-xs">
@@ -33,7 +33,7 @@ const Enumerators = () => {
         <div className="flex p-3 md:ml-8 items-center gap-6 w-fit rounded bg-white">
           <p className="">Recently Added</p>
           <p className="text-primary p-1 bg-gray-200 rounded text-sm">
-            {tableData?.newlyAdded}
+            {tableData.enumerators.length > 0 && tableData?.newlyAdded}
           </p>
         </div>
 
@@ -60,7 +60,11 @@ const Enumerators = () => {
 
       {/* table */}
       <div className="bg-white  w-full text-xs">
-        <Enum enumData={tableData?.enumerators} />
+        {tableData.length > 0 ? (
+          <Enum enumData={tableData?.enumerators} />
+        ) : (
+          <p>You have no enumerators yet...</p>
+        )}
       </div>
 
       {/* chart */}
@@ -86,7 +90,7 @@ const Enumerators = () => {
     </div>
   ) : (
     <p className="w-full h-screen grid place-items-center text-center">
-      <span>you have no enumerators yet...</span>
+      <span>loading....</span>
     </p>
   );
 };
