@@ -1,0 +1,228 @@
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-react-grids/styles/material.css";
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Poppins", sans-serif;
+}
+.login-form-shadow {
+  box-shadow: 0 0 16px #abbed1;
+}
+.glass {
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.scrollbar-hidee::-webkit-scrollbar {
+  display: none;
+  width: 5px;
+}
+
+.scrollbar-hidee:hover::-webkit-scrollbar {
+  display: block;
+  width: 5px;
+}
+
+.scrollbar-hidee::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+.scrollbar-hidee::-webkit-scrollbar-thumb {
+  background: grey;
+  border-radius: 10px;
+}
+
+/* .scrollbar-hidee::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+} */
+
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: "auto";
+  touch-action: pan-x;
+  user-select: none;
+}
+.touch-scroll * {
+  user-select: none;
+}
+
+/* material icon cat tab */
+p > .MuiSvgIcon {
+  height: 10px !important;
+  width: 10px;
+}
+
+.css-i4bv87-MuiSvgIcon-root {
+  height: 14px !important;
+  width: 14px;
+}
+
+.slick-track {
+  display: flex !important;
+}
+* {
+  font-family: "DM Sans", sans-serif;
+}
+* input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+* input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="radio"] {
+  /* The native appearance is hidden */
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* For a circular appearance we need a border-radius. */
+  border-radius: 50%;
+
+  /* The background will be the radio dot's color. */
+  background: #fff;
+
+  /* The border will be the spacing between the dot and the outer circle */
+  border: 3px solid #fff;
+
+  /* And by creating a box-shadow with no offset and no blur, we have an outer circle */
+  box-shadow: 0 0 0 1px #505565;
+}
+input[type="radio"]:checked {
+  /* The native appearance is hidden */
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* For a circular appearance we need a border-radius. */
+  border-radius: 50%;
+
+  /* The background will be the radio dot's color. */
+  background: #72a247;
+
+  /* The border will be the spacing between the dot and the outer circle */
+  border: 3px solid #fff;
+
+  /* And by creating a box-shadow with no offset and no blur, we have an outer circle */
+  box-shadow: 0 0 0 1px #505565;
+}
+
+.login-form-shadow {
+  box-shadow: 0 0 16px #abbed15c;
+}
+
+.drop-down-shadow {
+  box-shadow: 0 6px 12px #abbed1;
+}
+
+.fix-image {
+  width: clamp(120px, 20vw, 140px);
+}
+
+.clamp-sm {
+  width: clamp(100px, 50%, 120px);
+}
+.clamp-md {
+  width: clamp(100px, 50%, 284px);
+}
+
+.oaks-gradient {
+  background: linear-gradient(to bottom, #a2b854, #72a247);
+}
+
+.glass {
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.3);
+}
+.auto-size {
+  width: clamp(140px, 20vw, 200px);
+}
+
+.fix-scrollbar::-webkit-scrollbar {
+  appearance: none;
+  width: 2px;
+  height: 2px;
+}
+.fix-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d3d4d8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.fix-scrollbar::-webkit-scrollbar-track {
+  background-color: white;
+}
+.fix-scrollbar::-webkit-scrollbar-track-piece {
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.slab::before {
+  content: "";
+  width: 6px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #72a247;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.profile-bg {
+  background-image: url("profile-bg.svg");
+  background-size: cover;
+}
+.profile-btn-bg {
+  background-image: url("profile-bg.svg");
+  background-position: 100% right;
+  background-size: cover;
+}
+.radiant-shadow {
+  box-shadow: 0 0 0 10px rgba(130, 178, 46, 75%),
+    0 0 0 20px rgba(130, 178, 46, 50%);
+}
+
+td[aria-label="food column header food"] {
+  color: white !important;
+  background-color: blue !important;
+  font-size: 16px;
+}
+
+td[aria-label="transport column header transport"] {
+  color: white !important;
+  background-color: blue !important;
+  font-size: 16px;
+}
+
+td[aria-label="accomodation column header accomodation"] {
+  color: white !important;
+  background-color: blue !important;
+  font-size: 16px;
+}
+
+td[aria-label="electricity column header electricity"] {
+  color: white !important;
+  background-color: blue !important;
+  font-size: 16px;
+}
+
+td[aria-label="commodities column header others"] {
+  color: white !important;
+  background-color: blue !important;
+  font-size: 16px;
+}
