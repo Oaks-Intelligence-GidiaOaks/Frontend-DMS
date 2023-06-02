@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaRegUser } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
@@ -20,6 +20,8 @@ import Reports from "../../components/enumeratorFormTabs/Reports";
 import oaksLogo from "../../assets/oaks-logo.svg";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
 import { useAuth } from "../../context";
+import axios from "axios";
+import { Rings } from "react-loader-spinner";
 
 function EnumeratorForm() {
   const {
@@ -38,11 +40,12 @@ function EnumeratorForm() {
     hideSubmissionNotification,
     hideDuplicateNotification,
     hideErrorNotification,
+    updateTransportTab,
     logOut,
   } = useContext(EnumeratorFormContext);
 
   const { setUser, user } = useAuth();
-  console.log(user);
+  const [lgaRoutes, setLgaRoutes] = useState(null);
 
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
@@ -56,6 +59,19 @@ function EnumeratorForm() {
         e.returnValue = "";
       });
   }, []);
+
+  useEffect(() => {
+    axios
+      .get(`lga_routes`)
+      .then((res) => {
+        console.log(res.data.data);
+        setLgaRoutes(res.data);
+        updateTransportTab(
+          res.data.data.filter((t) => t.lga === currentLGA.toLowerCase())
+        );
+      })
+      .catch((err) => console.error(err));
+  }, [currentLGA, updateTransportTab]);
 
   return (
     <div>
@@ -116,11 +132,28 @@ function EnumeratorForm() {
 
         {/* Form */}
         <div className="min-h-[100vh] bg-white px-4">
-          {currentFormTab === "Food" && <Food />}
-          {currentFormTab === "Commodity" && <Commodity />}
-          {currentFormTab === "Transport" && <Transport />}
-          {currentFormTab === "Accomodation" && <Accomodation />}
-          {currentFormTab === "Reports" && <Reports />}
+          {lgaRoutes ? (
+            <>
+              {currentFormTab === "Food" && <Food />}
+              {currentFormTab === "Commodity" && <Commodity />}
+              {currentFormTab === "Transport" && <Transport />}
+              {currentFormTab === "Accomodation" && <Accomodation />}
+              {currentFormTab === "Reports" && <Reports />}
+            </>
+          ) : (
+            <div className="w-full min-h-[50vh] flex justify-center gap-2 flex-col items-center ">
+              <Rings
+                height="60"
+                width="60"
+                color="#72a247"
+                radius="30"
+                wrapperClass=""
+                visible={true}
+                ariaLabel="rings-loading"
+              />
+              <p>Loading</p>
+            </div>
+          )}
         </div>
       </div>
 

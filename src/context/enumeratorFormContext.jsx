@@ -1,4 +1,10 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   beanTypes,
   buildingBlockSizes,
@@ -943,27 +949,42 @@ export function EnumeratorFormProvider({ children }) {
         .then((res) => res.json())
         .then(({ success }) => {
           if (success) {
-            secureLocalStorage.clear();
+            secureLocalStorage.removeItem("ouis");
+            secureLocalStorage.removeItem("user");
             setUser(null);
             setIsLoggedIn(false);
             return navigate("/");
           }
         })
         .catch((error) => {
-          console.log("error:", error);
-          secureLocalStorage.clear();
+          secureLocalStorage.removeItem("ouis");
+          secureLocalStorage.removeItem("user");
           setUser(null);
           setIsLoggedIn(false);
           return navigate("/");
         });
     } catch (err) {
-      console.log("error:", err);
-      secureLocalStorage.clear();
+      secureLocalStorage.removeItem("ouis");
+      secureLocalStorage.removeItem("user");
       setUser(null);
       setIsLoggedIn(false);
       return navigate("/");
     }
   };
+  const updateTransportTab = useCallback(
+    (data) => {
+      console.log(data);
+      let routes = {};
+      data[0].routes.map((route) => {
+        routes[`${route.start} to ${route.end}`] = {
+          cost: "",
+          "mode of transportation": "",
+        };
+      });
+      setState((prev) => ({ ...prev, transportSectionStructure: routes }));
+    },
+    [state.currentLGA]
+  );
 
   const {
     foodSectionStructure,
@@ -1131,6 +1152,7 @@ export function EnumeratorFormProvider({ children }) {
         accomodationProgressPercentage,
         progressPercentage,
         handleValue,
+        updateTransportTab,
         logOut,
       }}
     >

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import TrackerGrid from "../../components/grid/TrackerGrid";
 import MeshedLineChart from "../../components/charts/MeshedLineChart";
+import CategoryTab from "../../components/CategoryTab";
 import { MeshedLineChartData } from "../../data/charts";
 import axios from "axios";
+import { Download } from "@mui/icons-material";
+import { useAuth } from "../../context";
 
 const Tracker = () => {
+  const {
+    user: { token },
+  } = useAuth();
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
 
@@ -18,6 +24,34 @@ const Tracker = () => {
 
   let firstChart = timeOfSub && timeOfSub.slice(0, 10);
   let secondChart = timeOfSub && timeOfSub.length > 10 && timeOfSub.slice(10);
+
+  const handleSubmit = () => {
+    let data = trackerData.results;
+    const formattedData = data.map((value) => value.form_id);
+    console.log("formattedData:", formattedData);
+
+    try {
+      axios
+        .post(
+          "form_response/approve_response",
+          { ids: formattedData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
+        )
+        .then((data) => {
+          console.log(data);
+          const message = data.data.message;
+          alert(message);
+        })
+        .catch((error) => console.log(error));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     axios
@@ -45,6 +79,9 @@ const Tracker = () => {
             {noResponse}
           </p>
         </div>
+      </div>
+      <div onClick={() => handleSubmit()}>
+        <CategoryTab text="Submit" Icon={Download} />
       </div>
 
       {/* table */}
