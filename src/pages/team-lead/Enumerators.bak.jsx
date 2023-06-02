@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Pie from "../../components/charts/Pie";
 import { data } from "../../data/chartData";
@@ -10,14 +10,15 @@ const Enumerators = () => {
   const [tableData, setTableData] = useState(null);
   // const [isloading, setIsLoading] = useState(true)
 
-  const getEnumeratorsCallback = useCallback(() => {
-    axios
-      .get("admin/enumerators")
-      .then((res) => setTableData(res.data))
-      .catch((err) => console.log(err));
+  const memoizedEnumerators = useMemo(() => {
+    return () =>
+      axios
+        .get("admin/enumerators")
+        .then((res) => setTableData(res.data))
+        .catch((err) => console.log(err));
   }, []);
-  console.log({ tableData });
-  useEffect(getEnumeratorsCallback, []);
+
+  useEffect(() => memoizedEnumerators, []);
 
   return tableData ? (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
@@ -59,10 +60,7 @@ const Enumerators = () => {
 
       {/* table */}
       <div className="bg-white  w-full text-xs">
-        <Enum
-          enumData={tableData?.enumerators}
-          loadEnums={getEnumeratorsCallback}
-        />
+        <Enum enumData={tableData?.enumerators} />
       </div>
 
       {/* chart */}

@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
   const [submissionCount, setSubmissionCount] = useState(null);
+  
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
@@ -178,6 +179,10 @@ const Dashboard = () => {
         </OaksSlider>
       </div>
     </div>
+
+
+
+    
   );
 };
 

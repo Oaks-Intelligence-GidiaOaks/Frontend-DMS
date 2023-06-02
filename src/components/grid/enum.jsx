@@ -1,47 +1,19 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useTable, usePagination, useRowSelect } from "react-table";
 import PopUpGrid from "./PopupGrid";
-// import { AiOutlineMenu } from "react-icons/ai";
 import * as XLSX from "xlsx";
 import MenuIcon from "@mui/icons-material/Menu";
 import Pagination from "./Pagination";
 import { usePopper } from "react-popper";
 import Checkbox from "./Checkbox";
+import axios from "axios";
+import { FaSpinner } from "react-icons/fa";
+import EditableCell from "./EditableCell";
 
-const EditableCell = ({
-  value: initialValue,
-  row: { index },
-  column: { id },
-  updateMyData,
-}) => {
-  const [value, setValue] = useState(initialValue);
-  console.log(value);
+const Enum = ({ enumData, loadEnums }) => {
+  
 
-  const onChange = (e) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-  };
-
-  const onBlur = () => {
-    updateMyData(index, id, value);
-  };
-
-  return (
-    <input
-      readOnly={value === "id"}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      className="w-full px-1 py-1 border border-gray-300 rounded"
-    />
-  );
-};
-
-const Enum = ({ enumData }) => {
-  // console.log(Object.keys(enumData?.[1]).length);
-  // console.log(enumData);
-
-  const headColumns = Object.keys(enumData?.[0])
+  const headColumns = Object.keys(enumData?.[0] || {})
     .filter(
       (item) =>
         item !== "_id" &&
@@ -51,13 +23,27 @@ const Enum = ({ enumData }) => {
         item !== "createdAt" &&
         item !== "created_at" &&
         item !== "updatedAt" &&
-        item !== "user"
+        item !== "user" &&
+        item !== "identityImage"
     )
-    .map((item) => ({
-      Header: item,
-      accessor: item,
-      defaultHidden: true,
-    }));
+    .map((item) => {
+      let Header = item;
+      let accessor = item;
+      let Cell = (cell) => cell.row.original[item];
+
+      switch (item) {
+        case "identityImage":
+          //access properties that are object and extract their literal value
+          Cell = (cell) => cell.row.original?.identityImage.url;
+      }
+
+      return {
+        Header,
+        accessor,
+        defaultHidden: true,
+        Cell,
+      };
+    });
 
   const columns = useMemo(() => headColumns, [enumData]);
   const [data, setData] = useState(enumData);
@@ -67,6 +53,7 @@ const Enum = ({ enumData }) => {
   const [editedRow, setEditedRow] = useState(null);
   const [selectedRowInfo, setSelectedRowInfo] = useState(null);
   const [tableData, setTableData] = useState(data);
+  const [isLoading, setIsLoading] = useState(false);
 
   let [referenceElement, setReferenceElement] = useState();
   let [popperElement, setPopperElement] = useState();
@@ -106,14 +93,12 @@ const Enum = ({ enumData }) => {
 
   const handleDeleteClick = (row, event) => {
     setSelectedRow(row.original);
-    console.log(row.original);
     setIsModalOpen(!row.original.showModal);
   };
 
   const deleteRow = () => {
     if (selectedRow) {
       const updatedData = data.filter((row) => row.id !== selectedRow.id);
-      // setData(updatedData);
     }
 
     setIsModalOpen(false);
@@ -129,11 +114,75 @@ const Enum = ({ enumData }) => {
     setIsEditing(true);
   };
 
-  const handleSaveRow = (row) => {
-    console.log(row.original);
-    setIsEditing(false);
-    setEditedRow(null);
-    setSelectedRow(null);
+  const updateMyData = async (rowIndex, columnId, value) => {
+    setIsLoading(true);
+    try {
+      const updatedData = data.map((row) => {
+        if (row?._id === rowIndex) {
+          return {
+            ...row,
+            [columnId]: value,
+          };
+        }
+        return row;
+      });
+
+      setData(updatedData);
+
+      const itemId = updatedData[rowIndex]?._id;
+
+      await axios
+        .put(`/admin/enumerator/${itemId}`, { [columnId]: value })
+        .then((res) => {
+          console.log(res.data);
+          setIsLoading(false);
+          setIsEditing(false);
+          setEditedRow(null);
+          setSelectedRow(null);
+
+          setTableData(updatedData);
+          window.location.reload(true);
+        })
+        .catch((err) => console.log(err));
+    } catch (error) {
+      console.error("Error updating enumerator:", error);
+    }
+  };
+
+  const handleToggleDisable = async (itemId) => {
+    const selectedItem = data.find((item) => item._id === itemId);
+
+    if (selectedItem) {
+      try {
+        await axios
+          .put(`/admin/enumerator/disable/${itemId}`, {
+            disabled: !selectedItem.disabled,
+          })
+          .then((res) => {
+            // setData(res.data);
+            loadEnums();
+
+            console.log(loadEnums);
+          })
+          .catch((err) => console.log(err));
+        console.log(
+          "Disable property toggled and database updated successfully!"
+        );
+      } catch (error) {
+        console.error("Failed to update the database:", error);
+      }
+    }
+  };
+
+  const handleSaveRow = async () => {
+    if (editedRow) {
+      const { id, columnId, value, index } = editedRow;
+
+      await updateMyData(id, columnId, value);
+      setIsEditing(false);
+      setEditedRow(null);
+      setSelectedRow(null);
+    }
   };
 
   const handleCancelRow = (row) => {
@@ -143,25 +192,7 @@ const Enum = ({ enumData }) => {
   };
 
   const resetPassword = (row) => {
-    // Perform the password reset for the given row
-    console.log("Reset password for row:", row);
-  };
-
-  const updateMyData = (rowIndex, columnId, value) => {
-    // setData((old) =>
-    //   old.map((row, index) => {
-    //     if (index === rowIndex) {
-    //       return {
-    //         ...old[rowIndex],
-    //         [columnId]: value,
-    //       };
-    //     }
-    //     return row;
-    //   })
-    // );
-
-    setEditedRow((old) => ({ ...old, [columnId]: value }));
-    console.log(editedRow);
+    // Perform the password reset 
   };
 
   const wrapperRef = useRef(null);
@@ -192,6 +223,13 @@ const Enum = ({ enumData }) => {
 
   return (
     <div className="w-full" ref={wrapperRef}>
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-[#cccc] bg-opacity-75 z-50">
+          <FaSpinner className="animate-spin w-8 h-8 text-gray-600" />
+          <span>Updating Enumerator....</span>
+        </div>
+      )}
+
       <button
         className="p-3 text-white rounded-md border bg-primary"
         onClick={handleOnExport}
@@ -231,6 +269,7 @@ const Enum = ({ enumData }) => {
               return (
                 <tr {...row.getRowProps()}>
                   {row.cells.map((cell) => {
+                   
                     return (
                       <td
                         {...cell.getCellProps()}
@@ -242,6 +281,10 @@ const Enum = ({ enumData }) => {
                             row={row}
                             column={cell.column}
                             updateMyData={updateMyData}
+                            edit={isEditingRow}
+                            setIsEditing={setIsEditing}
+                            setEditedRow={setEditedRow}
+                            setSelectedRow={setSelectedRow}
                           />
                         ) : (
                           cell.render("Cell")
@@ -254,7 +297,7 @@ const Enum = ({ enumData }) => {
                       <>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => handleSaveRow(row)}
+                            onClick={() => handleSaveRow(row.original)}
                             className="focus:outline-none text-[11px] leading-[15px] font-normal border-[1px] py-1 px-2 border-[#82B22E] bg-[#82B22E] text-white "
                           >
                             Save
@@ -288,7 +331,6 @@ const Enum = ({ enumData }) => {
                         >
                           <PopUpGrid
                             selectedRow={selectedRow}
-                            deleteRow={deleteRow}
                             closeModal={closeModal}
                             setPopperElement={setPopperElement}
                             popperStyles={styles}
@@ -297,6 +339,8 @@ const Enum = ({ enumData }) => {
                             row={row}
                             selectedRowInfo={selectedRowInfo}
                             resetPassword={resetPassword}
+                            edit={isEditingRow}
+                            toggleDisable={handleToggleDisable}
                           />
                         </div>
                       )}

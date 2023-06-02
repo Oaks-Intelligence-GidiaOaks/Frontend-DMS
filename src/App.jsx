@@ -37,6 +37,7 @@ import { EnumeratorFormProvider, useApp, useAuth } from "./context";
 import { useState } from "react";
 import { base_url } from "./lib/paths";
 import Admin from "./components/layout/Admin";
+import TeamLeadEnumerator from "./components/TeamLeadEnumerator";
 
 function App() {
   const { user, isLoggedIn } = useAuth();
@@ -47,12 +48,22 @@ function App() {
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
 
   const identifyRoute = (user) => {
-    if (user.role === "enumerator") {
-      return <Navigate replace to={"/form"} />;
+    switch (user.role) {
+      case "enumerator":
+         return <Navigate replace to={"/form"} />;
+      case "team_lead":
+        return <Navigate replace to={"/home"} />;
+  
+    
+      default:
+        break;
     }
-    if (user.role === "team_lead") {
-      return <Navigate replace to={"/home"} />;
-    }
+    // if (user.role === "enumerator") {
+    //   return <Navigate replace to={"/form"} />;
+    // }
+    // if (user.role === "team_lead") {
+    //   return <Navigate replace to={"/home"} />;
+    // }
   };
 
   return (
@@ -188,6 +199,9 @@ function App() {
               )
             }
           />
+
+          
+
           <Route
             path="admin/team_leads"
             element={
@@ -200,6 +214,22 @@ function App() {
               )
             }
           />
+
+          <Route
+            path="admin/team_leads/:id"
+            element={
+              isLoggedIn && user && user.role === "admin" ? (
+                <Admin>
+                  <TeamLeadEnumerator />
+                </Admin>
+              ) : (
+                <Navigate replace to={"/"} />
+              )
+            }
+          />
+
+
+         
           <Route
             path="admin/responses"
             element={

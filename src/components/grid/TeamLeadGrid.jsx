@@ -1,48 +1,21 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useTable, usePagination, useRowSelect } from "react-table";
-import PopUpGrid from "./PopupGrid";
-// import { AiOutlineMenu } from "react-icons/ai";
 import * as XLSX from "xlsx";
 import MenuIcon from "@mui/icons-material/Menu";
 import Pagination from "./Pagination";
 import { usePopper } from "react-popper";
 import Checkbox from "./Checkbox";
-
-const EditableCell = ({
-  value: initialValue,
-  row: { index },
-  column: { id },
-  updateMyData,
-}) => {
-  const [value, setValue] = useState(initialValue);
-  console.log(value);
-
-  const onChange = (e) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-  };
-
-  const onBlur = () => {
-    updateMyData(index, id, value);
-  };
-
-  return (
-    <input
-      readOnly={value === "id"}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      className="w-full px-1 py-1 border border-gray-300 rounded"
-    />
-  );
-};
+import axios from "axios";
+import EditableCell from "./EditableCell";
+import { FaSpinner } from "react-icons/fa";
+import AdminPopUp from "./AdminPopUp";
 
 const TeamLeadGrid = ({ data: teamLeadData }) => {
   // console.log(Object.keys(teamLeadData?.[1]).length);
   // console.log(teamLeadData);
 
   let allTeamLeads = teamLeadData.users;
-  console.log(allTeamLeads);
+  console.log({allTeamLeads}, "Team Lead");
 
   const headColumns = Object.keys(allTeamLeads?.[0])
     .filter(
@@ -54,7 +27,9 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
         item !== "createdAt" &&
         item !== "created_at" &&
         item !== "updatedAt" &&
-        item !== "user"
+        item !== "user" &&
+        item !== "_id" &&
+        item !== "identityImage"
     )
     .map((item) => ({
       Header: item,
@@ -69,7 +44,11 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedRow, setEditedRow] = useState(null);
   const [selectedRowInfo, setSelectedRowInfo] = useState(null);
-  // const [tableData, setTableData] = useState(data);
+  const [tableData, setTableData] = useState(data);
+  const [isLoading, setIsLoading] = useState(false);
+  
+
+
 
   let [referenceElement, setReferenceElement] = useState();
   let [popperElement, setPopperElement] = useState();
@@ -109,14 +88,12 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
 
   const handleDeleteClick = (row, event) => {
     setSelectedRow(row.original);
-    console.log(row.original);
     setIsModalOpen(!row.original.showModal);
   };
 
   const deleteRow = () => {
     if (selectedRow) {
       const updatedData = data.filter((row) => row.id !== selectedRow.id);
-      // setData(updatedData);
     }
 
     setIsModalOpen(false);
@@ -132,11 +109,75 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
     setIsEditing(true);
   };
 
-  const handleSaveRow = (row) => {
-    console.log(row.original);
-    setIsEditing(false);
-    setEditedRow(null);
-    setSelectedRow(null);
+  const updateMyData = async (rowIndex, columnId, value) => {
+    setIsLoading(true);
+    try {
+      const updatedData = data.map((row) => {
+        if (row?._id === rowIndex) {
+          return {
+            ...row,
+            [columnId]: value,
+          };
+        }
+        return row;
+      });
+
+      setData(updatedData);
+
+      const itemId = updatedData[rowIndex]?._id;
+
+      await axios
+        .put(`/admin/user/${itemId}`, { [columnId]: value })
+        .then((res) => {
+          console.log(res.data);
+          setIsLoading(false);
+          setIsEditing(false);
+          setEditedRow(null);
+          setSelectedRow(null);
+
+          setTableData(updatedData);
+        })
+        .catch((err) => console.log(err));
+    } catch (error) {
+      console.error("Error updating enumerator:", error);
+    }
+  };
+
+  const handleToggleDisable = async (itemId) => {
+    const selectedItem = data.find((item) => item._id === itemId);
+
+    if (selectedItem) {
+      try {
+        await axios
+          .put(`/admin/user/disable/${itemId}`, {
+            disabled: !selectedItem.disabled,
+          })
+          .then((res) => {
+            setData(res.data);
+            // loadEnums();
+
+            // console.log(loadEnums);
+            window.location.reload(true)
+          })
+          .catch((err) => console.log(err));
+        console.log(
+          "Disable property toggled and database updated successfully!"
+        );
+      } catch (error) {
+        console.error("Failed to update the database:", error);
+      }
+    }
+  };
+
+  const handleSaveRow = async () => {
+    if (editedRow) {
+      const { id, columnId, value, index } = editedRow;
+
+      await updateMyData(id, columnId, value);
+      setIsEditing(false);
+      setEditedRow(null);
+      setSelectedRow(null);
+    }
   };
 
   const handleCancelRow = (row) => {
@@ -147,21 +188,6 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
 
   const resetPassword = (row) => {
     // Perform the password reset for the given row
-    console.log("Reset password for row:", row);
-  };
-
-  const updateMyData = (rowIndex, columnId, value) => {
-    setData((old) =>
-      old.map((row, index) => {
-        if (index === rowIndex) {
-          return {
-            ...old[rowIndex],
-            [columnId]: value,
-          };
-        }
-        return row;
-      })
-    );
   };
 
   const wrapperRef = useRef(null);
@@ -192,6 +218,13 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
 
   return (
     <div className="w-full" ref={wrapperRef}>
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-[#cccc] bg-opacity-75 z-50">
+          <FaSpinner className="animate-spin w-8 h-8 text-gray-600" />
+          <span>Updating Enumerator....</span>
+        </div>
+      )}
+
       <button
         className="p-3 text-white rounded-md border bg-primary"
         onClick={handleOnExport}
@@ -242,9 +275,14 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
                             row={row}
                             column={cell.column}
                             updateMyData={updateMyData}
+                            edit={isEditingRow}
+                            setIsEditing={setIsEditing}
+                            setEditedRow={setEditedRow}
+                            setSelectedRow={setSelectedRow}
                           />
                         ) : (
                           cell.render("Cell")
+                            
                         )}
                       </td>
                     );
@@ -254,7 +292,7 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
                       <>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => handleSaveRow(row)}
+                            onClick={() => handleSaveRow(row.original)}
                             className="focus:outline-none text-[11px] leading-[15px] font-normal border-[1px] py-1 px-2 border-[#82B22E] bg-[#82B22E] text-white "
                           >
                             Save
@@ -286,9 +324,8 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
                           style={styles.popper}
                           {...attributes.popper}
                         >
-                          <PopUpGrid
+                          <AdminPopUp
                             selectedRow={selectedRow}
-                            deleteRow={deleteRow}
                             closeModal={closeModal}
                             setPopperElement={setPopperElement}
                             popperStyles={styles}
@@ -297,6 +334,8 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
                             row={row}
                             selectedRowInfo={selectedRowInfo}
                             resetPassword={resetPassword}
+                            edit={isEditingRow}
+                            toggleDisable={handleToggleDisable}
                           />
                         </div>
                       )}
@@ -323,5 +362,6 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
     </div>
   );
 };
+
 
 export default TeamLeadGrid;

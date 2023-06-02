@@ -1,11 +1,13 @@
-
 import React, { useState } from "react";
 import { usePopper } from "react-popper";
 import { HiOutlinePencilAlt } from "react-icons/hi";
 import { FaKey } from "react-icons/fa";
+import {BsArrowRight} from "react-icons/bs"
 import axios from "axios";
+import { MdDeleteOutline } from "react-icons/md"
+import {useNavigate} from "react-router-dom"
 
-const PopUpGrid = ({
+const AdminPopUp = ({
   selectedRow,
   deleteRow,
   closeModal,
@@ -23,6 +25,7 @@ const PopUpGrid = ({
     handleEditRow(row.original);
     console.log(row.original);
   };
+  const navigate = useNavigate()
 
   const cancelDelete = () => {
     closeModal();
@@ -46,7 +49,6 @@ const PopUpGrid = ({
     toggleDisable(row.original._id);
   };
 
-
   return (
     <div className="" style={popperStyles.popper} {...popperAttributes.popper}>
       <div className="bg-gray-200 p-1 rounded shadow">
@@ -58,19 +60,29 @@ const PopUpGrid = ({
             Edit
             <HiOutlinePencilAlt />
           </button>
+          <button onClick={() => {
+            navigate(`/admin/team_leads/${row.original.id}`)
+            console.log(row.original,   "yy")
+          }} className="text-[10px] leading-[24px] font-medium whitespace-nowrap flex items-center justify-center">
+            See more
+            <BsArrowRight />
+          </button>
           <button
             onClick={handleResetPasswordClick}
             className="text-[10px] leading-[24px] font-medium flex items-center justify-center"
           >
-            Reset password
-            {/* <FaKey /> */}
+            Reset password {""}
+            <FaKey size={8} className="" />
           </button>
 
           <button
             onClick={() => handleToggleDisable(row.original._id)}
-            className="text-[#FA0D0D] text-[10px] leading-[24px] font-medium"
+            className="text-[#FA0D0D] text-[10px] leading-[24px] font-medium flex justify-center items-center"
           >
-            {row.original.disabled ? "Enable" : "Remove"}
+            {/* {row.original.disabled ? "Enable" : "Remove"} {""} */}
+            Remove
+
+            <MdDeleteOutline size={10} />
           </button>
         </div>
       </div>
@@ -78,4 +90,4 @@ const PopUpGrid = ({
   );
 };
 
-export default PopUpGrid;
+export default AdminPopUp;
