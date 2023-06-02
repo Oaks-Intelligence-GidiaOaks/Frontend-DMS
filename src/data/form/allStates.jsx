@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export const AllStates = [
   { value: "abia", label: "Abia" },
   { value: "adamawa", label: "Adamawa" },
@@ -39,8 +37,3 @@ export const AllStates = [
   { value: "yobe", label: "Yobe" },
   { value: "zamfara", label: "Zamfara" },
 ];
-
-export const lgasByState = {
-  abia: ["abia North", "Abia South", "Aba"],
-  borno: ["bornoNorth", "bornoSouth", "maidugrui"],
-};

@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { EditNote } from "@mui/icons-material";
 import { DisplayInput, FormInput } from "../../components/form";
+import axios from "axios";
 
 const Profile = () => {
+  useEffect(() => {
+    axios
+      .get("me")
+      .then((res) => console.log(res.data))
+      .catch((err) => console.error(err));
+  }, []);
+
   const handleClick = (e) => {
     e.preventDefault();
   };
+
   return (
     <div className="h-full sm:mx-6 mt-6 lg:mx-auto lg:w-[90%]">
       <div className="flex items-center gap-6">

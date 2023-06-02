@@ -19,7 +19,7 @@ const TeamLeads = () => {
       axios
         .get("admin/team_lead")
         .then((res) => {
-          // console.log(res.data);
+          console.log(res.data);
           setTableData(res.data);
         })
         .catch((err) => console.log(err));
@@ -33,7 +33,7 @@ const TeamLeads = () => {
         <div className="rounded bg-primary p-3 flex items-center gap-2 text-xs">
           <p className="text-white">Total Team Leads</p>
           <p className="rounded p-1 text-primary bg-white">
-            {tableData?.total}
+            {tableData?.totalTeamLead}
           </p>
         </div>
 

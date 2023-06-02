@@ -45,7 +45,7 @@ const AdminSidebar = () => {
             isActive ? activeStyle : nonActiveStyle
           }
           onClick={handleNavLinkClick}
-          to="/profile"
+          to="/admin/profile"
         >
           <div className="flex items-start ">
             <img src="avatar.png" alt="avatar" />

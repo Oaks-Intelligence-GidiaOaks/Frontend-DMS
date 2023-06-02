@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
-import { AllStates, allLgasByState, lgasByState } from "../../data/form/states";
+import { AllStates, lgasByState } from "../../data/form/states";
+import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import FormMultipleSelect from "../../components/form/FormMultipleSelect";
@@ -26,8 +27,7 @@ const AddTeamLead = () => {
 
   let lgasArr = [];
 
-  let lgaOptions =
-    states.length > 0 &&
+  states.length > 0 &&
     states.map((item) => {
       allLgasByState[item.value].map((i) => lgasArr.push(i));
     });
@@ -66,8 +66,8 @@ const AddTeamLead = () => {
       idType: "",
     });
 
-    setStates(null);
-    setLgas(null);
+    setStates([]);
+    setLgas([]);
     setImage(null);
     setFileDataUrl(null);
     setFileDataUrl(null);
@@ -105,7 +105,7 @@ const AddTeamLead = () => {
 
     const { firstName, lastName, email, tel, idNo, idType } = formFields;
 
-    console.log(formFields);
+    // console.log(formFields);
 
     if (
       !firstName ||
@@ -261,12 +261,12 @@ const AddTeamLead = () => {
         {userCreated && (
           <p className="p-2 my-3 flex items-center justify-between rounded bg-green-500">
             <span className="text-white text-xs">
-              Enumerator created successfully..
+              Team lead created successfully..
             </span>
 
             <span
               onClick={() => setUserCreated(false)}
-              className="rounded-full w-6 h-6 text-center bg-white "
+              className="rounded-full w-6 h-6 text-center bg-white cursor-pointer"
             >
               x
             </span>

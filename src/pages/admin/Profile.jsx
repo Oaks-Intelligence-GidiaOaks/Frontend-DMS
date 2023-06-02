@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { EditNote } from "@mui/icons-material";
 import { DisplayInput, FormInput } from "../../components/form";
+import axios from "axios";
 
 const Profile = () => {
+  useEffect(() => {
+    axios
+      .get("/me")
+      .then((res) => console.log(res.dat))
+      .catch((err) => console.log(err));
+  }, []);
+
   const handleClick = (e) => {
     e.preventDefault();
   };
