@@ -18,6 +18,8 @@ const Enumerators = () => {
         .catch((err) => console.log(err));
   }, []);
 
+  console.log(tableData);
+
   useEffect(() => memoizedEnumerators, []);
 
   return tableData ? (

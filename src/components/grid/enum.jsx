@@ -51,7 +51,8 @@ const Enum = ({ enumData }) => {
         item !== "createdAt" &&
         item !== "created_at" &&
         item !== "updatedAt" &&
-        item !== "user"
+        item !== "user" &&
+        item !== "identityImage"
     )
     .map((item) => ({
       Header: item,
