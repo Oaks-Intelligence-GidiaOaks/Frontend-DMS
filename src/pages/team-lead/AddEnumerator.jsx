@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
-import { AllStates, lgasByState } from "../../data/form/states";
+import { AllStates } from "../../data/form/states";
+import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
-import { useAuth } from "../../context/useAuth";
-import { base_url } from "../../lib/paths";
-import { base_url_local } from "../../lib/paths";
 
 const AddEnumerator = () => {
   const [formFields, setFormFields] = useState({
@@ -26,7 +24,7 @@ const AddEnumerator = () => {
 
   const [userCreated, setUserCreated] = useState(false);
 
-  let lgaOptions = state ? lgasByState[state] : [];
+  let lgaOptions = state ? allLgasByState[state] : [];
 
   useEffect(() => {
     let fileReader,
@@ -205,7 +203,7 @@ const AddEnumerator = () => {
           <FormInputDropDown
             label="LGA"
             onChange={handleLgaChange}
-            data={lgaOptions.map((i) => ({ value: i, label: i }))}
+            data={lgaOptions}
             index="z-20"
           />
         )}
