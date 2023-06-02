@@ -60,8 +60,8 @@ const Enumerators = () => {
 
       {/* table */}
       <div className="bg-white  w-full text-xs">
-        {tableData.length > 0 ? (
-          <Enum enumData={tableData?.enumerators} />
+        {tableData.enumerators.length > 0 ? (
+          <Enum enumData={tableData.enumerators} />
         ) : (
           <p>You have no enumerators yet...</p>
         )}
