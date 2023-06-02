@@ -39,7 +39,7 @@ const EditableCell = ({
 
 const TeamLeadGrid = ({ data: teamLeadData }) => {
   // console.log(Object.keys(teamLeadData?.[1]).length);
-  // console.log(teamLeadData);
+  console.log(teamLeadData);
 
   let allTeamLeads = teamLeadData.users;
   console.log(allTeamLeads);
@@ -54,7 +54,8 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
         item !== "createdAt" &&
         item !== "created_at" &&
         item !== "updatedAt" &&
-        item !== "user"
+        item !== "user" &&
+        item !== "avarter"
     )
     .map((item) => ({
       Header: item,

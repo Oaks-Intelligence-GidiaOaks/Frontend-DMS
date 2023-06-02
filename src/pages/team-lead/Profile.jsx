@@ -13,12 +13,12 @@ const Profile = () => {
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  // useEffect(() => {
-  //   axios
-  //     .get("me")
-  //     .then((res) => console.log(res.data))
-  //     .catch((err) => console.error(err));
-  // }, []);
+  useEffect(() => {
+    axios
+      .get("me")
+      .then((res) => console.log(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleClick = (e) => {
     e.preventDefault();
