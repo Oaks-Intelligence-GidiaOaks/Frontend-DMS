@@ -311,62 +311,59 @@ export function EnumeratorFormProvider({ children }) {
     }));
   };
   const submitForm = async (token) => {
-    alert("Hello");
-    console.log(state);
-    console.log(progressPercentage);
     const formSubmission = prepareFormSubmission();
     console.log(formSubmission);
-    // setState((prev) => ({
-    //   ...prev,
-    //   isSubmitting: true,
-    // }));
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: true,
+    }));
 
     console.log("formSubmission:", state);
 
-    // try {
-    //   fetch(`${base_url}form/add_data`, {
-    //     method: "POST",
-    //     body: JSON.stringify(formSubmission),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       console.log(data);
-    //       if (data.message.includes("successful")) {
-    //         resetState();
-    //         setState((prev) => ({
-    //           ...prev,
-    //           showSubmissionNotification: true,
-    //           isSubmitting: false,
-    //         }));
-    //       }
-    //       if (data.message.includes("Already submitted")) {
-    //         resetState();
-    //         setState((prev) => ({
-    //           ...prev,
-    //           showDuplicateNotification: true,
-    //           isSubmitting: false,
-    //         }));
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       setState((prev) => ({
-    //         ...prev,
-    //         showErrorNotification: true,
-    //         isSubmitting: false,
-    //       }));
-    //     });
-    // } catch (error) {
-    //   console.log(error);
-    //   setState((prev) => ({
-    //     ...prev,
-    //     isSubmitting: false,
-    //   }));
-    // }
+    try {
+      fetch(`${base_url}form/add_data`, {
+        method: "POST",
+        body: JSON.stringify(formSubmission),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          if (data.message.includes("successful")) {
+            resetState();
+            setState((prev) => ({
+              ...prev,
+              showSubmissionNotification: true,
+              isSubmitting: false,
+            }));
+          }
+          if (data.message.includes("Already submitted")) {
+            resetState();
+            setState((prev) => ({
+              ...prev,
+              showDuplicateNotification: true,
+              isSubmitting: false,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setState((prev) => ({
+            ...prev,
+            showErrorNotification: true,
+            isSubmitting: false,
+          }));
+        });
+    } catch (error) {
+      console.log(error);
+      setState((prev) => ({
+        ...prev,
+        isSubmitting: false,
+      }));
+    }
   };
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
