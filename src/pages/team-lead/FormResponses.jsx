@@ -31,6 +31,10 @@ const FormResponses = () => {
   const [notesData, setNotesData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [sub, setSub] = useState(null);
+
+  // console.log()
+
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
@@ -43,6 +47,14 @@ const FormResponses = () => {
         setIsLoading(false);
       })
       .catch((err) => console.log(err));
+
+    axios
+      .get(`team_lead_dashboard/submission_rate`)
+      .then((res) => {
+        console.log(res.data);
+        setSub(res.data);
+      })
+      .catch((err) => console.error(err));
   }, []);
 
   const getFood = async () => {
@@ -107,17 +119,23 @@ const FormResponses = () => {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="rounded justify-between bg-oaksyellow p-3 flex xs:flex-1 md:flex-initial items-center gap-4 text-xs">
           <p className="text-white whitespace-nowrap">Expected submissions</p>
-          <p className="rounded p-1  bg-white">585</p>
+          <p className="rounded p-1  bg-white">
+            {sub && sub?.submited + sub?.notSubmited}
+          </p>
         </div>
 
         <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white border border-oaksyellow">
           <p className="">Submissions</p>
-          <p className="p-1 bg-gray-100 rounded text-sm">667</p>
+          <p className="p-1 bg-gray-100 rounded text-sm">
+            {sub && sub.submited}
+          </p>
         </div>
 
         <div className="rounded bg-white border border-oaksyellow  flex items-center p-3 gap-10 xs:gap-6 lg:ml-auto cursor-pointer">
           <p>No response</p>
-          <p className="bg-gray-100 p-1 rounded text-sm px-2">18</p>
+          <p className="bg-gray-100 p-1 rounded text-sm px-2">
+            {sub && sub.notSubmited}
+          </p>
         </div>
       </div>
 
@@ -188,9 +206,9 @@ const FormResponses = () => {
       </OaksSlider>
       {/* </div> */}
 
-      <div>
+      {/* <div>
         <CategoryTab text="Submit" Icon={Download} />
-      </div>
+      </div> */}
 
       {/* table */}
 

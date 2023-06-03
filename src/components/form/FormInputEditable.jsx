@@ -17,7 +17,7 @@ const FormInputEditable = ({ label, data, readOnly, onChange }) => {
   };
 
   return (
-    <div className="p-2 flex flex-col text-sm">
+    <div className="p-2 flex flex-col flex-1 text-sm">
       <label className="my-2" htmlFor="">
         {label}
       </label>

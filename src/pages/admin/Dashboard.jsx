@@ -19,11 +19,11 @@ const Dashboard = () => {
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
-  // console.log(user);
+  console.log(user);
 
   useEffect(() => {
     axios
-      .get(`admin_dashboard/price_fluctuation?lgaFilter=${"Fagge"}`)
+      .get(`admin_dashboard/price_fluctuation?lgaFilter=${lga}`)
       .then((res) => {
         console.log("price fluctuation:", priceFluctuation);
         setPriceFluctuation(res.data);
@@ -124,10 +124,10 @@ const Dashboard = () => {
 
             <div className="flex flex-col px-5">
               <p>
-                {". "} <span>Added</span>
+                {". "} <span>Submitted</span>
               </p>
               <p>
-                {". "} <span>Removed</span>
+                {". "} <span>No response</span>
               </p>
             </div>
 
