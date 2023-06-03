@@ -50,7 +50,12 @@ const Profile = () => {
             placeholder="Maria"
             label="First name"
           />
-          <FormInput readOnly placeholder="Grey" label="Last name" />
+          <FormInput
+            readOnly
+            value={user.lastName}
+            placeholder="Grey"
+            label="Last name"
+          />
           <FormInput readOnly placeholder="mariagrey@demo.com" label="Email" />
           <FormInput placeholder="+234 81674***" label="Contact number" />
 

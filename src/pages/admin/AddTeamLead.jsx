@@ -5,8 +5,10 @@ import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import FormMultipleSelect from "../../components/form/FormMultipleSelect";
+import { useAuth } from "../../context";
 
 const AddTeamLead = () => {
+  const { user } = useAuth();
   const [formFields, setFormFields] = useState({
     firstName: "",
     lastName: "",
@@ -15,26 +17,40 @@ const AddTeamLead = () => {
     idNo: "",
     idType: "",
   });
-
   const [states, setStates] = useState([]);
   const [lgas, setLgas] = useState([]);
-
   const [image, setImage] = useState(null);
   const [fileDataUrl, setFileDataUrl] = useState(null);
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
-
   const [userCreated, setUserCreated] = useState(false);
+  const [lgaRoutes, setLgaRoutes] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get(`lga_routes`)
+      .then((res) => setLgaRoutes(res.data.data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  let coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
 
   let lgasArr = [];
 
+  if (lgaRoutes) {
+    console.log(coveredLgas);
+  }
+
+  // const teamLeadStates = user.state.map((st) => ({
+  //   label: st,
+  //   value: st,
+  // }));
+
   states.length > 0 &&
     states.map((item) => {
-      allLgasByState[item.value].map((i) => lgasArr.push(i));
+      allLgasByState[item.value]
+        .filter((item) => !coveredLgas.includes(item.value))
+        .map((i) => lgasArr.push(i));
     });
-
-  // if (lgaOptions) {
-  //   console.log(lgasArr);
-  // }
 
   useEffect(() => {
     let fileReader,

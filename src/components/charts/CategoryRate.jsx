@@ -59,12 +59,11 @@ const CategoryRate = ({ Product }) => {
   // console.log(Product);
 
   const transformedProd = {
-    id: Product?.name,
-    data: Product?.weeklyPrice.sort((a, b) => a - b).reverse(),
-    // .map((item) => ({
-    //   x: `Week ${item.x}`,
-    //   y: item.y,
-    // })),
+    id: Product.name,
+    data: Product.weeklyPrice.map((item) => ({
+      x: `Week ${item.x}`,
+      y: item.y,
+    })),
   };
 
   // console.log(transformedProd);
@@ -85,7 +84,7 @@ const CategoryRate = ({ Product }) => {
 
       <div className="flex flex-col">
         <p className="text-xs py-2">Percentage increase</p>
-        <PercentageBar value={Product?.priceChange} />
+        <PercentageBar value={Product.priceChange} />
       </div>
     </div>
   );

@@ -24,10 +24,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     try {
+      setPriceFluctuation(null);
       console.log("lga changed...");
       axios
         .get(`team_lead_dashboard/price_fluctuation?lgaFilter=${lga}`)
         .then((res) => {
+          // setLga(null);
           setPriceFluctuation(res.data);
         })
         .catch((err) => console.error(err));
@@ -151,9 +153,15 @@ const Dashboard = () => {
 
         <OaksSlider slideDefault={4} break1={2} break2={2} break3={1}>
           {priceFluctuation ? (
-            priceFluctuation.map((item, i) => (
-              <CategoryRate key={i} Product={item} />
-            ))
+            priceFluctuation.length < 1 ? (
+              <div className="grid place-items-center h-36 border w-full">
+                <p>no data available for this LGA</p>
+              </div>
+            ) : (
+              priceFluctuation.map((item, i) => (
+                <CategoryRate key={i} Product={item} />
+              ))
+            )
           ) : (
             <p className="text-center my-auto font-bold">loading</p>
           )}

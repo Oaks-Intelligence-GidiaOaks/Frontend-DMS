@@ -14,55 +14,41 @@ const AdminNewRoute = () => {
   const [lga, setLga] = useState(null);
   const [lgaRoutes, setLgaRoutes] = useState([]);
 
-  const [route1, setRoute1] = useState(null);
-  const [route2, setRoute2] = useState(null);
-  const [route3, setRoute3] = useState(null);
+  const [route1Start, setRoute1Start] = useState(null);
+  const [route1End, setRoute1End] = useState(null);
+
+  const [route2Start, setRoute2Start] = useState(null);
+  const [route2End, setRoute2End] = useState(null);
+
+  const [route3Start, setRoute3Start] = useState(null);
+  const [route3End, setRoute3End] = useState(null);
 
   const [errors, setErrors] = useState(null);
   const [submitted, setSubmitted] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  let lgaOptions = state ? allLgasByState[state] : [];
+  const coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
 
-  // useEffect(() => {
-  //   axios
-  //     .get(`lga_routes`)
-  //     .then((res) => setLgaRoutes(res.data.data))
-  //     .catch((err) => console.error(err));
-  // }, []);
+  // let lgaOptions = state ? allLgasByState[state] : [];
 
-  // const coveredLgas =
-  //   lgaRoutes && lgaRoutes.map((it) => ({ label: it.lga, value: it.lga }));
+  let lgaOptions = state ? allLgasByState[state].map((it) => it.value) : [];
 
-  // if (coveredLgas) {
-  //   console.log(coveredLgas);
-  // }
+  let filteredLgas =
+    lgaOptions.length > 0 &&
+    lgaOptions
+      .filter((val) => !coveredLgas.includes(val))
+      .map((it) => ({ label: it, value: it }));
 
-  // const transformedLgaRoutes =
-  //   lgaRoutes.length > 0 &&
-  //   lgaRoutes.map((item) => {
-  //     let routes = item.routes.map((r) => ({
-  //       label: `${r.start} - ${r.end}`,
-  //       value: `${r.start} - ${r.end}`,
-  //     }));
+  if (lgaOptions) {
+    // console.log(finalResult);/
+  }
 
-  //     return {
-  //       lga: item.lga,
-  //       routes,
-  //     };
-  //   });
-
-  // let routeOptions =
-  //   lga &&
-  //   transformedLgaRoutes.filter((tl) => tl.lga == lga).map((it) => it.routes);
-
-  // if (transformedLgaRoutes) {
-  //   // console.log(lgaRoutes);
-  // }
-
-  // if (routeOptions) {
-  //   // console.log(routeOptions);
-  // }
+  useEffect(() => {
+    axios
+      .get(`lga_routes`)
+      .then((res) => setLgaRoutes(res.data.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const onChangeState = (selectedOption) => {
     setState(selectedOption);
@@ -71,30 +57,57 @@ const AdminNewRoute = () => {
 
   const onChangeLga = (selectedOption) => {
     setLga(selectedOption);
-    // console.log(selectedOption);
   };
 
   const resetForm = () => {
     setErrors(false);
     setLga(null);
     setState(null);
-    setRoute1("");
-    setRoute2("");
-    setRoute3("");
+    setRoute1Start("");
+    setRoute1End("");
+
+    setRoute2Start("");
+    setRoute2End("");
+
+    setRoute3Start("");
+    setRoute3End("");
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    if ((!lga, !state, !route1, !route2, !route3)) {
+    if (
+      (!lga,
+      !state,
+      !route1Start,
+      !route1End,
+      !route2Start,
+      !route2End,
+      !route3Start,
+      !route3End)
+    ) {
       return setErrors("Please fill all fields");
     }
+
+    let route1 = {
+      start: route1Start,
+      end: route1End,
+    };
+
+    let route2 = {
+      start: route2Start,
+      end: route2End,
+    };
+
+    let route3 = {
+      start: route3Start,
+      end: route3End,
+    };
 
     const newRoutes = {
       lga,
       routes: [route1, route2, route3],
     };
-    // console.log(newRoutes);
     setLoading(true);
 
     axios
@@ -133,30 +146,59 @@ const AdminNewRoute = () => {
         <FormInputDropDown
           label="LGA"
           onChange={onChangeLga}
-          data={lgaOptions}
+          data={filteredLgas}
           index="z-10"
         />
 
         {lga && (
           <>
-            <FormInputEditable
-              label="Route 1"
-              data=""
-              onChange={(selectedOption) => setRoute1(selectedOption)}
-              readOnly={false}
-            />
-            <FormInputEditable
-              label="Route 2"
-              data=""
-              readOnly={false}
-              onChange={(selectedOption) => setRoute2(selectedOption)}
-            />
-            <FormInputEditable
-              onChange={(selectedOption) => setRoute3(selectedOption)}
-              label="Route 3"
-              data=""
-              readOnly={false}
-            />
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                label="Route 1 - Start"
+                data=""
+                onChange={(selectedOption) => setRoute1Start(selectedOption)}
+                readOnly={false}
+              />
+
+              <FormInputEditable
+                label="Route 1 - End"
+                data=""
+                onChange={(selectedOption) => setRoute1End(selectedOption)}
+                readOnly={false}
+              />
+            </div>
+
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                label="Route 2 - Start"
+                data=""
+                readOnly={false}
+                onChange={(selectedOption) => setRoute2Start(selectedOption)}
+              />
+
+              <FormInputEditable
+                label="Route 2 - End"
+                data=""
+                readOnly={false}
+                onChange={(selectedOption) => setRoute2End(selectedOption)}
+              />
+            </div>
+
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                onChange={(selectedOption) => setRoute3Start(selectedOption)}
+                label="Route 3 - Start"
+                data=""
+                readOnly={false}
+              />
+
+              <FormInputEditable
+                onChange={(selectedOption) => setRoute3End(selectedOption)}
+                label="Route 3 - End"
+                data=""
+                readOnly={false}
+              />
+            </div>
           </>
         )}
         {errors && (

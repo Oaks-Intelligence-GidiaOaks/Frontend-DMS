@@ -93,7 +93,7 @@ const TeamLeads = () => {
     </div>
   ) : (
     <p className="w-full h-screen grid place-items-center text-center">
-      <span>loading.....</span>
+      <span>loading...</span>
     </p>
   );
 };

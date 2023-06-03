@@ -2,7 +2,7 @@ export const allLgasByState = {
   abia: [
     { value: "aba north", label: "Aba North" },
     { value: "aba south", label: "Aba South" },
-    // { value: "arochukwu", label: "Arochukwu" },
+    { value: "arochukwu", label: "Arochukwu" },
     { value: "bende", label: "Bende" },
     { value: "ikwuano", label: "Ikwuano" },
     { value: "isiala ngwa north", label: "Isiala Ngwa North" },
@@ -14,8 +14,8 @@ export const allLgasByState = {
     { value: "ugwunagbo", label: "Ugwunagbo" },
     { value: "ukwa east", label: "Ukwa East" },
     { value: "ukwa west", label: "Ukwa West" },
-    // { value: "umuahia north", label: "Umuahia North" },
-    // { value: "umuahia south", label: "Umuahia South" },
+    { value: "umuahia north", label: "Umuahia North" },
+    { value: "umuahia south", label: "Umuahia South" },
     { value: "umu nneochi", label: "Umu Nneochi" },
   ],
   adamawa: [
