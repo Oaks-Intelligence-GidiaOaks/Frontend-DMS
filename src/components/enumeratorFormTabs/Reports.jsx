@@ -324,13 +324,16 @@ function Reports() {
       <p className="text-[14px] w-full mb-10 text-gray-500">
         <span className="font-bold">NOTE</span>: Submit button will only be
         active once the progress bar at the top of this page is complete.
+        {console.log(progressPercentage)}
       </p>
       <button
         disabled={progressPercentage !== 100}
-        onClick={() => submitForm(token)}
+        onClick={() => {
+          submitForm(token);
+        }}
         className={`${
           progressPercentage === 100 ? "bg-primary-green" : "bg-gray-300"
-        } w-full rounded-lg flex justify-center items-center p-2   mt-7 bg-primary-green text-white`}
+        } w-full rounded-lg flex justify-center items-center p-2   mt-7 text-white`}
       >
         {isSubmitting ? (
           <Rings
