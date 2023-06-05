@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Edit } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-const FormInputEditable = ({ label, value }) => {
+const FormInputEditable = ({ label, data, readOnly, onChange }) => {
+  const [value, setValue] = useState(data);
+
+  // console.log(data);
+
+  const handleChange = (selectedOption) => {
+    setValue(selectedOption.target.value);
+    onChange(selectedOption.target.value);
+  };
+
+  const editField = () => {
+    readOnly = false;
+  };
+
   return (
     <div className="p-2 flex flex-col text-sm">
       <label className="my-2" htmlFor="">
@@ -13,11 +26,12 @@ const FormInputEditable = ({ label, value }) => {
         <input
           type="text"
           value={value}
+          onChange={handleChange}
           className="bg-transparent outline-none  text-xs px-3 p-3 xs:w-5/6 flex-1 "
-          readOnly={true}
+          readOnly={false}
         />
 
-        <div>
+        <div onClick={editField}>
           <IconButton>
             <Edit />
           </IconButton>

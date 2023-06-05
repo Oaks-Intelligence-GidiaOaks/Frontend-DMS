@@ -60,12 +60,12 @@ const SubmissionRate = ({ data }) => {
     labels,
     datasets: [
       {
-        label: "Added",
+        label: "Submitted",
         data: submitted,
         backgroundColor: "#FFAD10",
       },
       {
-        label: "Removed",
+        label: "no response",
         data: notSubmitted,
         backgroundColor: "#FA0D0D",
       },

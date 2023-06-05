@@ -188,10 +188,6 @@ const FormResponses = () => {
       </OaksSlider>
       {/* </div> */}
 
-      {/* <div>
-        <CategoryTab text="Submit" Icon={Download} />
-      </div> */}
-
       {/* table */}
 
       <div className="bg-white h-80 w-full">

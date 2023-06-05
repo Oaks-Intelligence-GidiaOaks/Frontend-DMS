@@ -28,7 +28,7 @@ const MasterList = () => {
 
   useEffect(() => {
     axios
-      .get("form_response/master_list_data")
+      .get(`form_response/master_list_data`)
       .then((res) => setMasterList(res.data))
       .catch((err) => console.log(err));
   }, []);
@@ -143,14 +143,14 @@ const MasterList = () => {
   };
 
   return (
-    <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="rounded justify-between bg-oaksyellow p-3 flex xs:flex-1 md:flex-initial items-center gap-4 text-xs">
-          <p className="text-white whitespace-nowrap">Expected submissions</p>
-          <p className="rounded p-1  bg-white">585</p>
+          <p className="text-white whitespace-nowrap">Master List</p>
+          {/* <p className="rounded p-1  bg-white">585</p> */}
         </div>
 
-        <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white border border-oaksyellow">
+        {/* <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white border border-oaksyellow">
           <p className="">Submissions</p>
           <p className="p-1 bg-gray-100 rounded text-sm">667</p>
         </div>
@@ -158,12 +158,12 @@ const MasterList = () => {
         <div className="rounded bg-white border border-oaksyellow  flex items-center p-3 gap-10 xs:gap-6 lg:ml-auto cursor-pointer">
           <p>No response</p>
           <p className="bg-gray-100 p-1 rounded text-sm px-2">18</p>
-        </div>
+        </div> */}
       </div>
 
-      <div>
+      {/* <div>
         <CategoryTab text="Submit" Icon={Download} />
-      </div>
+      </div> */}
 
       {/* table */}
       <div className="bg-white h-80 w-full text-[6px]">

@@ -11,8 +11,6 @@ import { FaSpinner } from "react-icons/fa";
 import EditableCell from "./EditableCell";
 
 const Enum = ({ enumData, loadEnums }) => {
-  
-
   const headColumns = Object.keys(enumData?.[0] || {})
     .filter(
       (item) =>
@@ -24,6 +22,7 @@ const Enum = ({ enumData, loadEnums }) => {
         item !== "created_at" &&
         item !== "updatedAt" &&
         item !== "user" &&
+        item !== "identityImage" &&
         item !== "identityImage"
     )
     .map((item) => {
@@ -192,7 +191,7 @@ const Enum = ({ enumData, loadEnums }) => {
   };
 
   const resetPassword = (row) => {
-    // Perform the password reset 
+    // Perform the password reset
   };
 
   const wrapperRef = useRef(null);
@@ -269,7 +268,6 @@ const Enum = ({ enumData, loadEnums }) => {
               return (
                 <tr {...row.getRowProps()}>
                   {row.cells.map((cell) => {
-                   
                     return (
                       <td
                         {...cell.getCellProps()}

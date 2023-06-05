@@ -107,7 +107,6 @@ const vehicleTypes = [
   "Bus",
   "Taxi (e.g Bolt, Uber, Rida, Drop)",
   "Cab (e.g Along, Cabu-Cabu",
-  "Other",
 ];
 
 const demoRoutes = [

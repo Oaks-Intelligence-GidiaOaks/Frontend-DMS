@@ -12,7 +12,7 @@ const TeamLeads = () => {
   // const [isloading, setIsLoading] = useState(true)
 
   // if (tableData) {
-  //   // console.log(tableData);
+  //   console.log(tableData);
   // }
 
   const memoizedEnumerators = useMemo(() => {

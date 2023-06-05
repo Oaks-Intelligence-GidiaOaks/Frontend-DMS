@@ -11,11 +11,7 @@ import { FaSpinner } from "react-icons/fa";
 import AdminPopUp from "./AdminPopUp";
 
 const TeamLeadGrid = ({ data: teamLeadData }) => {
-  // console.log(Object.keys(teamLeadData?.[1]).length);
-  // console.log(teamLeadData);
-
-  let allTeamLeads = teamLeadData.users;
-  console.log({allTeamLeads}, "Team Lead");
+let allTeamLeads = teamLeadData.users;
 
   const headColumns = Object.keys(allTeamLeads?.[0])
     .filter(
@@ -29,7 +25,8 @@ const TeamLeadGrid = ({ data: teamLeadData }) => {
         item !== "updatedAt" &&
         item !== "user" &&
         item !== "_id" &&
-        item !== "identityImage"
+        item !== "identityImage" &&
+        item !== "avarter"
     )
     .map((item) => ({
       Header: item,

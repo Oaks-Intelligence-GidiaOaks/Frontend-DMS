@@ -19,6 +19,9 @@ const Enumerators = () => {
   console.log({ tableData });
   useEffect(getEnumeratorsCallback, []);
 
+  console.log(tableData);
+  useEffect(getEnumeratorsCallback, []);
+
   return tableData ? (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-2 xs:text-[10px]">
@@ -32,7 +35,7 @@ const Enumerators = () => {
         <div className="flex p-3 md:ml-8 items-center gap-6 w-fit rounded bg-white">
           <p className="">Recently Added</p>
           <p className="text-primary p-1 bg-gray-200 rounded text-sm">
-            {tableData?.newlyAdded}
+            {tableData.enumerators.length > 0 && tableData?.newlyAdded}
           </p>
         </div>
 
@@ -45,16 +48,14 @@ const Enumerators = () => {
           <span>+</span>
         </Link>
 
-        <Link
+        {/* <Link
           to="/new-lga"
           onClick={() => {}}
           className="rounded bg-white border border-primary text-primary flex items-center p-3 gap-12 sm:ml-auto cursor-pointer sm:flex-initial xs:flex-1 xs:justify-between"
         >
-          {/* <div> */}
           <p>Enroll new Lga</p>
           <span>+</span>
-          {/* </div> */}
-        </Link>
+        </Link> */}
       </div>
 
       {/* table */}
@@ -63,6 +64,11 @@ const Enumerators = () => {
           enumData={tableData?.enumerators}
           loadEnums={getEnumeratorsCallback}
         />
+        {tableData.enumerators.length > 0 ? (
+          <Enum enumData={tableData.enumerators} />
+        ) : (
+          <p>You have no enumerators yet...</p>
+        )}
       </div>
 
       {/* chart */}
@@ -88,7 +94,7 @@ const Enumerators = () => {
     </div>
   ) : (
     <p className="w-full h-screen grid place-items-center text-center">
-      <span>loading.....</span>
+      <span>loading....</span>
     </p>
   );
 };

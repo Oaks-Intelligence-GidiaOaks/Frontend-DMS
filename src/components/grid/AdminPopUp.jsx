@@ -32,11 +32,10 @@ const AdminPopUp = ({
     setPopperElement(null);
   };
 
-  const handleSeeMoreClick = (row) => {
-    closeModal();
-    console.log(row);
-    // Perform any necessary actions with the selectedRowInfo data
-  };
+   const handleSeeMoreClick = (row) => {
+     closeModal();
+     navigate(`/admin/team_leads/${row.original._id}`);
+   };
 
   const handleResetPasswordClick = () => {
     const { email } = row.original;
@@ -60,10 +59,10 @@ const AdminPopUp = ({
             Edit
             <HiOutlinePencilAlt />
           </button>
-          <button onClick={() => {
-            navigate(`/admin/team_leads/${row.original.id}`)
-            console.log(row.original,   "yy")
-          }} className="text-[10px] leading-[24px] font-medium whitespace-nowrap flex items-center justify-center">
+          <button
+            onClick={() => handleSeeMoreClick(row)}
+            className="text-[10px] leading-[24px] font-medium whitespace-nowrap flex items-center justify-center"
+          >
             See more
             <BsArrowRight />
           </button>
@@ -81,7 +80,6 @@ const AdminPopUp = ({
           >
             {/* {row.original.disabled ? "Enable" : "Remove"} {""} */}
             Remove
-
             <MdDeleteOutline size={10} />
           </button>
         </div>

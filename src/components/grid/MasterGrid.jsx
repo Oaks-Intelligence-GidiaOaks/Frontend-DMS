@@ -14,10 +14,13 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { TrackerColumns, TrackerRows } from "../../data/trackerData";
 // import { MasterColumns, masterRow } from "../../data/MasterListData";
+import * as XLSX from "xlsx";
 
 const MasterGrid = ({ data: masterRow }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
+
+  let downloadData = masterRow;
 
   // console.log(masterRow);
 
@@ -78,21 +81,40 @@ const MasterGrid = ({ data: masterRow }) => {
     </div>
   );
 
+  const handleDownload = () => {
+    var wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(downloadData);
+
+    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
+    XLSX.writeFile(wb, "Excel-sheet.xlsx");
+  };
+
   return masterRow ? (
-    <div className="text-[6px] ">
-      <GridComponent
-        dataSource={masterRow}
-        allowPaging={true}
-        allowSorting={true}
-        // allowFiltering={true}
-        pageSettings={pageSettings}
-        allowEditing={true}
-        editSettings={editSettings}
-        allowGrouping={true}
-      >
-        <ColumnsDirective>{masterColumn}</ColumnsDirective>
-        <Inject services={[Page, Sort, Filter, Group, Toolbar, Edit]} />
-      </GridComponent>
+    <div className="">
+      <div className="my-6 ">
+        <button
+          onClick={handleDownload}
+          className="px-3 p-2 rounded-md text-sm drop-shadow-sm bg-blue-500 text-white"
+        >
+          Download
+        </button>
+      </div>
+
+      <div className="text-[7px]">
+        <GridComponent
+          dataSource={masterRow}
+          allowPaging={true}
+          allowSorting={true}
+          // allowFiltering={true}
+          pageSettings={pageSettings}
+          allowEditing={true}
+          editSettings={editSettings}
+          allowGrouping={true}
+        >
+          <ColumnsDirective>{masterColumn}</ColumnsDirective>
+          <Inject services={[Page, Sort, Filter, Group, Toolbar, Edit]} />
+        </GridComponent>
+      </div>
     </div>
   ) : (
     <div className="text-center w-full grid place-items-center">

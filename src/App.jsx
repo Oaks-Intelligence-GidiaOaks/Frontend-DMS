@@ -48,22 +48,12 @@ function App() {
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
 
   const identifyRoute = (user) => {
-    switch (user.role) {
-      case "enumerator":
-         return <Navigate replace to={"/form"} />;
-      case "team_lead":
-        return <Navigate replace to={"/home"} />;
-  
-    
-      default:
-        break;
+    if (user.role === "enumerator") {
+      return <Navigate replace to={"/form"} />;
     }
-    // if (user.role === "enumerator") {
-    //   return <Navigate replace to={"/form"} />;
-    // }
-    // if (user.role === "team_lead") {
-    //   return <Navigate replace to={"/home"} />;
-    // }
+    if (user.role === "team_lead") {
+      return <Navigate replace to={"/home"} />;
+    }
   };
 
   return (
@@ -200,8 +190,6 @@ function App() {
             }
           />
 
-          
-
           <Route
             path="admin/team_leads"
             element={
@@ -216,7 +204,7 @@ function App() {
           />
 
           <Route
-            path="admin/team_leads/:id"
+            path="/admin/team_leads/:_id"
             element={
               isLoggedIn && user && user.role === "admin" ? (
                 <Admin>
@@ -228,8 +216,6 @@ function App() {
             }
           />
 
-
-         
           <Route
             path="admin/responses"
             element={

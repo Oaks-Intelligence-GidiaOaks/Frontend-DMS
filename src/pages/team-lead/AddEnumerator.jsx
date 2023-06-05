@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
-import { AllStates, lgasByState } from "../../data/form/states";
+import { AllStates } from "../../data/form/states";
+import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
-import { useAuth } from "../../context/useAuth";
-import { base_url } from "../../lib/paths";
-import { base_url_local } from "../../lib/paths";
+import { useAuth } from "../../context";
 
 const AddEnumerator = () => {
+  const { user } = useAuth();
+
+  const teamLeadStates = user.state.map((st) => ({ label: st, value: st }));
+  const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
+
   const [formFields, setFormFields] = useState({
     firstName: "",
     lastName: "",
@@ -26,7 +30,7 @@ const AddEnumerator = () => {
 
   const [userCreated, setUserCreated] = useState(false);
 
-  let lgaOptions = state ? lgasByState[state] : [];
+  let lgaOptions = state ? allLgasByState[state] : [];
 
   useEffect(() => {
     let fileReader,
@@ -196,7 +200,7 @@ const AddEnumerator = () => {
 
         <FormInputDropDown
           label="State"
-          data={AllStates}
+          data={teamLeadStates}
           index="z-30"
           onChange={handleStateChange}
         />
@@ -205,7 +209,7 @@ const AddEnumerator = () => {
           <FormInputDropDown
             label="LGA"
             onChange={handleLgaChange}
-            data={lgaOptions.map((i) => ({ value: i, label: i }))}
+            data={teamLeadLgas}
             index="z-20"
           />
         )}
