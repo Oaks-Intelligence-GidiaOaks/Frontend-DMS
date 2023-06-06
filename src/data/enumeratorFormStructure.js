@@ -124,7 +124,7 @@ const vehicleTypes = [
   "Keke",
   "Bus",
   "Taxi (e.g Bolt, Uber, Rida, Drop)",
-  "Cab (e.g Along, Cabu-Cabu",
+  "Cab (e.g Along, Cabu-Cabu)",
 ];
 
 const demoRoutes = [

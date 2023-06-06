@@ -751,7 +751,7 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
-                          <p>Specify type of Yam</p>
+                          <p>Specify size of Yam</p>
                           <DropDownMenu
                             list={YamList.filter(
                               (el) =>

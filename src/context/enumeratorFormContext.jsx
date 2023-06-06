@@ -31,15 +31,15 @@ export function EnumeratorFormProvider({ children }) {
   const { user, setUser, setIsLoggedIn } = useAuth();
   const { secureLocalStorage } = useApp();
 
+  const cachedTransport = secureLocalStorage.getItem("tp") ?? {};
+
   // User's saved changes
 
   const initialState = useMemo(
     () => ({
       currentFormTab: "Food",
       isSubmitting: false,
-      currentLGA:
-        // user.LGA[0]
-        ["Oredo"],
+      currentLGA: user.LGA[0],
       showSavedNotification: false,
       showSubmissionNotification: false,
       showDuplicateNotification: false,
@@ -275,20 +275,7 @@ export function EnumeratorFormProvider({ children }) {
           },
         },
       },
-      transportSectionStructure: {
-        "Mile-2 to Marina": {
-          cost: "",
-          "mode of transportation": "",
-        },
-        "Old-Ojo to Iyana-Iba": {
-          cost: "",
-          "mode of transportation": "",
-        },
-        "Oshodi to Oyingbo": {
-          cost: "",
-          "mode of transportation": "",
-        },
-      },
+      transportSectionStructure: cachedTransport,
       accomodationSectionStructure: {
         // variations: [
         //   {
@@ -346,8 +333,7 @@ export function EnumeratorFormProvider({ children }) {
         url: "",
       },
     }),
-    // [user.LGA]
-    []
+    [user.LGA]
   );
 
   const savedState = JSON.parse(localStorage.getItem("oaks-enum-form"));
@@ -390,57 +376,55 @@ export function EnumeratorFormProvider({ children }) {
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
     console.log(formSubmission);
-    setState((prev) => ({
-      ...prev,
-      isSubmitting: true,
-    }));
+    // setState((prev) => ({
+    //   ...prev,
+    //   isSubmitting: true,
+    // }));
 
-    console.log("formSubmission:", state);
-
-    try {
-      fetch(`${base_url}form/add_data`, {
-        method: "POST",
-        body: JSON.stringify(formSubmission),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.message.includes("successful")) {
-            resetState();
-            setState((prev) => ({
-              ...prev,
-              showSubmissionNotification: true,
-              isSubmitting: false,
-            }));
-          }
-          if (data.message.includes("Already submitted")) {
-            resetState();
-            setState((prev) => ({
-              ...prev,
-              showDuplicateNotification: true,
-              isSubmitting: false,
-            }));
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setState((prev) => ({
-            ...prev,
-            showErrorNotification: true,
-            isSubmitting: false,
-          }));
-        });
-    } catch (error) {
-      console.log(error);
-      setState((prev) => ({
-        ...prev,
-        isSubmitting: false,
-      }));
-    }
+    // try {
+    //   fetch(`${base_url}form/add_data`, {
+    //     method: "POST",
+    //     body: JSON.stringify(formSubmission),
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       console.log(data);
+    //       if (data.message.includes("successful")) {
+    //         resetState();
+    //         setState((prev) => ({
+    //           ...prev,
+    //           showSubmissionNotification: true,
+    //           isSubmitting: false,
+    //         }));
+    //       }
+    //       if (data.message.includes("Already submitted")) {
+    //         resetState();
+    //         setState((prev) => ({
+    //           ...prev,
+    //           showDuplicateNotification: true,
+    //           isSubmitting: false,
+    //         }));
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       setState((prev) => ({
+    //         ...prev,
+    //         showErrorNotification: true,
+    //         isSubmitting: false,
+    //       }));
+    //     });
+    // } catch (error) {
+    //   console.log(error);
+    //   setState((prev) => ({
+    //     ...prev,
+    //     isSubmitting: false,
+    //   }));
+    // }
   };
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
@@ -913,6 +897,7 @@ export function EnumeratorFormProvider({ children }) {
 
     const foodItems = [];
     const accomodationArray = [];
+    const clothingArray = [];
     const others = [];
 
     // Create foodItems array
@@ -1072,9 +1057,9 @@ export function EnumeratorFormProvider({ children }) {
         note: state.reportsSectionStructure.Notes.answer ?? "",
       },
     ];
-    const accomodations = Object.keys(
-      state.accomodationSectionStructure
-    ).forEach((key) => {
+
+    // Accomodation logic
+    Object.keys(state.accomodationSectionStructure).forEach((key) => {
       state.accomodationSectionStructure[key].forEach((value, i) =>
         accomodationArray.push({
           price: parseInt(
@@ -1085,6 +1070,20 @@ export function EnumeratorFormProvider({ children }) {
         })
       );
     });
+
+    // Clothing logic for submission data structure goes here.
+    // Object.keys(state.clothingSectionStructure).forEach()
+    Object.keys(state.clothingSectionStructure).forEach((key) => {
+      Object.keys(state.clothingSectionStructure[key]).forEach((category) => {
+        clothingArray.push({
+          price: state.clothingSectionStructure[key][category]["price"],
+          category: key,
+          subcategory: category,
+          size: state.clothingSectionStructure[key][category]["size"],
+        });
+      });
+    });
+
     const lga = state.currentLGA;
 
     object = {
@@ -1094,6 +1093,7 @@ export function EnumeratorFormProvider({ children }) {
       transports,
       questions,
       accomodations: accomodationArray,
+      clothing: clothingArray,
       lga,
     };
 
@@ -1292,7 +1292,11 @@ export function EnumeratorFormProvider({ children }) {
   );
 
   // Save form if any change is made
-  useEffect(() => backgroundSave(), [state]);
+  useEffect(() => {
+    console.log(state);
+    backgroundSave();
+    secureLocalStorage.setItem("tp", state.transportSectionStructure);
+  }, [state]);
 
   // hide saved notification after three seconds
   useEffect(() => {
@@ -1305,8 +1309,6 @@ export function EnumeratorFormProvider({ children }) {
 
     return () => clearTimeout(timeoutId);
   }, [state.showSavedNotification]);
-
-  console.log("Here: ", state.clothingSectionStructure);
 
   return (
     <EnumeratorFormContext.Provider

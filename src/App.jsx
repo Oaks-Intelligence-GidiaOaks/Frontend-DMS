@@ -67,13 +67,13 @@ function App() {
           <Route
             path="/form"
             element={
-              // isLoggedIn && user && user.role === "enumerator" ? (
-              <EnumeratorFormProvider>
-                <EnumeratorForm />
-              </EnumeratorFormProvider>
-              // ) : (
-              //   <Navigate replace to={"/"} />
-              // )
+              isLoggedIn && user && user.role === "enumerator" ? (
+                <EnumeratorFormProvider>
+                  <EnumeratorForm />
+                </EnumeratorFormProvider>
+              ) : (
+                <Navigate replace to={"/"} />
+              )
             }
           />
 

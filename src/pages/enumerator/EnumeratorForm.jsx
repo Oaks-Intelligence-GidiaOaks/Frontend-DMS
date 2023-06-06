@@ -20,12 +20,14 @@ import Accomodation from "../../components/enumeratorFormTabs/Accomodation";
 import Reports from "../../components/enumeratorFormTabs/Reports";
 import oaksLogo from "../../assets/oaks-logo.svg";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
-import { useAuth } from "../../context";
+import { useApp, useAuth } from "../../context";
 import axios from "axios";
 import { Rings } from "react-loader-spinner";
 import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 
 function EnumeratorForm() {
+  const { secureLocalStorage } = useApp();
+  const cachedTp = secureLocalStorage.getItem("tp");
   const {
     state: {
       showEnumeratorProfile,
@@ -65,18 +67,20 @@ function EnumeratorForm() {
   useEffect(() => {
     lgaRoutes
       ? updateTransportTab(
-          lgaRoutes.filter((t) => t.lga === "Oredo".toLowerCase())
-          // lgaRoutes.filter((t) => t.lga === currentLGA.toLowerCase())
+          lgaRoutes.filter((t) => t.lga === currentLGA.toLowerCase())
         )
       : axios
           .get(`lga_routes`)
           .then((res) => {
             console.log(res.data.data);
             setLgaRoutes(res.data.data);
-            updateTransportTab(
-              res.data.data.filter((t) => t.lga === "Oredo".toLowerCase())
-              // res.data.data.filter((t) => t.lga === currentLGA.toLowerCase())
-            );
+            Object.keys(cachedTp).length
+              ? cachedTp
+              : updateTransportTab(
+                  res.data.data.filter(
+                    (t) => t.lga === currentLGA.toLowerCase()
+                  )
+                );
           })
           .catch((err) => console.error(err));
   }, [currentLGA, updateTransportTab]);
@@ -99,7 +103,7 @@ function EnumeratorForm() {
       </div>
       <div className="max-w-[1280px] mx-auto justify-center">
         {/* Enumerator account */}
-        {/* <div className="mx-auto max-w-[1040px] mt-5 pl-3">
+        <div className="mx-auto max-w-[1040px] mt-5 pl-3">
           <button
             className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg rounded"
             onClick={() => showProfile()}
@@ -111,7 +115,7 @@ function EnumeratorForm() {
               {user.firstName} {user.lastName}
             </span>
           </button>
-        </div> */}
+        </div>
 
         {/* Info Bar */}
         <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
@@ -140,7 +144,7 @@ function EnumeratorForm() {
 
         {/* Form */}
         <div className="min-h-[100vh] bg-white px-4">
-          {!lgaRoutes ? (
+          {lgaRoutes ? (
             <>
               {currentFormTab === "Food" && <Food />}
               {currentFormTab === "Commodity" && <Commodity />}
@@ -360,7 +364,7 @@ function EnumeratorForm() {
       )}
 
       {/* Change password on initial login */}
-      {true && <ChangePassword />}
+      {false && <ChangePassword />}
     </div>
   );
 }

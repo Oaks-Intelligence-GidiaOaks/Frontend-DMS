@@ -202,7 +202,7 @@ function Clothing() {
       </p>
       <button
         disabled={clothingProgressPercentage !== 100}
-        onClick={() => setCurrentFormTab("Reports")}
+        onClick={() => setCurrentFormTab("Transport")}
         className={`${
           clothingProgressPercentage === 100
             ? "bg-primary-green"
