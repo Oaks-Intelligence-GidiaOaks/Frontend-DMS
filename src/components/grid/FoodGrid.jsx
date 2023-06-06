@@ -61,16 +61,7 @@ const FoodGrid = ({ data: foodRowss }) => {
     if (args.commandColumn.type === "Save") {
       try {
         await axios
-          .patch(
-            `form_response/food_product/${modifiedData._id}`,
-            modifiedData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
-              },
-            }
-          )
+          .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
           })
@@ -102,7 +93,7 @@ const FoodGrid = ({ data: foodRowss }) => {
 
   return foodRowss["data"].length > 0 ? (
     <GridComponent
-      dataSource={transformedData}
+      dataSource={FoodRows}
       allowPaging={true}
       allowSorting={true}
       pageSettings={pageSettings}
@@ -112,7 +103,16 @@ const FoodGrid = ({ data: foodRowss }) => {
       commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
-        {transformedColumns?.map(({ field, width }) => (
+        {/* {transformedColumns?.map(({ field, width }) => (
+          <ColumnDirective
+            key={field}
+            field={field}
+            isPrimaryKey={field === "_id" ? true : false}
+            width={width}
+          />
+        ))} */}
+
+        {FoodColumns.map(({ field }) => (
           <ColumnDirective
             key={field}
             field={field}
@@ -126,9 +126,32 @@ const FoodGrid = ({ data: foodRowss }) => {
       <Inject services={[Page, Sort, Filter, Group, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
-    </div>
+    <GridComponent
+      dataSource={FoodRows}
+      allowPaging={true}
+      allowSorting={true}
+      pageSettings={pageSettings}
+      allowEditing={true}
+      editSettings={editSettings}
+      allowGrouping={true}
+      height={390}
+      commandClick={(args) => handleSave(args)}
+    >
+      <ColumnsDirective>
+        {FoodColumns.map(({ field, width }) => (
+          <ColumnDirective
+            key={field}
+            field={field}
+            allowEditing={field === "Price" ? true : false}
+            isPrimaryKey={field === "_id" ? true : false}
+            width={width}
+          />
+        ))}
+
+        <ColumnDirective headerText="Action" width={100} commands={commands} />
+      </ColumnsDirective>
+      <Inject services={[Page, Sort, Filter, Group, Edit, CommandColumn]} />
+    </GridComponent>
   );
 };
 

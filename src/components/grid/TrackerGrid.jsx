@@ -44,11 +44,9 @@ const TrackerGrid = ({ data: TrackerRows }) => {
       dataSource={TrackerRows.results}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
-      // toolbar={toolbarOptions}
     >
       <ColumnsDirective>{TrackerColumns}</ColumnsDirective>
       <Inject services={[Page, Sort, Toolbar, Edit]} />

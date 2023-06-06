@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
-  console.log(user);
+  // console.log(user);
 
   useEffect(() => {
     axios

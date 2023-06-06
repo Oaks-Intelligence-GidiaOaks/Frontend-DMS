@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   GridComponent,
   ColumnsDirective,
@@ -11,36 +10,12 @@ import {
   Edit,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
-// import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
+import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
 
-const TeamLeadGrid = ({ data }) => {
-  const navigate = useNavigate();
-
+const EnumeratorGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-
-  let teamLeadsData = data.users;
-
-  const dataColumns = Object.keys(teamLeadsData[0])
-    .filter(
-      (item) =>
-        item !== "avarter" &&
-        item !== "createdAt" &&
-        item !== "firstUse" &&
-        item !== "updatedAt" &&
-        item !== "enumerators" &&
-        item !== "disabled" &&
-        item !== "LGA" &&
-        item !== "__v" &&
-        item !== ""
-    )
-    .map((it) => ({
-      field: it,
-      width: it.length + 150,
-    }));
-
-  // console.log(dataColumns);
 
   const handleMenuToggle = (event, user) => {
     event.stopPropagation();
@@ -54,29 +29,8 @@ const TeamLeadGrid = ({ data }) => {
     });
   };
 
-  const handleEdit = (user) => {
-    console.log("Edit", user);
-  };
-
   const handleSeeMore = (user) => {
     console.log("See More", user);
-
-    const { email, firstName, lastName, role, states, id, _id, LGA } = user;
-
-    const transformedUser = {
-      email,
-      firstName,
-      lastName,
-      role,
-      states,
-      LGA,
-      id,
-      _id,
-    };
-
-    navigate(`/admin/team_leads/${user._id}`, {
-      state: transformedUser,
-    });
   };
 
   const handleDelete = (user) => {
@@ -89,7 +43,7 @@ const TeamLeadGrid = ({ data }) => {
 
   const ActionTemplate = (rowData) => {
     return (
-      <div className="action-container text-[10px]">
+      <div className="action-container">
         <div
           className="hamburger-menu space-y-1 grid place-items-center cursor-pointer"
           onClick={(e) => handleMenuToggle(e, rowData)}
@@ -100,42 +54,28 @@ const TeamLeadGrid = ({ data }) => {
         </div>
         {selectedUser && selectedUser.index === rowData.index && isMenuOpen && (
           <div
-            className={`popup-menu fixed flex flex-col gap-1 p-2 rounded bg-blue-50 drop-shdow-sm z-50`}
+            className={`popup-menu fixed flex flex-col gap-2 p-2 rounded bg-blue-50 drop-shdow-sm z-50`}
             style={{ top: popupPosition.top, left: popupPosition.left }}
           >
             <button
-              className="see-more-button hover:text-gray-700"
-              onClick={() => handleEdit(rowData)}
-            >
-              Edit
-            </button>
-
-            <button
-              className="see-more-button hover:text-gray-700"
+              className="see-more-button"
               onClick={() => handleSeeMore(rowData)}
             >
               See More
             </button>
 
             <button
-              className="reset-button hover:text-gray-700"
+              className="reset-button "
               onClick={() => handleResetPassword(rowData)}
             >
               Reset Password
             </button>
 
             <button
-              className="delete-button text-red-500 hover:text-red-900"
+              className="delete-button text-red-500"
               onClick={() => handleDelete(rowData)}
             >
               Delete
-            </button>
-
-            <button
-              className="delete-button text-blue-500 hover:text-gray-700"
-              onClick={() => handleDelete(rowData)}
-            >
-              Make Admin
             </button>
           </div>
         )}
@@ -145,12 +85,8 @@ const TeamLeadGrid = ({ data }) => {
 
   return (
     <div className="z-10">
-      <div className="p-3  text-base font-semibold tracking-tighter">
-        Users - Team Leads
-      </div>
-
       <GridComponent
-        dataSource={teamLeadsData}
+        dataSource={ElectricityRows}
         allowPaging={true}
         allowSorting={true}
         pageSettings={{ pageSize: 50 }}
@@ -158,15 +94,9 @@ const TeamLeadGrid = ({ data }) => {
         height={400}
       >
         <ColumnsDirective>
-          {dataColumns.map(({ field, width }) => (
-            <ColumnDirective
-              visible={field === "state" || field === "_id" ? false : true}
-              key={field}
-              field={field}
-              width={width}
-            />
+          {ElectricityColumns.map(({ field, width }) => (
+            <ColumnDirective key={field} field={field} width={width} />
           ))}
-
           <ColumnDirective
             headerText="Actions"
             width="100"
@@ -179,4 +109,4 @@ const TeamLeadGrid = ({ data }) => {
   );
 };
 
-export default TeamLeadGrid;
+export default EnumeratorGrid;

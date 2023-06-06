@@ -19,8 +19,6 @@ const AdminSidebar = () => {
   const { user } = useAuth();
   const { setCurrentPage, sidebarShown, setSidebarShown } = useApp();
 
-  console.log(sidebarShown);
-
   const activeStyle = "bg-gray-200 p-3 mt-3";
   const nonActiveStyle = "p-3 mt-3";
 
