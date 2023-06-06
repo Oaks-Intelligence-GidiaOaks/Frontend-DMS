@@ -11,6 +11,7 @@ import {
   beginEdit,
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
+import LoadingScreen from "../LoadingScreen";
 
 const formatTime = (time) => {};
 
@@ -55,7 +56,7 @@ const TrackerGrid = ({ data: TrackerRows }) => {
     </GridComponent>
   ) : (
     <div className="grid place-items-center w-full">
-      <span>loading..</span>
+      <LoadingScreen />
     </div>
   );
 };

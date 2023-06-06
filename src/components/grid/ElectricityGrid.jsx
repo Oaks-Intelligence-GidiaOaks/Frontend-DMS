@@ -13,10 +13,13 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
+import NoDataScreen from "../NoDataScreen";
 
 const ElectricityGrid = ({ data }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
+
+  const title = "No submissions received yet...";
 
   let dataCount = data.totalCount;
 
@@ -89,7 +92,9 @@ const ElectricityGrid = ({ data }) => {
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+        <p className="w-1/2 ">
+          <NoDataScreen title={title} />
+      </p>
     </div>
   );
 };

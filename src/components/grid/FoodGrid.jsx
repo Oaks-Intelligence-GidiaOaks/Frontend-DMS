@@ -17,6 +17,7 @@ import {
 import { FoodRows, FoodColumns } from "../../data/formResponses";
 import axios from "axios";
 import { useAuth } from "../../context";
+import NoDataScreen from "../NoDataScreen";
 
 const FoodGrid = ({ data: foodRowss }) => {
   // console.log(foodRowss["data"]);
@@ -25,6 +26,7 @@ const FoodGrid = ({ data: foodRowss }) => {
   } = useAuth();
 
   let foodData = foodRowss["data"];
+  const title = "No submissions received yet...";
 
   const transformedData =
     foodData.length > 0 &&
@@ -127,7 +129,9 @@ const FoodGrid = ({ data: foodRowss }) => {
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+        <p className="w-1/2 ">
+          <NoDataScreen title={title} />
+      </p>
     </div>
   );
 };

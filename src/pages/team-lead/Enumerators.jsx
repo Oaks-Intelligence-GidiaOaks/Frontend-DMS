@@ -5,10 +5,13 @@ import { data } from "../../data/chartData";
 
 import { Enum } from "../../components/grid";
 import { Link } from "react-router-dom";
+import LoadingScreen from "../../components/LoadingScreen";
+import NoDataScreen from "../../components/NoDataScreen";
 
 const Enumerators = () => {
   const [tableData, setTableData] = useState(null);
-  // const [isloading, setIsLoading] = useState(true)
+
+  const title = "You have no Enumerators yet........";
 
   const getEnumeratorsCallback = useCallback(() => {
     axios
@@ -60,14 +63,10 @@ const Enumerators = () => {
 
       {/* table */}
       <div className="bg-white  w-full text-xs">
-        <Enum
-          enumData={tableData?.enumerators}
-          loadEnums={getEnumeratorsCallback}
-        />
         {tableData.enumerators.length > 0 ? (
           <Enum enumData={tableData.enumerators} />
         ) : (
-          <p>You have no enumerators yet...</p>
+          <NoDataScreen title={title} />
         )}
       </div>
 
@@ -94,7 +93,7 @@ const Enumerators = () => {
     </div>
   ) : (
     <p className="w-full h-screen grid place-items-center text-center">
-      <span>loading....</span>
+      <LoadingScreen />
     </p>
   );
 };

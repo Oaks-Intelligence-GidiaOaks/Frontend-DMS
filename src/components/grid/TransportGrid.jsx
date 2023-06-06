@@ -13,9 +13,11 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { TransportRows, TransportColumns } from "../../data/formResponses";
+import NoDataScreen from "../NoDataScreen";
 
 const TransportGrid = ({ data }) => {
   let dataCount = data.totalCount;
+  const title = " No submissions received yet...";
 
   let transportData = data.data;
 
@@ -91,7 +93,9 @@ const TransportGrid = ({ data }) => {
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+        <p className="w-1/2 ">
+          <NoDataScreen title={title} />
+      </p>
     </div>
   );
 };

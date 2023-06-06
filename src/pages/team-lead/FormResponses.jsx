@@ -20,6 +20,7 @@ import {
 } from "../../components/grid";
 import OaksSlider from "../../components/Slider";
 import axios from "axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 const FormResponses = () => {
   const [activeTab, setActiveTab] = useState("food");
@@ -40,7 +41,9 @@ const FormResponses = () => {
   const nonActiveStyle = "bg-white";
 
   useEffect(() => {
+
     axios
+      
       .get("form_response/food_product")
       .then((res) => {
         setFoodData(res.data);
@@ -214,7 +217,7 @@ const FormResponses = () => {
 
       <div className="bg-white h-80 w-full">
         {isLoading ? (
-          <p>loading...</p>
+          <LoadingScreen />
         ) : (
           <>
             {activeTab === "food" && <FoodGrid data={foodData} />}

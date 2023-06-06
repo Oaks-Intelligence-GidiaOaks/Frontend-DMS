@@ -15,6 +15,7 @@ import {
 import { TrackerColumns, TrackerRows } from "../../data/trackerData";
 // import { MasterColumns, masterRow } from "../../data/MasterListData";
 import * as XLSX from "xlsx";
+import LoadingScreen from "../LoadingScreen";
 
 const MasterGrid = ({ data: masterRow }) => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -90,7 +91,7 @@ const MasterGrid = ({ data: masterRow }) => {
   };
 
   return masterRow ? (
-    <div className="">
+    <div className=" relative">
       <div className="my-6 ">
         <button
           onClick={handleDownload}
@@ -117,9 +118,7 @@ const MasterGrid = ({ data: masterRow }) => {
       </div>
     </div>
   ) : (
-    <div className="text-center w-full grid place-items-center">
-      <span>Loading.....</span>
-    </div>
+    <LoadingScreen />
   );
 };
 

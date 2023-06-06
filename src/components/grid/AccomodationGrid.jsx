@@ -12,9 +12,11 @@ import {
   Toolbar,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import NoDataScreen from "../NoDataScreen";
 
 const AccomodationGrid = ({ data }) => {
   let dataCount = data.totalCount;
+  const title = "No submissions received yet...";
 
   let accData = data.data;
 
@@ -99,7 +101,7 @@ const AccomodationGrid = ({ data }) => {
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+      <p className="w-1/2 "><NoDataScreen title={title} /></p>
     </div>
   );
 };

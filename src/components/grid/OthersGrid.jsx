@@ -13,10 +13,12 @@ import {
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
 import { FoodRows, FoodColumns } from "../../data/formResponses";
+import NoDataScreen from "../NoDataScreen";
 
 const OthersGrid = ({ data }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
+  const title = "No submissions received yet...";
 
   let dataCount = data?.totalCount;
 
@@ -92,7 +94,9 @@ const OthersGrid = ({ data }) => {
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+        <p className="w-1/2 ">
+          <NoDataScreen title={title} />
+      </p>
     </div>
   );
 };

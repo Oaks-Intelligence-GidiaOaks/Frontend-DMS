@@ -7,7 +7,6 @@ import Pagination from "./Pagination";
 import { usePopper } from "react-popper";
 import Checkbox from "./Checkbox";
 import axios from "axios";
-import { FaSpinner } from "react-icons/fa";
 import EditableCell from "./EditableCell";
 
 const Enum = ({ enumData, loadEnums }) => {
@@ -222,13 +221,6 @@ const Enum = ({ enumData, loadEnums }) => {
 
   return (
     <div className="w-full" ref={wrapperRef}>
-      {isLoading && (
-        <div className="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-[#cccc] bg-opacity-75 z-50">
-          <FaSpinner className="animate-spin w-8 h-8 text-gray-600" />
-          <span>Updating Enumerator....</span>
-        </div>
-      )}
-
       <button
         className="p-3 text-white rounded-md border bg-primary"
         onClick={handleOnExport}
