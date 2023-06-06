@@ -807,6 +807,26 @@ export function EnumeratorFormProvider({ children }) {
       };
     });
   };
+  const setClothingItemValue = (action) => {
+    const { clothingSectionStructure } = state;
+    const { item, cloth, value, valueTitle } = action;
+
+    if (cloth === undefined) return;
+    setState((prev) => {
+      const updatedObject = { ...clothingSectionStructure[item] };
+      updatedObject[cloth] = {
+        ...updatedObject[cloth],
+        [valueTitle]: value,
+      };
+      return {
+        ...prev,
+        clothingSectionStructure: {
+          ...clothingSectionStructure,
+          [item]: updatedObject,
+        },
+      };
+    });
+  };
   const setReportsItemValue = (action) => {
     const { reportsSectionStructure } = state;
     const { item, value, valueTitle, answer } = action;
@@ -1131,6 +1151,7 @@ export function EnumeratorFormProvider({ children }) {
     transportSectionStructure,
     accomodationSectionStructure,
     reportsSectionStructure,
+    clothingSectionStructure,
   } = state;
 
   const totalNumOfFields = useMemo(
@@ -1141,6 +1162,7 @@ export function EnumeratorFormProvider({ children }) {
         transportSectionStructure,
         accomodationSectionStructure,
         reportsSectionStructure,
+        clothingSectionStructure,
       }),
     [
       foodSectionStructure,
@@ -1148,6 +1170,7 @@ export function EnumeratorFormProvider({ children }) {
       transportSectionStructure,
       accomodationSectionStructure,
       reportsSectionStructure,
+      clothingSectionStructure,
     ]
   );
   const numOfValidFields = useMemo(
@@ -1158,6 +1181,7 @@ export function EnumeratorFormProvider({ children }) {
         transportSectionStructure,
         accomodationSectionStructure,
         reportsSectionStructure,
+        clothingSectionStructure,
       }),
     [
       foodSectionStructure,
@@ -1165,6 +1189,7 @@ export function EnumeratorFormProvider({ children }) {
       transportSectionStructure,
       accomodationSectionStructure,
       reportsSectionStructure,
+      clothingSectionStructure,
     ]
   );
   const foodNumOfFields = useMemo(
@@ -1223,6 +1248,20 @@ export function EnumeratorFormProvider({ children }) {
       }),
     [accomodationSectionStructure]
   );
+  const clothingNumOfFields = useMemo(
+    () =>
+      countEmptyStringFields({
+        clothingSectionStructure,
+      }),
+    [clothingSectionStructure]
+  );
+  const numOfValidClothingFields = useMemo(
+    () =>
+      countValidFields({
+        clothingSectionStructure,
+      }),
+    [clothingSectionStructure]
+  );
 
   const foodProgressPercentage = useMemo(
     () => Math.trunc((numOfValidFoodFields / foodNumOfFields) * 100),
@@ -1242,6 +1281,10 @@ export function EnumeratorFormProvider({ children }) {
         (numOfValidAccomodationFields / accomodationNumOfFields) * 100
       ),
     [numOfValidAccomodationFields, accomodationNumOfFields]
+  );
+  const clothingProgressPercentage = useMemo(
+    () => Math.trunc((numOfValidClothingFields / clothingNumOfFields) * 100),
+    [numOfValidClothingFields, accomodationNumOfFields]
   );
   const progressPercentage = useMemo(
     () => Math.trunc((numOfValidFields / totalNumOfFields) * 100),
@@ -1263,6 +1306,8 @@ export function EnumeratorFormProvider({ children }) {
     return () => clearTimeout(timeoutId);
   }, [state.showSavedNotification]);
 
+  console.log("Here: ", state.clothingSectionStructure);
+
   return (
     <EnumeratorFormContext.Provider
       value={{
@@ -1276,6 +1321,7 @@ export function EnumeratorFormProvider({ children }) {
         setCommodityItemValue,
         setTransportItemValue,
         setAccomodationItemValue,
+        setClothingItemValue,
         setReportsItemValue,
         addItem,
         removeItem,
@@ -1294,6 +1340,8 @@ export function EnumeratorFormProvider({ children }) {
         commodityProgressPercentage,
         transportProgressPercentage,
         accomodationProgressPercentage,
+        clothingProgressPercentage,
+        clothingProgressPercentage,
         progressPercentage,
         handleValue,
         logOut,

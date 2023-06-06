@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { FaRegUser } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
-import { HiOutlineArrowLeft } from "react-icons/hi";
-import { BiLogOut, BiIdCard, BiError } from "react-icons/bi";
+import { HiOutlineArrowLeft, HiUserCircle } from "react-icons/hi";
+import { BiLogOut, BiIdCard, BiError, BiLock } from "react-icons/bi";
 import { BsDot } from "react-icons/bs";
 import { SlLocationPin } from "react-icons/sl";
 import { ImBlocked } from "react-icons/im";
@@ -23,6 +23,7 @@ import EnumeratorFormContext from "../../context/enumeratorFormContext";
 import { useAuth } from "../../context";
 import axios from "axios";
 import { Rings } from "react-loader-spinner";
+import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 
 function EnumeratorForm() {
   const {
@@ -113,16 +114,16 @@ function EnumeratorForm() {
         </div> */}
 
         {/* Info Bar */}
-        {/* <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
+        <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
           <ProgressBar />
           <div
             className={`flex flex-nowrap gap-5 ${
-              user.LGA.length > 1
+              ["Oredo"].length > 1
                 ? "justify-center"
                 : "justify-end xs:pr-0 sm:pr-3"
             }  max-w-[410px] xs:w-[90%]`}
           >
-            {user.LGA.length > 1 && <LGAController />}
+            {/* {user.LGA.length > 1 && <LGAController />} */}
             <button
               className="flex justify-center items-center px-3 bg-primary-green py-2 max-w-[170px] rounded"
               onClick={saveFormChanges}
@@ -130,16 +131,16 @@ function EnumeratorForm() {
               <span className="text-white text-[14px] ">Save Changes</span>
             </button>
           </div>
-        </div> */}
+        </div>
 
         {/* Tab Bar */}
-        {/* <div className="sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll">
+        <div className="sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll">
           <TabBar />
-        </div> */}
+        </div>
 
         {/* Form */}
         <div className="min-h-[100vh] bg-white px-4">
-          {lgaRoutes ? (
+          {!lgaRoutes ? (
             <>
               {currentFormTab === "Food" && <Food />}
               {currentFormTab === "Commodity" && <Commodity />}
@@ -357,6 +358,9 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
+
+      {/* Change password on initial login */}
+      {true && <ChangePassword />}
     </div>
   );
 }

@@ -117,6 +117,8 @@ const singleFieldCommodityInputs = [
   "Petrol/PMS",
 ];
 
+const clothSizes = ["Small", "Medium", "Large"];
+
 const vehicleTypes = [
   "Bike",
   "Keke",
@@ -175,4 +177,5 @@ export {
   binaryQuestionValues,
   demoRoutes,
   numberOfRooms,
+  clothSizes,
 };

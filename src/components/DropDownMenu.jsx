@@ -7,6 +7,7 @@ const DropDownMenu = ({
   list,
   item,
   type,
+  cloth,
   valueTitle,
   value,
   handleChange,
@@ -55,6 +56,8 @@ const DropDownMenu = ({
         });
       } else if (section === "accomodationSectionStructure") {
         handleChange(item, valueTitle, dropDownValue, i);
+      } else if (section === "clothingSectionStructure") {
+        handleChange(item, cloth, valueTitle, dropDownValue);
       } else {
         handleChange(item, type, valueTitle, dropDownValue, i);
       }
