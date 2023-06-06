@@ -3,10 +3,18 @@ import { IoMdAdd } from "react-icons/io";
 import { MdOutlineClear } from "react-icons/md";
 
 import {
+  EggsList,
+  GroundnutOilList,
+  PalmOilList,
+  YamList,
   beanTypes,
+  beefList,
+  breadList,
+  chickenList,
   fishList,
   garriTypes,
   riceBrands,
+  turkeyList,
 } from "../../data/enumeratorFormStructure";
 import DropDownMenu from "../DropDownMenu";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
@@ -507,6 +515,23 @@ function Food() {
                             />
                           </div>
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify size of Beef</p>
+                          <DropDownMenu
+                            list={beefList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
+                        </div>
                       </>
                     )}
                     {item === "Chicken" && (
@@ -536,6 +561,23 @@ function Food() {
                               className="flex-1 pl-8 py-2 outline-primary-green"
                             />
                           </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify type of Chicken</p>
+                          <DropDownMenu
+                            list={chickenList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
                         </div>
                       </>
                     )}
@@ -567,6 +609,23 @@ function Food() {
                             />
                           </div>
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify type of Turkey</p>
+                          <DropDownMenu
+                            list={turkeyList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
+                        </div>
                       </>
                     )}
                     {item === "Bread" && (
@@ -596,6 +655,23 @@ function Food() {
                               className="flex-1 pl-8 py-2 outline-primary-green"
                             />
                           </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify size of Bread</p>
+                          <DropDownMenu
+                            list={breadList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
                         </div>
                       </>
                     )}
@@ -627,6 +703,23 @@ function Food() {
                             />
                           </div>
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify size of Egg</p>
+                          <DropDownMenu
+                            list={EggsList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
+                        </div>
                       </>
                     )}
                     {item === "Yam" && (
@@ -656,6 +749,23 @@ function Food() {
                               className="flex-1 pl-8 py-2 outline-primary-green"
                             />
                           </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify type of Yam</p>
+                          <DropDownMenu
+                            list={YamList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
                         </div>
                       </>
                     )}
@@ -687,6 +797,23 @@ function Food() {
                             />
                           </div>
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify type of Palm Oil</p>
+                          <DropDownMenu
+                            list={PalmOilList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
+                        </div>
                       </>
                     )}
                     {item === "Groundnut oil" && (
@@ -716,6 +843,23 @@ function Food() {
                               className="flex-1 pl-8 py-2 outline-primary-green"
                             />
                           </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify type of Groundnut Oil</p>
+                          <DropDownMenu
+                            list={GroundnutOilList.filter(
+                              (el) =>
+                                !foodForm[item][type]
+                                  .map((item) => item.weight)
+                                  .includes(el)
+                            )}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
                         </div>
                       </>
                     )}

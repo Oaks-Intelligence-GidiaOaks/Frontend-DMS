@@ -9,6 +9,8 @@ import { useAuth } from "../../context";
 const AddEnumerator = () => {
   const { user } = useAuth();
 
+  console.log(user);
+
   const teamLeadStates = user.state.map((st) => ({ label: st, value: st }));
   const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
 
@@ -110,7 +112,7 @@ const AddEnumerator = () => {
       !idNo ||
       !idType ||
       !fileDataUrl ||
-      !state ||
+      // !state ||
       !lga
     ) {
       console.log("Error in form fields, please input all fields");
@@ -126,7 +128,7 @@ const AddEnumerator = () => {
       identityType: idType,
       identity: idNo,
       // identityNumber: idNo,
-      state,
+      state: "default",
       LGA: lga,
     };
 
@@ -198,21 +200,21 @@ const AddEnumerator = () => {
           }
         />
 
-        <FormInputDropDown
+        {/* <FormInputDropDown
           label="State"
           data={teamLeadStates}
           index="z-30"
           onChange={handleStateChange}
-        />
+        /> */}
 
-        {state && (
-          <FormInputDropDown
-            label="LGA"
-            onChange={handleLgaChange}
-            data={teamLeadLgas}
-            index="z-20"
-          />
-        )}
+        {/* {state && ( */}
+        <FormInputDropDown
+          label="LGA"
+          onChange={handleLgaChange}
+          data={teamLeadLgas}
+          index="z-20"
+        />
+        {/* )} */}
 
         <FormInputDropDown
           label="Identification(ID) type"

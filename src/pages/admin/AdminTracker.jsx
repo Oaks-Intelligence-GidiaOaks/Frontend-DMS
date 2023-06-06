@@ -35,12 +35,17 @@ const AdminTracker = () => {
       <div className="flex items-center flex-wrap gap-3">
         <div className="rounded bg-primary p-3 flex items-center justify-between  xs:flex-1 md:flex-initial gap-6 xs:gap-16 shrink-0 text-xs">
           <p className="text-white">Submitted</p>
-          <p className="rounded p-1 text-primary bg-white">585</p>
+          <p className="rounded p-1 text-primary bg-white">
+            {trackerData && trackerData.totalSubmision}
+          </p>
         </div>
 
         <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white">
           <p className="">No response</p>
-          <p className="text-primary p-1 bg-gray-200 rounded text-sm">52</p>
+          <p className="text-primary p-1 bg-gray-200 rounded text-sm">
+            {trackerData &&
+              trackerData.totalEnumerators - trackerData.totalSubmision}
+          </p>
         </div>
       </div>
 

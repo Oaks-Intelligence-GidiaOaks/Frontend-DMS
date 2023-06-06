@@ -13,7 +13,7 @@ export const AllStates = [
   { value: "edo", label: "Edo" },
   { value: "ekiti", label: "Ekiti" },
   { value: "enugu", label: "Enugu" },
-  { value: "fct", label: "Federal Capital Territory" },
+  { value: "fct", label: "FCT" },
   { value: "gombe", label: "Gombe" },
   { value: "imo", label: "Imo" },
   { value: "jigawa", label: "Jigawa" },

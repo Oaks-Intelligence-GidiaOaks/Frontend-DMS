@@ -106,6 +106,7 @@ export function EnumeratorFormProvider({ children }) {
           "5-pieces": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -113,6 +114,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-kg": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -120,6 +122,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-kg": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -127,6 +130,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-loaf": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -134,6 +138,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-crate": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -141,6 +146,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-Standard size": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -148,6 +154,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-Litre": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -155,6 +162,7 @@ export function EnumeratorFormProvider({ children }) {
           "1-Litre": [
             {
               price: "",
+              type: "",
             },
           ],
         },
@@ -228,7 +236,34 @@ export function EnumeratorFormProvider({ children }) {
         },
       },
       accomodationSectionStructure: {
-        variations: [
+        // variations: [
+        //   {
+        //     cost: "",
+        //     type: "",
+        //     rooms: "",
+        //   },
+        "1 Room": [
+          {
+            cost: "",
+            type: "",
+            rooms: "",
+          },
+        ],
+        "2 Rooms": [
+          {
+            cost: "",
+            type: "",
+            rooms: "",
+          },
+        ],
+        "3 Rooms": [
+          {
+            cost: "",
+            type: "",
+            rooms: "",
+          },
+        ],
+        "4 Rooms": [
           {
             cost: "",
             type: "",
@@ -283,7 +318,7 @@ export function EnumeratorFormProvider({ children }) {
       isSubmitting: true,
     }));
 
-    console.log("formSubmission:", formSubmission);
+    console.log("formSubmission:", state);
 
     try {
       fetch(`${base_url}form/add_data`, {
@@ -525,7 +560,19 @@ export function EnumeratorFormProvider({ children }) {
       });
     }
     // Fish
-    if (item === "Fish") {
+    if (
+      [
+        "Fish",
+        "Chicken",
+        "Beef",
+        "Turkey",
+        "Bread",
+        "Egg",
+        "Yam",
+        "Palm oil",
+        "Groundnut oil",
+      ].includes(item)
+    ) {
       setState((prev) => {
         const updatedArray = [...foodSectionStructure[item][type]];
         updatedArray[i] = {
@@ -672,6 +719,7 @@ export function EnumeratorFormProvider({ children }) {
       updatedArray[i] = {
         ...updatedArray[i],
         [valueTitle]: value,
+        rooms: item.split(" ")[0],
       };
       return {
         ...prev,
@@ -771,6 +819,7 @@ export function EnumeratorFormProvider({ children }) {
     let object = {};
 
     const foodItems = [];
+    const accomodationArray = [];
     const others = [];
 
     // Create foodItems array
@@ -797,7 +846,19 @@ export function EnumeratorFormProvider({ children }) {
             }
           });
         }
-      } else if (item === "Fish") {
+      } else if (
+        [
+          "Fish",
+          "Chicken",
+          "Beef",
+          "Turkey",
+          "Bread",
+          "Egg",
+          "Yam",
+          "Palm oil",
+          "Groundnut oil",
+        ].includes(item)
+      ) {
         Object.keys(state.foodSectionStructure[item]).forEach((type) => {
           let j = 0;
           while (state.foodSectionStructure[item][type][j]) {
@@ -918,13 +979,19 @@ export function EnumeratorFormProvider({ children }) {
         note: state.reportsSectionStructure.Notes.answer ?? "",
       },
     ];
-    const accomodations = state.accomodationSectionStructure.variations.map(
-      (variant) => ({
-        price: parseInt(variant.cost.replace(/,/g, "")),
-        type: variant.type,
-        rooms: variant.rooms,
-      })
-    );
+    const accomodations = Object.keys(
+      state.accomodationSectionStructure
+    ).forEach((key) => {
+      state.accomodationSectionStructure[key].forEach((value, i) =>
+        accomodationArray.push({
+          price: parseInt(
+            state.accomodationSectionStructure[key][i].cost.replace(/,/g, "")
+          ),
+          type: state.accomodationSectionStructure[key][i].type,
+          rooms: state.accomodationSectionStructure[key][i].rooms,
+        })
+      );
+    });
     const lga = state.currentLGA;
 
     object = {
@@ -933,7 +1000,7 @@ export function EnumeratorFormProvider({ children }) {
       electricity,
       transports,
       questions,
-      accomodations,
+      accomodations: accomodationArray,
       lga,
     };
 
@@ -949,23 +1016,22 @@ export function EnumeratorFormProvider({ children }) {
         .then((res) => res.json())
         .then(({ success }) => {
           if (success) {
-            secureLocalStorage.removeItem("ouis");
-            secureLocalStorage.removeItem("user");
+            secureLocalStorage.clear();
             setUser(null);
             setIsLoggedIn(false);
             return navigate("/");
           }
         })
         .catch((error) => {
-          secureLocalStorage.removeItem("ouis");
-          secureLocalStorage.removeItem("user");
+          console.log("error:", error);
+          secureLocalStorage.clear();
           setUser(null);
           setIsLoggedIn(false);
           return navigate("/");
         });
     } catch (err) {
-      secureLocalStorage.removeItem("ouis");
-      secureLocalStorage.removeItem("user");
+      console.log("error:", err);
+      secureLocalStorage.clear();
       setUser(null);
       setIsLoggedIn(false);
       return navigate("/");
@@ -1152,8 +1218,8 @@ export function EnumeratorFormProvider({ children }) {
         accomodationProgressPercentage,
         progressPercentage,
         handleValue,
-        updateTransportTab,
         logOut,
+        updateTransportTab,
       }}
     >
       {children}

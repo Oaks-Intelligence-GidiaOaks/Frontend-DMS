@@ -76,6 +76,22 @@ const fishList = [
   "Smoked",
   "Other",
 ];
+const beefList = ["Small Chunks", "Large Chunks"];
+const chickenList = ["Full Chicken", "Lap", "Chest", "Wings"];
+const turkeyList = ["Lap", "Wings"];
+const breadList = ["Family Size", "Medium"];
+const EggsList = ["Large", "Small"];
+const TomatoSeedList = ["Large", "Small"];
+const TomatoBasketList = ["Large", "Small"];
+const YamList = ["Large", "Small"];
+const GroundnutOilList = [
+  "Bottle",
+  "Golden Terra",
+  "Kings",
+  "Power Oil",
+  "Laziz",
+];
+const PalmOilList = ["Bottle"];
 
 const singleFieldFoodInputs = [
   "Beef",
@@ -138,6 +154,16 @@ export {
   beanTypes,
   garriTypes,
   fishList,
+  beefList,
+  chickenList,
+  turkeyList,
+  breadList,
+  EggsList,
+  TomatoBasketList,
+  TomatoSeedList,
+  GroundnutOilList,
+  PalmOilList,
+  YamList,
   singleFieldFoodInputs,
   charcoalWeights,
   cementBrands,

@@ -15,9 +15,14 @@ import {
   Column,
 } from "@syncfusion/ej2-react-grids";
 import { FoodRows, FoodColumns } from "../../data/formResponses";
+import axios from "axios";
+import { useAuth } from "../../context";
 
 const FoodGrid = ({ data: foodRowss }) => {
   // console.log(foodRowss["data"]);
+  const {
+    user: { token },
+  } = useAuth();
 
   let foodData = foodRowss["data"];
 
@@ -51,14 +56,29 @@ const FoodGrid = ({ data: foodRowss }) => {
   };
 
   const handleSave = async (args) => {
-    const modifiedData = args.data;
-
-    await axios
-      .put(`form_response/food_product/${modifiedData._id}`)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => console.error(err));
+    console.log(args);
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(
+            `form_response/food_product/${modifiedData._id}`,
+            modifiedData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
+            }
+          )
+          .then((res) => {
+            alert(res.data.message);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   const commands = [
@@ -89,6 +109,7 @@ const FoodGrid = ({ data: foodRowss }) => {
       allowEditing={true}
       editSettings={editSettings}
       allowGrouping={true}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {transformedColumns?.map(({ field, width }) => (

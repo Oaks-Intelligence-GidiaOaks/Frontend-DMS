@@ -215,19 +215,12 @@ let allTeamLeads = teamLeadData.users;
 
   return (
     <div className="w-full" ref={wrapperRef}>
-      {isLoading && (
-        <div className="absolute inset-0 flex flex-col gap-2 items-center justify-center bg-[#cccc] bg-opacity-75 z-50">
-          <FaSpinner className="animate-spin w-8 h-8 text-gray-600" />
-          <span>Updating Enumerator....</span>
-        </div>
-      )}
-
-      <button
+      {/* <button
         className="p-3 text-white rounded-md border bg-primary"
         onClick={handleOnExport}
       >
         Download
-      </button>
+      </button> */}
 
       <div className="w-full overflow-x-scroll">
         <table {...getTableProps()} className="w-full my-5 bg-white">
