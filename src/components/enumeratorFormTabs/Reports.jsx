@@ -5,14 +5,21 @@ import EnumeratorFormContext from "../../context/enumeratorFormContext";
 import { useEffect } from "react";
 import { useAuth } from "../../context";
 import { Rings } from "react-loader-spinner";
+import { Info, InfoOutlined } from "@mui/icons-material";
 
 function Reports() {
   const {
-    state: { reportsSectionStructure: reportsForm, isSubmitting },
+    state: {
+      reportsSectionStructure: reportsForm,
+      isSubmitting,
+      attachedImage,
+    },
     setReportsItemValue,
     progressPercentage,
     submitForm,
     handleValue,
+    setImageUrl,
+    removeImageUrl,
   } = useContext(EnumeratorFormContext);
 
   const {
@@ -26,6 +33,17 @@ function Reports() {
     if (value === false && variant === "No") {
       return true;
     }
+  };
+
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    const fileReader = new FileReader();
+
+    fileReader.addEventListener("load", () => {
+      setImageUrl(fileReader.result);
+    });
+
+    fileReader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -314,6 +332,41 @@ function Reports() {
                         }}
                       />
                     </div>
+                    {!attachedImage.url && (
+                      <label
+                        htmlFor="image-picker"
+                        className="w-fit bg-oaksgreen rounded py-1 cursor-pointer"
+                      >
+                        <span className="text-white px-4">Attach Image</span>
+                      </label>
+                    )}
+                    {attachedImage.url && (
+                      <>
+                        <label
+                          className="w-fit bg-red-600 rounded py-1 cursor-pointer"
+                          onClick={removeImageUrl}
+                        >
+                          <span className="text-white px-4">Remove Image</span>
+                        </label>
+                        <p className="flex items-center gap-1 text-[12px] w-full text-gray-500">
+                          <InfoOutlined fontSize="small" />
+                          <span>Selected image should preview below:</span>
+                        </p>
+                        <div className="flex flex-wrap justify-center items-center w-full rounded-xl h-[50vh]">
+                          <img
+                            src={attachedImage.url}
+                            className="h-full rounded login-form-shadow"
+                          />
+                        </div>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      id="image-picker"
+                      onChange={handleFile}
+                    />
                   </div>
                 )}
               </>

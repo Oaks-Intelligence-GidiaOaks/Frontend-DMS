@@ -14,6 +14,7 @@ import TabBar from "../../components/TabBar";
 
 import Food from "../../components/enumeratorFormTabs/Food";
 import Commodity from "../../components/enumeratorFormTabs/Commodity";
+import Clothing from "../../components/enumeratorFormTabs/Clothing";
 import Transport from "../../components/enumeratorFormTabs/Transport";
 import Accomodation from "../../components/enumeratorFormTabs/Accomodation";
 import Reports from "../../components/enumeratorFormTabs/Reports";
@@ -61,16 +62,22 @@ function EnumeratorForm() {
   }, []);
 
   useEffect(() => {
-    axios
-      .get(`lga_routes`)
-      .then((res) => {
-        console.log(res.data.data);
-        setLgaRoutes(res.data);
-        updateTransportTab(
-          res.data.data.filter((t) => t.lga === currentLGA.toLowerCase())
-        );
-      })
-      .catch((err) => console.error(err));
+    lgaRoutes
+      ? updateTransportTab(
+          lgaRoutes.filter((t) => t.lga === "Oredo".toLowerCase())
+          // lgaRoutes.filter((t) => t.lga === currentLGA.toLowerCase())
+        )
+      : axios
+          .get(`lga_routes`)
+          .then((res) => {
+            console.log(res.data.data);
+            setLgaRoutes(res.data.data);
+            updateTransportTab(
+              res.data.data.filter((t) => t.lga === "Oredo".toLowerCase())
+              // res.data.data.filter((t) => t.lga === currentLGA.toLowerCase())
+            );
+          })
+          .catch((err) => console.error(err));
   }, [currentLGA, updateTransportTab]);
 
   return (
@@ -91,7 +98,7 @@ function EnumeratorForm() {
       </div>
       <div className="max-w-[1280px] mx-auto justify-center">
         {/* Enumerator account */}
-        <div className="mx-auto max-w-[1040px] mt-5 pl-3">
+        {/* <div className="mx-auto max-w-[1040px] mt-5 pl-3">
           <button
             className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg rounded"
             onClick={() => showProfile()}
@@ -103,10 +110,10 @@ function EnumeratorForm() {
               {user.firstName} {user.lastName}
             </span>
           </button>
-        </div>
+        </div> */}
 
         {/* Info Bar */}
-        <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
+        {/* <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
           <ProgressBar />
           <div
             className={`flex flex-nowrap gap-5 ${
@@ -123,12 +130,12 @@ function EnumeratorForm() {
               <span className="text-white text-[14px] ">Save Changes</span>
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Tab Bar */}
-        <div className="sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll">
+        {/* <div className="sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll">
           <TabBar />
-        </div>
+        </div> */}
 
         {/* Form */}
         <div className="min-h-[100vh] bg-white px-4">
@@ -136,6 +143,7 @@ function EnumeratorForm() {
             <>
               {currentFormTab === "Food" && <Food />}
               {currentFormTab === "Commodity" && <Commodity />}
+              {currentFormTab === "Clothing" && <Clothing />}
               {currentFormTab === "Transport" && <Transport />}
               {currentFormTab === "Accomodation" && <Accomodation />}
               {currentFormTab === "Reports" && <Reports />}

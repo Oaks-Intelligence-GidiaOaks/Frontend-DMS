@@ -37,7 +37,9 @@ export function EnumeratorFormProvider({ children }) {
     () => ({
       currentFormTab: "Food",
       isSubmitting: false,
-      currentLGA: user.LGA[0],
+      currentLGA:
+        // user.LGA[0]
+        ["Oredo"],
       showSavedNotification: false,
       showSubmissionNotification: false,
       showDuplicateNotification: false,
@@ -221,6 +223,58 @@ export function EnumeratorFormProvider({ children }) {
           ],
         },
       },
+      clothingSectionStructure: {
+        Male: {
+          Shirt: {
+            price: "",
+            size: "",
+          },
+          "T-Shirt": {
+            price: "",
+            size: "",
+          },
+          Shorts: {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
+        },
+        Female: {
+          Blouse: {
+            price: "",
+            size: "",
+          },
+          Skirt: {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
+          Gown: {
+            price: "",
+            size: "",
+          },
+        },
+        Children: {
+          "T-Shirt": {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
+          Skirt: {
+            price: "",
+            size: "",
+          },
+        },
+      },
       transportSectionStructure: {
         "Mile-2 to Marina": {
           cost: "",
@@ -288,8 +342,12 @@ export function EnumeratorFormProvider({ children }) {
           boolean: "",
         },
       },
+      attachedImage: {
+        url: "",
+      },
     }),
-    [user.LGA]
+    // [user.LGA]
+    []
   );
 
   const savedState = JSON.parse(localStorage.getItem("oaks-enum-form"));
@@ -303,12 +361,31 @@ export function EnumeratorFormProvider({ children }) {
   const setCurrentLGA = (LGA) => {
     setState((prev) => ({ ...prev, currentLGA: LGA }));
   };
+  const setImageUrl = (base64) => {
+    setState((prev) => ({
+      ...prev,
+      attachedImage: {
+        url: base64,
+      },
+    }));
+  };
+  const removeImageUrl = () => {
+    setState((prev) => ({
+      ...prev,
+      attachedImage: {
+        url: "",
+      },
+    }));
+  };
   const saveFormChanges = () => {
     localStorage.setItem("oaks-enum-form", JSON.stringify(state));
     setState((prev) => ({
       ...prev,
       showSavedNotification: true,
     }));
+  };
+  const backgroundSave = () => {
+    localStorage.setItem("oaks-enum-form", JSON.stringify(state));
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
@@ -804,11 +881,7 @@ export function EnumeratorFormProvider({ children }) {
       const newNumber = formattedNumber.toString().slice(0, 15);
       return Number(newNumber).toLocaleString("en-us");
     }
-    if (
-      isNaN(formattedNumber) ||
-      formattedNumber.length < 1 ||
-      formattedNumber === 0
-    ) {
+    if (isNaN(formattedNumber) || formattedNumber.length < 1 || value === "") {
       return "";
     } else {
       console.log(formattedNumber.toLocaleString());
@@ -1175,6 +1248,9 @@ export function EnumeratorFormProvider({ children }) {
     [numOfValidFields, totalNumOfFields]
   );
 
+  // Save form if any change is made
+  useEffect(() => backgroundSave(), [state]);
+
   // hide saved notification after three seconds
   useEffect(() => {
     let timeoutId;
@@ -1194,6 +1270,8 @@ export function EnumeratorFormProvider({ children }) {
         setState,
         setCurrentFormTab,
         setCurrentLGA,
+        setImageUrl,
+        removeImageUrl,
         setFoodItemValue,
         setCommodityItemValue,
         setTransportItemValue,
