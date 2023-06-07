@@ -24,8 +24,12 @@ const TrackerGrid = ({ data }) => {
   let tableData = data.map((item) => ({
     ...item,
     created_at: item.created_at
-      ? arrangeTime(item.created_at)
-      : item.created_at,
+      ? item.created_at
+        ? arrangeTime(item.created_at)
+        : item.created_at
+      : item.updated_at
+      ? arrangeTime(item.updated_at)
+      : item.updated_at,
     status: item.status ? "submitted" : "no response",
   }));
 

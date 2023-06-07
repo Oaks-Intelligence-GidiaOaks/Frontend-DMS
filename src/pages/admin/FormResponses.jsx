@@ -17,6 +17,7 @@ import {
   ElectricityGrid,
   TransportGrid,
   AccomodationGrid,
+  ClothingGrid,
 } from "../../components/grid";
 import OaksSlider from "../../components/Slider";
 import axios from "axios";
@@ -29,6 +30,7 @@ const FormResponses = () => {
   const [electricityData, setElectricityData] = useState(null);
   const [othersData, setOthersData] = useState(null);
   const [notesData, setNotesData] = useState(null);
+  const [clothingData, setClothingData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // styles
@@ -102,6 +104,17 @@ const FormResponses = () => {
       .catch((err) => console.log(err));
   };
 
+  const getClothing = async () => {
+    await axios
+      .get("form_response/clothings")
+      .then((res) => {
+        setClothingData(res.data);
+        // console.log(res.data);
+        setActiveTab("clothing");
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center gap-3 flex-wrap">
@@ -157,6 +170,15 @@ const FormResponses = () => {
 
         <div
           className={`rounded ${
+            activeTab === "clothing" ? activeStyle : nonActiveStyle
+          }`}
+          onClick={() => getClothing()}
+        >
+          <CategoryTab text="Clothing" Icon={Home} activeTab={activeTab} />
+        </div>
+
+        <div
+          className={`rounded ${
             activeTab === "electricity" ? activeStyle : nonActiveStyle
           }`}
           onClick={() => getElectricity()}
@@ -201,6 +223,9 @@ const FormResponses = () => {
             )}
             {activeTab === "accomodation" && (
               <AccomodationGrid data={accomodationData ?? accomodationData} />
+            )}
+            {activeTab === "clothing" && (
+              <ClothingGrid data={clothingData ?? clothingData} />
             )}
             {activeTab === "electricity" && (
               <ElectricityGrid data={electricityData ?? electricityData} />

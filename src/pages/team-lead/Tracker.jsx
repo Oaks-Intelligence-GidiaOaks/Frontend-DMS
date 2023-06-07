@@ -30,6 +30,7 @@ const Tracker = () => {
 
   const handleSubmit = () => {
     let data = trackerData.results;
+
     const formattedData = data.map((value) => value.form_id);
     console.log("formattedData:", formattedData);
 

@@ -3,56 +3,44 @@ import {
   ColumnDirective,
   ColumnsDirective,
   GridComponent,
-  Filter,
   Inject,
   Page,
   Edit,
   Sort,
   Group,
-  beginEdit,
-  Toolbar,
   CommandColumn,
-  Column,
 } from "@syncfusion/ej2-react-grids";
-import { FoodRows, FoodColumns } from "../../data/formResponses";
 import axios from "axios";
 import { useAuth } from "../../context";
 
-const FoodGrid = ({ data: foodRowss }) => {
-  // console.log(foodRowss["data"]);
+const ClothingGrid = ({ data }) => {
   const {
     user: { token },
   } = useAuth();
 
-  let foodData = foodRowss["data"];
-
-  console.log(foodData);
+  let clothingData = data["data"];
 
   const transformedData =
-    foodData.length > 0 &&
-    foodData?.map((item, i) => ({
+    clothingData.length > 0 &&
+    clothingData?.map((item, i) => ({
       S_N: i + 1,
       _id: item._id,
       id: item.created_by.id,
       lga: item.lga,
-      name: item.name,
+      category: item.category,
+      sub_category: item.sub_category,
+      size: item.size,
       price: item.price,
     }));
 
   const transformedColumns =
-    foodData.length > 0 &&
+    clothingData.length > 0 &&
     Object.keys(transformedData?.[0]).map((item) => ({
       field: item,
       width: item.length < 4 ? 120 : item.length + 130,
     }));
 
-  // console.log(transformedColumns);
-
-  // const [isEditMode, setIsEditMode] = useState(false);
-  // const [editedData, setEditedData] = useState({});
-
   const pageSettings = { pageSize: 60 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
     allowEditing: true,
@@ -64,10 +52,10 @@ const FoodGrid = ({ data: foodRowss }) => {
     if (args.commandColumn.type === "Save") {
       try {
         await axios
-          .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
+          .patch(`form_response/clothings/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
@@ -95,7 +83,7 @@ const FoodGrid = ({ data: foodRowss }) => {
     columns: ["State"],
   };
 
-  return foodRowss["data"].length > 0 ? (
+  return data["data"].length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
@@ -127,4 +115,4 @@ const FoodGrid = ({ data: foodRowss }) => {
   );
 };
 
-export default FoodGrid;
+export default ClothingGrid;

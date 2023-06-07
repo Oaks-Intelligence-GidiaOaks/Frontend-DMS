@@ -7,3 +7,4 @@ export { default as OthersGrid } from "./OthersGrid";
 export { default as TrackerGrid } from "./TrackerGrid";
 export { default as TransportGrid } from "./TransportGrid";
 export { default as TeamLeadGrid } from "./TeamLeadGrid";
+export { default as ClothingGrid } from "./ClothingGrid";
