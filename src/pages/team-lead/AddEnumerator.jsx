@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
-import { AllStates } from "../../data/form/states";
-import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import { useAuth } from "../../context";
 
 const AddEnumerator = () => {
   const { user } = useAuth();
-
-  // console.log(user);
 
   const teamLeadStates = user.states.map((st) => ({ label: st, value: st }));
   const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
@@ -23,7 +19,7 @@ const AddEnumerator = () => {
     idType: "",
   });
 
-  const [states, setState] = useState(null);
+  const [state, setState] = useState(null);
   const [lga, setLga] = useState(null);
 
   const [image, setImage] = useState(null);
@@ -114,7 +110,7 @@ const AddEnumerator = () => {
       !idNo ||
       !idType ||
       !fileDataUrl ||
-      !states ||
+      !state ||
       !lga
     ) {
       setError("Error in form fields, please input all fields");
@@ -129,8 +125,9 @@ const AddEnumerator = () => {
       phoneNumber: tel,
       identityType: idType,
       identity: idNo,
-      states: states,
+      state: state,
       LGA: lga,
+      avarter: fileDataUrl,
     };
 
     // console.log(newUser);

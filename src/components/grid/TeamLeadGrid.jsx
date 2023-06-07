@@ -11,9 +11,12 @@ import {
   Edit,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import { useAuth } from "../../context";
+import axios from "axios";
 // import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
 
 const TeamLeadGrid = ({ data }) => {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -54,10 +57,6 @@ const TeamLeadGrid = ({ data }) => {
     });
   };
 
-  const handleEdit = (user) => {
-    console.log("Edit", user);
-  };
-
   const handleSeeMore = (user) => {
     console.log("See More", user);
 
@@ -81,6 +80,13 @@ const TeamLeadGrid = ({ data }) => {
 
   const handleDelete = (user) => {
     console.log("Delete", user);
+
+    if (user) {
+      axios
+        .put(`admin/user/disable/${user._id}`)
+        .then((res) => console.log(res.data))
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleResetPassword = (user) => {
@@ -105,13 +111,6 @@ const TeamLeadGrid = ({ data }) => {
           >
             <button
               className="see-more-button hover:text-gray-700"
-              onClick={() => handleEdit(rowData)}
-            >
-              Edit
-            </button>
-
-            <button
-              className="see-more-button hover:text-gray-700"
               onClick={() => handleSeeMore(rowData)}
             >
               See More
@@ -131,12 +130,14 @@ const TeamLeadGrid = ({ data }) => {
               Delete
             </button>
 
-            <button
-              className="delete-button text-blue-500 hover:text-gray-700"
-              onClick={() => handleDelete(rowData)}
-            >
-              Make Admin
-            </button>
+            {user.role === "super_admin" && (
+              <button
+                className="delete-button text-blue-500 hover:text-gray-700"
+                onClick={() => handleDelete(rowData)}
+              >
+                Make Admin
+              </button>
+            )}
           </div>
         )}
       </div>

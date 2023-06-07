@@ -1,9 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Pie from "../../components/charts/Pie";
-import { data } from "../../data/chartData";
 
-import { Enum } from "../../components/grid";
 import { Link } from "react-router-dom";
 import EnumeratorGrid from "../../components/grid/EnumeratorGrid";
 
@@ -11,17 +8,20 @@ const Enumerators = () => {
   const [tableData, setTableData] = useState(null);
   // const [isloading, setIsLoading] = useState(true)
 
-  const memoizedEnumerators = useMemo(() => {
-    return () =>
-      axios
-        .get("admin/enumerators")
-        .then((res) => setTableData(res.data))
-        .catch((err) => console.log(err));
+  // const memoizedEnumerators = useMemo(() => {
+  //   return () =>
+  //     axios
+  //       .get("admin/enumerators")
+  //       .then((res) => setTableData(res.data))
+  //       .catch((err) => console.log(err));
+  // }, []);
+
+  useEffect(() => {
+    axios
+      .get("admin/enumerators")
+      .then((res) => setTableData(res.data))
+      .catch((err) => console.log(err));
   }, []);
-
-  // console.log(tableData);
-
-  useEffect(() => memoizedEnumerators, []);
 
   return (
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">

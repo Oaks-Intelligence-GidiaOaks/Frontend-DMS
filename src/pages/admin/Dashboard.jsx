@@ -16,10 +16,20 @@ const Dashboard = () => {
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
   const [submissionCount, setSubmissionCount] = useState(null);
+  const [coveredLgas, setCoveredLgas] = useState(null);
 
-  let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
+  let selectLGA = coveredLgas
+    ? coveredLgas.map((item) => ({ value: item, label: item }))
+    : [];
 
-  console.log(user);
+  const getCoveredLgas = () => {
+    axios
+      .get(`lga_routes`)
+      .then((res) => setCoveredLgas(res.data.data.map((it) => it.lga)))
+      .catch((err) => console.error(err));
+  };
+
+  useMemo(getCoveredLgas, []);
 
   useEffect(() => {
     axios
@@ -60,10 +70,6 @@ const Dashboard = () => {
       })
       .catch((err) => console.err);
   }, []);
-
-  // useMemo(()=> {
-  //   axios.get('')
-  // })
 
   return (
     <div className="">

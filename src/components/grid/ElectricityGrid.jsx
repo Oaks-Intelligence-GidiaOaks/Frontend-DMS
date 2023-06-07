@@ -8,16 +8,10 @@ import {
   Page,
   Edit,
   Sort,
-  beginEdit,
-  Toolbar,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
-import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
 
 const ElectricityGrid = ({ data }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
-
   let dataCount = data.totalCount;
 
   let elecData = data.data;
@@ -67,20 +61,42 @@ const ElectricityGrid = ({ data }) => {
     },
   ];
 
+  const handleSave = async (args) => {
+    console.log(args);
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(`form_response/electricity/${modifiedData._id}`, modifiedData)
+          .then((res) => {
+            alert(res.data.message);
+            console.log(res.data);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return elecData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
-      // toolbar={toolbarOptions}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {elecColumns.map(({ field, width }) => (
-          <ColumnDirective key={field} field={field} width={width} />
+          <ColumnDirective
+            key={field}
+            field={field}
+            width={width}
+            visible={field !== "_id"}
+          />
         ))}
 
         <ColumnDirective headerText="Action" width={100} commands={commands} />

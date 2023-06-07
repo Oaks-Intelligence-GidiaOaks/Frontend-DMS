@@ -35,31 +35,14 @@ const AccomodationGrid = ({ data }) => {
     accData.length > 0 &&
     Object.keys(transformedData[0]).map((item) => ({
       field: item,
-      width: item.length ? item.length + 150 : 100,
+      width: item.length === "type" ? item.length + 120 : 120,
     }));
 
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
-
-  const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
   const pageSettings = { pageSize: 50 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
     allowEditing: true,
-    mode: "Dialog",
-    allowAdding: true,
-    allowDeleting: true,
-    newRowPosition: "Top",
   };
-
-  // const actionTemplate = (props) => {
-  //   return (
-  //     <button onClick={() => console.log("button clicked")}>
-  //       {props.data.action}
-  //     </button>
-  //   );
-  // };
 
   const commands = [
     {
@@ -76,23 +59,45 @@ const AccomodationGrid = ({ data }) => {
     },
   ];
 
+  const handleSave = async (args) => {
+    console.log(args);
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(`form_response/accomodation/${modifiedData._id}`, modifiedData)
+          .then((res) => {
+            alert(res.data.message);
+            console.log(res.data);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return accData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
       allowGrouping={true}
-      // toolbar={toolbarOptions}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {accColumns.map(({ field, width }) => (
-          <ColumnDirective key={field} field={field} width={width} />
+          <ColumnDirective
+            key={field}
+            field={field}
+            allowEditing={field === "price"}
+            width={width}
+            visible={field !== "_id"}
+          />
         ))}
-
         <ColumnDirective headerText="Action" width={100} commands={commands} />
       </ColumnsDirective>
       <Inject services={[Page, Sort, Toolbar, Edit, CommandColumn]} />

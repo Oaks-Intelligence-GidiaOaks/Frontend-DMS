@@ -3,22 +3,15 @@ import {
   ColumnDirective,
   ColumnsDirective,
   GridComponent,
-  Filter,
   Inject,
   Page,
   Edit,
   Sort,
-  beginEdit,
-  Toolbar,
 } from "@syncfusion/ej2-react-grids";
-import { NotesRows, NotesColumns } from "../../data/formResponses";
+import axios from "axios";
 
 const NotesGrid = ({ data }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
-
   let dataCount = data?.totalCount;
-
   let noteData = data.data;
 
   const transformedData =
@@ -34,6 +27,7 @@ const NotesGrid = ({ data }) => {
       comment_for_crime_report: item.comment_for_crime_report,
       government_project: item.government_project ? "Yes" : "No",
       comment_for_government_project: item.comment_for_government_project,
+      notes: item.note,
       _id: item._id,
     }));
 
@@ -44,43 +38,68 @@ const NotesGrid = ({ data }) => {
       width: item.length > 10 ? item.length + 200 : 120,
     }));
 
-  // const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
   const pageSettings = { pageSize: 50 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
     allowEditing: true,
-    mode: "Dialog",
-    allowAdding: true,
-    allowDeleting: true,
-    newRowPosition: "Top",
   };
 
-  // const actionTemplate = (props) => {
-  //   return (
-  //     <button onClick={() => console.log("button clicked")}>
-  //       {props.data.action}
-  //     </button>
-  //   );
-  // };
+  const commands = [
+    {
+      type: "Edit",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-edit e-icons" },
+    },
+    {
+      type: "Save",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-update e-icons" },
+    },
+    {
+      type: "Cancel",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" },
+    },
+  ];
+
+  const handleSave = async (args) => {
+    console.log(args);
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(`form_response/questions/${modifiedData._id}`, modifiedData)
+          .then((res) => {
+            alert(res.data.message);
+            console.log(res.data);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return noteData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       allowGrouping={true}
       editSettings={editSettings}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {notesColumns.map(({ field, width }) => (
-          <ColumnDirective key={field} field={field} width={width} />
+          <ColumnDirective
+            key={field}
+            field={field}
+            width={width}
+            visible={field !== "_id"}
+            allowEditing={field === "notes"}
+          />
         ))}
 
-        {/* <ColumnDirective headerText="Action" width={100} commands={commands} /> */}
+        <ColumnDirective headerText="Action" width={100} commands={commands} />
       </ColumnsDirective>
       <Inject services={[Page, Sort, Edit]} />
     </GridComponent>

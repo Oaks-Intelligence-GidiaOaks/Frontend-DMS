@@ -3,59 +3,65 @@ import {
   ColumnDirective,
   ColumnsDirective,
   GridComponent,
-  Filter,
   Inject,
   Page,
   Edit,
   Sort,
-  beginEdit,
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
 
 const arrangeTime = (time) => {
   const passedDate = new Date(time);
   const formattedDate = passedDate.toLocaleDateString();
-  const formattedTime = passedDate.toLocaleDateString();
+  const formattedTime = passedDate.toLocaleTimeString();
 
   return `${formattedDate} ${formattedTime}`;
 };
 
-const TrackerGrid = ({ data: TrackerRows }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
+const TrackerGrid = ({ data }) => {
+  console.log(data);
 
-  // console.log(TrackerRows?.results);
+  let tableData = data.map((item) => ({
+    ...item,
+    created_at: item.created_at
+      ? arrangeTime(item.created_at)
+      : item.created_at,
+    status: item.status ? "submitted" : "no response",
+  }));
 
-  const TrackerColumns =
-    TrackerRows && TrackerRows.results.length > 0
-      ? Object.keys(TrackerRows.results[0]).map((item) => (
-          <ColumnDirective key={item} field={item} width={150} />
-        ))
-      : [];
-
-  // const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
-  const pageSettings = { pageSize: 9 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
+  const pageSettings = { pageSize: 35 };
 
   const editSettings = {
-    allowEditing: true,
-    mode: "Dialog",
-    allowAdding: true,
-    allowDeleting: true,
-    newRowPosition: "Top",
+    allowEditing: false,
   };
 
-  return TrackerRows ? (
+  return data ? (
     <GridComponent
-      dataSource={TrackerRows.results}
+      dataSource={tableData}
       allowPaging={true}
       allowSorting={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
+      height={210}
     >
-      <ColumnsDirective>{TrackerColumns}</ColumnsDirective>
-      <Inject services={[Page, Sort, Toolbar, Edit]} />
+      <ColumnsDirective>
+        <ColumnDirective field="first_name" width={150} />
+        <ColumnDirective field="last_name" width={150} />
+        <ColumnDirective field="id" width={120} />
+        <ColumnDirective field="state" width={120} />
+        <ColumnDirective field="lga" width={150} />
+        <ColumnDirective field="status" width={150} />
+
+        <ColumnDirective
+          field="created_at"
+          headerText="submission_time"
+          width={170}
+        />
+        <ColumnDirective field="form_id" visible={false} width={120} />
+      </ColumnsDirective>
+
+      <Inject services={[Page, Sort, Edit]} />
     </GridComponent>
   ) : (
     <div className="grid place-items-center w-full">

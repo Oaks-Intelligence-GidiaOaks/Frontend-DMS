@@ -14,12 +14,15 @@ const Tracker = () => {
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
 
-  let submitted = trackerData && trackerData.totalSubmission;
+  console.log(trackerData);
+
+  let submitted = trackerData && trackerData.totalSubmision;
+
   let noResponse =
-    trackerData && trackerData.totalEnumerators - trackerData?.totalSubmission;
+    trackerData && trackerData.totalEnumerators - trackerData.totalSubmision;
 
   if (timeOfSub) {
-    console.log("time of submission", timeOfSub);
+    // console.log("time of submission", timeOfSub);
   }
 
   let firstChart = timeOfSub && timeOfSub.slice(0, 10);
@@ -76,7 +79,7 @@ const Tracker = () => {
         <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white">
           <p className="">No response</p>
           <p className="text-primary p-1 bg-gray-200 rounded text-sm">
-            {/* {noResponse ?? noResponse} */}
+            {noResponse}
           </p>
         </div>
       </div>
@@ -86,7 +89,7 @@ const Tracker = () => {
 
       {/* table */}
       <div className="bg-white  w-full">
-        <TrackerGrid data={trackerData} />
+        {trackerData && <TrackerGrid data={trackerData.results} />}
       </div>
 
       {/* chart */}

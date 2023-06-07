@@ -37,7 +37,10 @@ const AdminEnumerators = () => {
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-2 xs:text-[10px]">
         <div className="rounded p-3 flex items-center gap-2 text-xs">
-          <p className="text-sm font-semibold">Maria Grey - Team Lead </p>
+          <p className="text-sm font-semibold">
+            {" "}
+            {`${teamLeadData.firstName} ${teamLeadData.lastName}`} - Team Lead{" "}
+          </p>
         </div>
 
         <div className="rounded bg-primary p-3 flex items-center gap-2 text-xs">

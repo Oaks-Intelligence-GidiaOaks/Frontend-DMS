@@ -1,7 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Pie from "../../components/charts/Pie";
-import { data } from "../../data/chartData";
 
 import { TeamLeadGrid } from "../../components/grid";
 import { Link } from "react-router-dom";
@@ -14,18 +12,14 @@ const TeamLeads = () => {
     // console.log(tableData);
   }
 
-  const memoizedTeamLeads = useMemo(() => {
-    return () =>
-      axios
-        .get("admin/team_lead")
-        .then((res) => {
-          console.log(res.data);
-          setTableData(res.data);
-        })
-        .catch((err) => console.log(err));
+  useEffect(() => {
+    axios
+      .get("admin/team_lead")
+      .then((res) => {
+        setTableData(res.data);
+      })
+      .catch((err) => console.log(err));
   }, []);
-
-  useEffect(() => memoizedTeamLeads, []);
 
   return (
     <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">

@@ -15,10 +15,10 @@ import {
 import { TrackerColumns, TrackerRows } from "../../data/trackerData";
 // import { MasterColumns, masterRow } from "../../data/MasterListData";
 import * as XLSX from "xlsx";
+import { useAuth } from "../../context";
 
 const MasterGrid = ({ data: masterRow }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
+  const { user } = useAuth();
 
   let downloadData = masterRow;
 
@@ -91,14 +91,16 @@ const MasterGrid = ({ data: masterRow }) => {
 
   return masterRow ? (
     <div className="">
-      <div className="my-6 ">
-        <button
-          onClick={handleDownload}
-          className="px-3 p-2 rounded-md text-sm drop-shadow-sm bg-blue-500 text-white"
-        >
-          Download
-        </button>
-      </div>
+      {user.role === "admin" && (
+        <div className="my-6 ">
+          <button
+            onClick={handleDownload}
+            className="px-3 p-2 rounded-md text-sm drop-shadow-sm bg-blue-500 text-white"
+          >
+            Download
+          </button>
+        </div>
+      )}
 
       <div className="text-[7px]">
         <GridComponent

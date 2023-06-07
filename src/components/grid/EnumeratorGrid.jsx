@@ -167,7 +167,7 @@ const EnumeratorGrid = ({ data }) => {
           />
           <ColumnDirective width={150} field="identity" />
           <ColumnDirective width={150} allowEditing={false} field="role" />
-          <ColumnDirective width={150} allowEditing={false} field="states" />
+          <ColumnDirective width={150} allowEditing={false} field="state" />
           <ColumnDirective width={150} allowEditing={false} field="LGA" />
 
           {/* <ColumnDirective

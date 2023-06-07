@@ -12,8 +12,8 @@ const AdminTracker = () => {
     // console.log("time of submission", timeOfSub);
   }
 
-  let firstChart = timeOfSub && timeOfSub.slice(0, 1);
-  let secondChart = timeOfSub && timeOfSub.slice(1);
+  let firstChart = timeOfSub && timeOfSub.slice(0, 15);
+  let secondChart = timeOfSub && timeOfSub.length > 15 && timeOfSub.slice(15);
 
   useEffect(() => {
     axios
@@ -51,17 +51,17 @@ const AdminTracker = () => {
 
       {/* table */}
       <div className="bg-white  w-full">
-        <TrackerGrid data={trackerData} />
+        {trackerData && <TrackerGrid data={trackerData.results} />}
       </div>
 
       {/* chart */}
       <div className="p-3 flex flex-col lg:flex-row gap-3 rounded-xl drop-shadow-lg ">
         <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
-          <MeshedLineChart data={firstChart} />
+          {/* <MeshedLineChart data={firstChart} /> */}
         </div>
 
         <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
-          <MeshedLineChart data={secondChart} />
+          {/* <MeshedLineChart data={secondChart} /> */}
         </div>
       </div>
     </div>

@@ -142,15 +142,16 @@ const AddTeamLead = () => {
       firstName,
       lastName,
       email,
-      phoneNumber: tel,
-      identityType: idType,
-      identity: idNo,
+      // phoneNumber: tel,
+      // identityType: idType,
+      // identity: idNo,
       role: "team_lead",
       states: transformedStates,
       LGA: transformedLgas,
+      // avarter: fileDataUrl,
     };
 
-    console.log(newUser);
+    // console.log(newUser);
 
     axios
       .post("user/new", newUser)
