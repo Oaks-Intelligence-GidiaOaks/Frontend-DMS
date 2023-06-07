@@ -11,7 +11,7 @@ const DisplayInput = ({ label, data }) => {
             type="text"
             value={item}
             readOnly
-            className="p-1 text-xs w-16 outline-none cursor-pointer  bg-oaksyellow active:outline-none text-white"
+            className="p-1 text-xs w-16 shrink-[15px] outline-none cursor-pointer  bg-gray-400 rounded active:outline-none text-white"
           />
         ))}
       </div>

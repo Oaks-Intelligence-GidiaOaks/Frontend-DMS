@@ -7,6 +7,7 @@ import {
 } from "../../components/form";
 import axios from "axios";
 import { useAuth } from "../../context";
+import Select from "react-select";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -77,13 +78,15 @@ const Profile = () => {
             label="Contact number"
           />
 
-          <FormMultipleSelect
-            // defaultValue={states}
+          {/* <FormMultipleSelect
+            defaultValue={states}
             index="z-10"
-            data={states.map((item) => ({ label: item, value: item }))}
+            // data={states.map((item) => ({ label: item, value: item }))}
             label="State"
             onChange={handleStatesChange}
-          />
+          /> */}
+
+          <DisplayInput label="States" data={user.states} />
           <DisplayInput label="LGA" data={user.LGA} />
 
           <input
