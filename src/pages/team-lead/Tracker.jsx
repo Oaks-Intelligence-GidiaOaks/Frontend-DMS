@@ -76,7 +76,7 @@ const Tracker = () => {
         <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white">
           <p className="">No response</p>
           <p className="text-primary p-1 bg-gray-200 rounded text-sm">
-            {noResponse}
+            {/* {noResponse ?? noResponse} */}
           </p>
         </div>
       </div>

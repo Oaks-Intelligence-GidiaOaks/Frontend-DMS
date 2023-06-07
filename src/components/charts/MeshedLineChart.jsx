@@ -32,6 +32,14 @@ const formatTime = (time) => {
   return `${submissionDelta}`;
 };
 
+const arrangeTime = (time) => {
+  const passedDate = new Date(time);
+  const formattedDate = passedDate.toLocaleDateString();
+  const formattedTime = passedDate.toLocaleDateString();
+
+  return `${formattedDate} ${formattedTime}`;
+};
+
 console.log(formatTime("2023-05-25T20:24:32.318Z"));
 
 const MeshedLineChart = ({ data: MeshedLineD }) => {

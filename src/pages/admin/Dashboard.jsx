@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MetricsCard from "../../components/MetricsCard";
 import { SubmissionRateAdmin } from "../../components/charts";
 import CategoryRate from "../../components/charts/CategoryRate";
@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
-  // console.log(user);
+  console.log(user);
 
   useEffect(() => {
     axios
@@ -60,6 +60,10 @@ const Dashboard = () => {
       })
       .catch((err) => console.err);
   }, []);
+
+  // useMemo(()=> {
+  //   axios.get('')
+  // })
 
   return (
     <div className="">
@@ -150,7 +154,7 @@ const Dashboard = () => {
       {/* fluctuation rates */}
       <div className=" rounded-md p-3 mt-6 lg:ml-[6rem] border h-72">
         <div className="flex flex-row justify-between items-center">
-          <p>Average price fluctuation rate</p>
+          <p>Price Fluctuation Rate</p>
 
           <div className="w-[200px]">
             <FormInputDropDown

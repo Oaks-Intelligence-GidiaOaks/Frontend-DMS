@@ -12,7 +12,13 @@ import {
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
 
-const formatTime = (time) => {};
+const arrangeTime = (time) => {
+  const passedDate = new Date(time);
+  const formattedDate = passedDate.toLocaleDateString();
+  const formattedTime = passedDate.toLocaleDateString();
+
+  return `${formattedDate} ${formattedTime}`;
+};
 
 const TrackerGrid = ({ data: TrackerRows }) => {
   const [isEditMode, setIsEditMode] = useState(false);

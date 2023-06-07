@@ -16,24 +16,22 @@ const AdminEnumerators = () => {
 
   // const { LGA, email, firstName, id, lastName, role, states, _id } =
   //   teamLeadData;
-
-  console.log(teamLeadData);
+  // console.log(teamLeadData);
 
   const [tableData, setTableData] = useState(null);
-  // const [isloading, setIsLoading] = useState(true)
+  const [isloading, setIsLoading] = useState(true);
 
-  // const memoizedTeamLeads = useMemo(() => {
-  //   return () =>
-  //     axios
-  //       .get(`/admin/team_lead_enumerators/${id}`)
-  //       .then((res) => {
-  //         console.log(res.data);
-  //         setTableData(res.data);
-  //       })
-  //       .catch((err) => console.log(err));
-  // }, [id]);
+  const memoizedTeamLeads = useMemo(() => {
+    return () =>
+      axios
+        .get(`/admin/team_lead_enumerators/${id}`)
+        .then((res) => {
+          setTableData(res.data);
+        })
+        .catch((err) => console.log(err));
+  }, [id]);
 
-  // useEffect(() => memoizedTeamLeads, []);
+  useEffect(() => memoizedTeamLeads, []);
 
   return (
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
@@ -63,10 +61,6 @@ const AdminEnumerators = () => {
               state: teamLeadData,
             })
           }
-          // to={{
-          //   pathname: `/admin/profile/${_id}`,
-          //   state: { data: { id: "jandjnjnaj" } },
-          // }}
           className="rounded bg-white border border-primary text-primary flex items-center p-3 gap-12 sm:ml-auto cursor-pointer sm:flex-initial xs:flex-1 xs:justify-between"
         >
           <p>About</p>
@@ -80,8 +74,8 @@ const AdminEnumerators = () => {
           Users - Enumerators
         </div>
 
-        {tableData?.users.length > 0 ? (
-          <EnumeratorGrid data={tableData ?? tableData} />
+        {tableData?.enumerators.length > 0 ? (
+          <EnumeratorGrid data={tableData.enumerators} />
         ) : (
           <p>No enumerators yet...</p>
         )}

@@ -37,7 +37,7 @@ const Sidebar = () => {
       } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
     >
       <div className="ml-10 flex flex-col h-full">
-        <p className="mt-2 capitalize">{user?.role}</p>
+        <p className="mt-2 capitalize">{user?.role.replace("_", " ")}</p>
 
         <NavLink
           className={({ isActive }) =>

@@ -53,10 +53,10 @@ const Enumerators = () => {
       {/* table */}
       <div className="bg-white  w-full text-xs">
         {tableData?.enumerators.length > 0 ? (
-          <EnumeratorGrid enumData={tableData.enumerators} />
+          <EnumeratorGrid data={tableData.enumerators} />
         ) : (
           <>
-            <EnumeratorGrid />
+            {/* <EnumeratorGrid /> */}
             <p>You have no enumerators yet...</p>
           </>
         )}

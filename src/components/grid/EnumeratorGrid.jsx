@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   GridComponent,
   ColumnsDirective,
@@ -11,27 +11,44 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
+import { FormInput } from "../form";
+import axios from "axios";
+import Modal from "react-modal";
 
 const EnumeratorGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [isEditing, setIsEditing] = useState(false);
+  const [tableData, setTableData] = useState(data ?? data);
 
-  const handleMenuToggle = (event, user) => {
-    event.stopPropagation();
-    setSelectedUser(user);
-    setIsMenuOpen(!isMenuOpen);
-    const rect = event.currentTarget.getBoundingClientRect();
-
-    setPopupPosition({
-      top: rect.top + rect.height,
-      left: rect.left,
-    });
+  // console.log(tableData);
+  const customStyles = {
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
   };
 
-  const handleSeeMore = (user) => {
-    console.log("See More", user);
+  const editOptions = {
+    allowEditing: true,
+    mode: "Dialog",
+    allowDeleting: true,
   };
+
+  const commands = [
+    {
+      type: "Edit",
+      buttonOption: {
+        iconCss: "e-icons e-edit",
+        cssClass: "e-flat",
+      },
+    },
+  ];
 
   const handleDelete = (user) => {
     console.log("Delete", user);
@@ -42,15 +59,27 @@ const EnumeratorGrid = ({ data }) => {
   };
 
   const ActionTemplate = (rowData) => {
+    const handleMenuToggle = (event, user) => {
+      event.stopPropagation();
+      setSelectedUser(user);
+      setIsMenuOpen(!isMenuOpen);
+      const rect = event.currentTarget.getBoundingClientRect();
+
+      setPopupPosition({
+        top: rect.top + rect.height,
+        left: rect.left,
+      });
+    };
+
     return (
       <div className="action-container">
         <div
           className="hamburger-menu space-y-1 grid place-items-center cursor-pointer"
           onClick={(e) => handleMenuToggle(e, rowData)}
         >
-          <div className="border-2 border-blue-400 w-6"></div>
-          <div className="border-2 border-blue-400 w-6"></div>
-          <div className="border-2 border-blue-400 w-6"></div>
+          <div key="action1" className="border-2 border-blue-400 w-6"></div>
+          <div key="action2" className="border-2 border-blue-400 w-6"></div>
+          <div key="action3" className="border-2 border-blue-400 w-6"></div>
         </div>
         {selectedUser && selectedUser.index === rowData.index && isMenuOpen && (
           <div
@@ -58,13 +87,7 @@ const EnumeratorGrid = ({ data }) => {
             style={{ top: popupPosition.top, left: popupPosition.left }}
           >
             <button
-              className="see-more-button"
-              onClick={() => handleSeeMore(rowData)}
-            >
-              See More
-            </button>
-
-            <button
+              key="key1"
               className="reset-button "
               onClick={() => handleResetPassword(rowData)}
             >
@@ -72,6 +95,7 @@ const EnumeratorGrid = ({ data }) => {
             </button>
 
             <button
+              key="key2"
               className="delete-button text-red-500"
               onClick={() => handleDelete(rowData)}
             >
@@ -83,25 +107,76 @@ const EnumeratorGrid = ({ data }) => {
     );
   };
 
+  const onActionBegin = (args) => {
+    // console.log(args);
+  };
+
+  const onActionComplete = (args) => {
+    // console.log(args);
+    if (args.requestType === "save") {
+      const { LGA, email, firstName, identity, identityType, lastName, id } =
+        args.data;
+
+      const editedEnum = {
+        firstName,
+        lastName,
+        identity,
+        identityType,
+        id,
+        email,
+        LGA,
+      };
+
+      axios
+        .put(`admin/enumerator/${args.data._id}`, editedEnum)
+        .then((res) => {
+          setTableData((prev) =>
+            prev.map((item) =>
+              item._id === res.data.user._id ? res.data.user : item
+            )
+          );
+        })
+        .catch((err) => console.error(err));
+    }
+  };
+
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="z-10">
       <GridComponent
-        dataSource={ElectricityRows}
+        dataSource={tableData}
         allowPaging={true}
         allowSorting={true}
+        editSettings={editOptions}
         pageSettings={{ pageSize: 50 }}
-        allowSelection={false}
         height={400}
+        actionBegin={onActionBegin}
+        actionComplete={onActionComplete}
       >
         <ColumnsDirective>
-          {ElectricityColumns.map(({ field, width }) => (
-            <ColumnDirective key={field} field={field} width={width} />
-          ))}
+          <ColumnDirective isPrimaryKey={true} field="id" width={120} />
+          <ColumnDirective width={150} field="firstName" />
+          <ColumnDirective width={150} field="lastName" />
+          <ColumnDirective width={150} field="email" />
+          <ColumnDirective width={150} field="phoneNumber" />
           <ColumnDirective
+            width={150}
+            allowEditing={false}
+            field="identityType"
+          />
+          <ColumnDirective width={150} field="identity" />
+          <ColumnDirective width={150} allowEditing={false} field="role" />
+          <ColumnDirective width={150} allowEditing={false} field="states" />
+          <ColumnDirective width={150} allowEditing={false} field="LGA" />
+
+          {/* <ColumnDirective
             headerText="Actions"
+            allowEditing={false}
             width="100"
             template={ActionTemplate}
-          />
+          /> */}
+          <ColumnDirective headerText="Edit" width={120} commands={commands} />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>

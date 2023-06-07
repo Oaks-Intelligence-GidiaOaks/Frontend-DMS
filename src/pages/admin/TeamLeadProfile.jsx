@@ -12,15 +12,19 @@ const TeamLeadProfile = () => {
   const navigate = useNavigate();
   let formData = location.state;
 
+  console.log(formData);
+
   const [lgaRoutes, setLgaRoutes] = useState(null);
   const [firstName, setFirstName] = useState(formData.firstName);
   const [lastName, setLastName] = useState(formData.lastName);
   const [email, setEmail] = useState(formData.email);
-  const [phoneNumber, setPhoneNumber] = useState();
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [states, setStates] = useState(formData.states);
   const [lgas, setLgas] = useState([]);
 
-  let lgaOptions = [];
+  const [errors, setErrors] = useState(null);
+  const [success, setSuccess] = useState(null);
+
   let allLgaOptions = [];
   let coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
 
@@ -31,21 +35,55 @@ const TeamLeadProfile = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  states && states.map((st) => console.log(allLgasByState[st]));
+  states.length > 0 &&
+    coveredLgas &&
+    states.map((state) =>
+      allLgasByState[state].map((l) => allLgaOptions.push(l))
+    );
 
-  if (states) {
-    // console.log(states);
-  }
-  if (lgaOptions.length > 0) {
-    console.log(lgaOptions);
-  }
+  const resetForm = () => {
+    setErrors(null);
+    setSuccess(true);
+    setFirstName(formData.firstName);
+    setLastName(formData.lastName);
+    setLgas(formData.lgas);
+    setPhoneNumber("");
+    setEmail(formData.email);
+    setStates(formData.states);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!firstName || !lastName || !email || !phoneNumber || !states || !lgas) {
+      return setErrors("please fill all form fields...");
+    }
+
+    const updatedTeamLead = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      states,
+      LGA: lgas,
+      id: formData.id,
+      role: formData.role,
+    };
+
+    // console.log(updatedTeamLead);
+    axios
+      .put(`admin/user/${formData._id}`, updatedTeamLead)
+      .then((res) => resetForm())
+      .catch((err) => console.log(err));
   };
 
   const handleStatesChange = (selectedOptions) => {
-    setStates(selectedOptions.states);
+    setStates(selectedOptions.map((it) => it.value));
+    setLgas([]);
+  };
+
+  const handleLgasChange = (selectedOption) => {
+    setLgas(selectedOption.map((it) => it.value));
   };
 
   return (
@@ -84,21 +122,26 @@ const TeamLeadProfile = () => {
             placeholder="Maria"
             label="First name"
             value={firstName}
-            onChange={(selectedOption) => setFirstName(selectedOption)}
+            onChange={(e) => setFirstName(e.target.value)}
           />
           <FormInput
             placeholder="Grey"
             label="Last name"
             value={lastName}
-            onChange={(selectedOption) => setLastName(selectedOption)}
+            onChange={(e) => setLastName(e.target.value)}
           />
           <FormInput
             value={email}
-            onChange={(selectedOption) => setEmail(selectedOption)}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="mariagrey@demo.com"
             label="Email"
           />
-          <FormInput placeholder="+234 81674***" label="Contact number" />
+          <FormInput
+            placeholder="+234 81674***"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            label="Contact number"
+          />
 
           <FormMultipleSelect
             defaultValue={formData.states.map((item) => ({
@@ -111,7 +154,41 @@ const TeamLeadProfile = () => {
             data={formData.states.map((item) => ({ value: item, label: item }))}
           />
 
-          <FormMultipleSelect label="LGA" data={user.LGA} />
+          <FormMultipleSelect
+            label="LGA"
+            data={allLgaOptions}
+            onChange={handleLgasChange}
+          />
+
+          {success && (
+            <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
+              <span className="text-red-500 text-xs">
+                credential updated successfully...
+              </span>
+
+              <span
+                className="cursor-pointer h-6 w-6 text-center rounded-full bg-gray-400 text-white"
+                onClick={() => setSuccess(null)}
+              >
+                x
+              </span>
+            </p>
+          )}
+
+          {errors && (
+            <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
+              <span className="text-red-500 text-xs">
+                please fill all form fields...
+              </span>
+
+              <span
+                className="cursor-pointer h-6 w-6 text-center rounded-full bg-gray-400 text-white"
+                onClick={() => setErrors(null)}
+              >
+                x
+              </span>
+            </p>
+          )}
 
           <input
             type="submit"

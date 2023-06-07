@@ -9,9 +9,9 @@ import { useAuth } from "../../context";
 const AddEnumerator = () => {
   const { user } = useAuth();
 
-  console.log(user);
+  // console.log(user);
 
-  const teamLeadStates = user.state.map((st) => ({ label: st, value: st }));
+  const teamLeadStates = user.states.map((st) => ({ label: st, value: st }));
   const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
 
   const [formFields, setFormFields] = useState({
@@ -23,7 +23,7 @@ const AddEnumerator = () => {
     idType: "",
   });
 
-  const [state, setState] = useState(null);
+  const [states, setState] = useState(null);
   const [lga, setLga] = useState(null);
 
   const [image, setImage] = useState(null);
@@ -31,8 +31,9 @@ const AddEnumerator = () => {
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
   const [userCreated, setUserCreated] = useState(false);
+  const [error, setError] = useState(null);
 
-  let lgaOptions = state ? allLgasByState[state] : [];
+  // let lgaOptions = states ? allLgasByState[state] : [];
 
   useEffect(() => {
     let fileReader,
@@ -75,6 +76,7 @@ const AddEnumerator = () => {
 
   const handleStateChange = (selectedValue) => {
     setState(selectedValue);
+    console.log(selectedValue);
     setLga(null);
   };
 
@@ -112,10 +114,10 @@ const AddEnumerator = () => {
       !idNo ||
       !idType ||
       !fileDataUrl ||
-      // !state ||
+      !states ||
       !lga
     ) {
-      console.log("Error in form fields, please input all fields");
+      setError("Error in form fields, please input all fields");
 
       return;
     }
@@ -127,12 +129,11 @@ const AddEnumerator = () => {
       phoneNumber: tel,
       identityType: idType,
       identity: idNo,
-      // identityNumber: idNo,
-      state: "default",
+      states: states,
       LGA: lga,
     };
 
-    console.log(newUser);
+    // console.log(newUser);
 
     axios
       .post("enumerator/new", newUser)

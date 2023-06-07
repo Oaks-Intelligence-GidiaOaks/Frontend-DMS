@@ -40,11 +40,6 @@ const AddTeamLead = () => {
     console.log(coveredLgas);
   }
 
-  // const teamLeadStates = user.state.map((st) => ({
-  //   label: st,
-  //   value: st,
-  // }));
-
   states.length > 0 &&
     states.map((item) => {
       allLgasByState[item.value]
