@@ -39,11 +39,17 @@ const DropDownMenu = ({
 
   // handle state change
   useEffect(() => {
-    if (item === "Charcoal" || item === "Cement" || item === "Building Block") {
+    if (
+      item === "Charcoal" ||
+      item === "Cement" ||
+      item === "Building Block" ||
+      item === "Firewood"
+    ) {
       setCommodityItemValue({
         item,
         type,
-        valueTitle: item === "Building Block" ? "size" : "weight",
+        valueTitle:
+          item === "Building Block" || item === "Firewood" ? "size" : "weight",
         value: dropDownValue,
         i,
       });

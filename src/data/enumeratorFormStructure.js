@@ -119,6 +119,10 @@ const singleFieldCommodityInputs = [
 
 const clothSizes = ["Small", "Medium", "Large"];
 
+const tomatoTypes = ["Fresh Tomatoes", "Dry Tomatoes"];
+
+const firewoodBundleSizes = ["Small", "Medium", "Large"];
+
 const vehicleTypes = [
   "Bike",
   "Keke",
@@ -178,4 +182,6 @@ export {
   demoRoutes,
   numberOfRooms,
   clothSizes,
+  tomatoTypes,
+  firewoodBundleSizes,
 };

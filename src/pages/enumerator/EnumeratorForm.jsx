@@ -27,7 +27,7 @@ import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 
 function EnumeratorForm() {
   const { secureLocalStorage } = useApp();
-  const cachedTp = secureLocalStorage.getItem("tp");
+  const cachedTp = secureLocalStorage.getItem("tp") ?? {};
   const {
     state: {
       showEnumeratorProfile,
@@ -63,7 +63,7 @@ function EnumeratorForm() {
         e.returnValue = "";
       });
   }, []);
-
+  console.log(user);
   useEffect(() => {
     lgaRoutes
       ? updateTransportTab(
@@ -247,7 +247,7 @@ function EnumeratorForm() {
             >
               <MdOutlineClose size={20} />
             </div>
-            <div className="flex gap-3 justify-center items-center radiant-shadow bg-red-600 w-fit mx-auto p-3 mt-5 mb-10 rounded-full">
+            <div className="flex gap-3 justify-center items-center error-radiant-shadow bg-red-600 w-fit mx-auto p-3 mt-5 mb-10 rounded-full">
               <BiError color="white" size={30} />
             </div>
             <p className="text-center font-bold text-xl">Error</p>
@@ -364,7 +364,7 @@ function EnumeratorForm() {
       )}
 
       {/* Change password on initial login */}
-      {false && <ChangePassword />}
+      {user.firstUse && <ChangePassword />}
     </div>
   );
 }

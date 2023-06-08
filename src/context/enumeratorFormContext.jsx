@@ -91,6 +91,7 @@ export function EnumeratorFormProvider({ children }) {
         Tomatoes: {
           prices: [
             {
+              type: "",
               "4-seeds": "",
               "big-basket": "",
             },
@@ -187,6 +188,7 @@ export function EnumeratorFormProvider({ children }) {
         Firewood: {
           "1-bundle": [
             {
+              size: "",
               price: "",
             },
           ],
@@ -376,56 +378,57 @@ export function EnumeratorFormProvider({ children }) {
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
     console.log(formSubmission);
-    // setState((prev) => ({
-    //   ...prev,
-    //   isSubmitting: true,
-    // }));
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: true,
+    }));
 
-    // try {
-    //   fetch(`${base_url}form/add_data`, {
-    //     method: "POST",
-    //     body: JSON.stringify(formSubmission),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       console.log(data);
-    //       if (data.message.includes("successful")) {
-    //         resetState();
-    //         setState((prev) => ({
-    //           ...prev,
-    //           showSubmissionNotification: true,
-    //           isSubmitting: false,
-    //         }));
-    //       }
-    //       if (data.message.includes("Already submitted")) {
-    //         resetState();
-    //         setState((prev) => ({
-    //           ...prev,
-    //           showDuplicateNotification: true,
-    //           isSubmitting: false,
-    //         }));
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       setState((prev) => ({
-    //         ...prev,
-    //         showErrorNotification: true,
-    //         isSubmitting: false,
-    //       }));
-    //     });
-    // } catch (error) {
-    //   console.log(error);
-    //   setState((prev) => ({
-    //     ...prev,
-    //     isSubmitting: false,
-    //   }));
-    // }
+    try {
+      fetch(`${base_url}form/add_data`, {
+        method: "POST",
+        body: JSON.stringify(formSubmission),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          if (data.message.includes("successful")) {
+            resetState();
+            setState((prev) => ({
+              ...prev,
+              showSubmissionNotification: true,
+              isSubmitting: false,
+            }));
+          }
+          if (data.message.includes("Already submitted")) {
+            resetState();
+            setState((prev) => ({
+              ...prev,
+              showDuplicateNotification: true,
+              isSubmitting: false,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setState((prev) => ({
+            ...prev,
+            showErrorNotification: true,
+            isSubmitting: false,
+          }));
+        });
+    } catch (error) {
+      console.log(error);
+      setState((prev) => ({
+        ...prev,
+        isSubmitting: false,
+      }));
+    }
   };
+  console.log(user);
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
       if (section === "accomodationSectionStructure") {
@@ -956,6 +959,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (item === "Tomatoes") {
         Object.keys(state.foodSectionStructure[item]["prices"][0]).forEach(
           (type) =>
+            type !== "type" &&
             foodItems.push({
               name: `${item}_${type}`,
               price: parseInt(
@@ -964,7 +968,7 @@ export function EnumeratorFormProvider({ children }) {
                   ""
                 )
               ),
-              brand: "",
+              brand: state.foodSectionStructure[item]["prices"][0]["type"],
             })
         );
       } else {
@@ -1006,6 +1010,14 @@ export function EnumeratorFormProvider({ children }) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
             name: `${item}_${type[item === "Charcoal" ? "weight" : "size"]}`,
+            price: parseInt(type["price"].replace(/,/g, "")),
+            brand: "",
+          })
+        );
+      } else if (item === "Firewood") {
+        state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
+          others.push({
+            name: `${item}_${type["size"]}`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -1076,9 +1088,14 @@ export function EnumeratorFormProvider({ children }) {
     Object.keys(state.clothingSectionStructure).forEach((key) => {
       Object.keys(state.clothingSectionStructure[key]).forEach((category) => {
         clothingArray.push({
-          price: state.clothingSectionStructure[key][category]["price"],
+          price: parseInt(
+            state.clothingSectionStructure[key][category]["price"].replace(
+              /,/g,
+              ""
+            )
+          ),
           category: key,
-          subcategory: category,
+          sub_category: category,
           size: state.clothingSectionStructure[key][category]["size"],
         });
       });
@@ -1093,7 +1110,7 @@ export function EnumeratorFormProvider({ children }) {
       transports,
       questions,
       accomodations: accomodationArray,
-      clothing: clothingArray,
+      clothings: clothingArray,
       lga,
     };
 
@@ -1101,7 +1118,9 @@ export function EnumeratorFormProvider({ children }) {
   };
   const resetState = () => {
     localStorage.removeItem("oaks-enum-form");
+    secureLocalStorage.removeItem("tp");
     setState(initialState);
+    window.location.reload();
   };
   const logOut = () => {
     try {

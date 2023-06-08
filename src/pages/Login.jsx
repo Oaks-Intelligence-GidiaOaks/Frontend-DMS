@@ -94,6 +94,15 @@ function EnumeratorLogin() {
                 "Invalid ID or Password, please try again"
               );
             }
+            console.log(others);
+            if (
+              others &&
+              others.message &&
+              others.message.includes("disabled")
+            ) {
+              return setErrorResponse(others.message);
+            }
+
             setUser({ ...user, ...others });
             setIsLoggedIn(true);
 
