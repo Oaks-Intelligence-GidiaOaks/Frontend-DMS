@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
-import { AllStates } from "../../data/form/states";
-import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import { useAuth } from "../../context";
@@ -9,9 +7,7 @@ import { useAuth } from "../../context";
 const AddEnumerator = () => {
   const { user } = useAuth();
 
-  console.log(user);
-
-  const teamLeadStates = user.state.map((st) => ({ label: st, value: st }));
+  const teamLeadStates = user.states.map((st) => ({ label: st, value: st }));
   const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
 
   const [formFields, setFormFields] = useState({
@@ -31,8 +27,9 @@ const AddEnumerator = () => {
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
   const [userCreated, setUserCreated] = useState(false);
+  const [error, setError] = useState(null);
 
-  let lgaOptions = state ? allLgasByState[state] : [];
+  // let lgaOptions = states ? allLgasByState[state] : [];
 
   useEffect(() => {
     let fileReader,
@@ -75,6 +72,7 @@ const AddEnumerator = () => {
 
   const handleStateChange = (selectedValue) => {
     setState(selectedValue);
+    console.log(selectedValue);
     setLga(null);
   };
 
@@ -112,10 +110,10 @@ const AddEnumerator = () => {
       !idNo ||
       !idType ||
       !fileDataUrl ||
-      // !state ||
+      !state ||
       !lga
     ) {
-      console.log("Error in form fields, please input all fields");
+      setError("Error in form fields, please input all fields");
 
       return;
     }
@@ -127,12 +125,12 @@ const AddEnumerator = () => {
       phoneNumber: tel,
       identityType: idType,
       identity: idNo,
-      // identityNumber: idNo,
-      state: "default",
+      state: state,
       LGA: lga,
+      avarter: fileDataUrl,
     };
 
-    console.log(newUser);
+    // console.log(newUser);
 
     axios
       .post("enumerator/new", newUser)
@@ -200,12 +198,12 @@ const AddEnumerator = () => {
           }
         />
 
-        {/* <FormInputDropDown
+        <FormInputDropDown
           label="State"
           data={teamLeadStates}
           index="z-30"
           onChange={handleStateChange}
-        /> */}
+        />
 
         {/* {state && ( */}
         <FormInputDropDown

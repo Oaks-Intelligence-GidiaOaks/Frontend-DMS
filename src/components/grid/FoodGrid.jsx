@@ -26,6 +26,8 @@ const FoodGrid = ({ data: foodRowss }) => {
 
   let foodData = foodRowss["data"];
 
+  console.log(foodData);
+
   const transformedData =
     foodData.length > 0 &&
     foodData?.map((item, i) => ({
@@ -41,14 +43,15 @@ const FoodGrid = ({ data: foodRowss }) => {
     foodData.length > 0 &&
     Object.keys(transformedData?.[0]).map((item) => ({
       field: item,
-      width: item.length < 4 ? 100 : item.length + 130,
+      width: item.length < 4 ? 120 : item.length + 130,
     }));
 
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
+  // console.log(transformedColumns);
 
-  const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
-  const pageSettings = { pageSize: 50 };
+  // const [isEditMode, setIsEditMode] = useState(false);
+  // const [editedData, setEditedData] = useState({});
+
+  const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
@@ -61,18 +64,10 @@ const FoodGrid = ({ data: foodRowss }) => {
     if (args.commandColumn.type === "Save") {
       try {
         await axios
-          .patch(
-            `form_response/food_product/${modifiedData._id}`,
-            modifiedData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token,
-              },
-            }
-          )
+          .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
+            console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
@@ -109,26 +104,26 @@ const FoodGrid = ({ data: foodRowss }) => {
       allowEditing={true}
       editSettings={editSettings}
       allowGrouping={true}
+      height={350}
       commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {transformedColumns?.map(({ field, width }) => (
           <ColumnDirective
             key={field}
+            visible={field === "_id" ? false : true}
             field={field}
-            isPrimaryKey={field === "_id" ? true : false}
+            allowEditing={field === "price"}
             width={width}
           />
         ))}
 
         <ColumnDirective headerText="Action" width={100} commands={commands} />
       </ColumnsDirective>
-      <Inject services={[Page, Sort, Filter, Group, Edit, CommandColumn]} />
+      <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
-    </div>
+    <div>No data available for current week...</div>
   );
 };
 

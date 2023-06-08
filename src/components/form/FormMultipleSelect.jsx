@@ -9,11 +9,12 @@ const options = [
   { value: "Bayelsa", label: "Bayelsa" },
 ];
 
-const FormMultipleSelect = ({ label, data, index, onChange }) => {
-  const [value, setValue] = useState([]);
+const FormMultipleSelect = ({ label, data, index, onChange, defaultValue }) => {
+  const [value, setValue] = useState(defaultValue ?? []);
 
   const handleChange = (selectedOption) => {
     setValue(selectedOption);
+    console.log(selectedOption);
     onChange(selectedOption);
   };
 

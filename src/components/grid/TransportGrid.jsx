@@ -19,6 +19,8 @@ const TransportGrid = ({ data }) => {
 
   let transportData = data.data;
 
+  console.log(transportData);
+
   const transformedData =
     transportData.length > 0 &&
     transportData.map((item, i) => ({
@@ -28,29 +30,20 @@ const TransportGrid = ({ data }) => {
       route: item.route,
       mode: item.mode,
       _id: item._id,
+      cost: item.cost,
     }));
   const transportColumns =
     transportData.length > 0 &&
     Object.keys(transformedData[0]).map((item) => ({
       field: item,
-      width: item.length ? item.length + 150 : 100,
+      width: item === "route" ? item.length + 200 : 130,
     }));
 
-  // console.log(transformedData);
-
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
-
-  const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
-  const pageSettings = { pageSize: 50 };
+  const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
     allowEditing: true,
-    mode: "Dialog",
-    allowAdding: true,
-    allowDeleting: true,
-    newRowPosition: "Top",
   };
 
   const commands = [
@@ -68,26 +61,51 @@ const TransportGrid = ({ data }) => {
     },
   ];
 
+  const handleSave = async (args) => {
+    console.log(args);
+
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(`form_response/transport/${modifiedData._id}`, modifiedData)
+          .then((res) => {
+            alert(res.data.message);
+            console.log(res.data);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return transportData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
       allowGrouping={true}
-      // toolbar={toolbarOptions}
+      height={350}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {transportColumns.map(({ field, width }) => (
-          <ColumnDirective key={field} field={field} width={width} />
+          <ColumnDirective
+            key={field}
+            field={field}
+            width={width}
+            visible={field !== "_id"}
+            allowEditing={field === "cost"}
+          />
         ))}
 
         <ColumnDirective headerText="Action" width={100} commands={commands} />
       </ColumnsDirective>
-      <Inject services={[Page, Sort, Filter, Toolbar, Edit, CommandColumn]} />
+      <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
     <div className="py-16  grid place-items-center w-full">

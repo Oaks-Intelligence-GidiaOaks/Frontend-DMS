@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { EditNote } from "@mui/icons-material";
-import { DisplayInput, FormInput } from "../../components/form";
+import {
+  DisplayInput,
+  FormInput,
+  FormMultipleSelect,
+} from "../../components/form";
 import axios from "axios";
 import { useAuth } from "../../context";
+import Select from "react-select";
 
 const Profile = () => {
   const { user } = useAuth();
 
-  console.log(user);
-
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState(user.email);
+  const [states, setStates] = useState(user.states);
+  const [lgas, setLgas] = useState(user.LGA);
 
-  useEffect(() => {
-    axios
-      .get("me")
-      .then((res) => console.log(res.data))
-      .catch((err) => console.error(err));
-  }, []);
-
-  const handleClick = (e) => {
-    e.preventDefault();
+  const handleStatesChange = (selectedOptions) => {
+    setStates(selectedOptions.map((item) => item.value));
   };
+  console.log(states);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -53,12 +53,40 @@ const Profile = () => {
         </div>
 
         <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>
-          <FormInput placeholder="Maria" label="First name" />
-          <FormInput placeholder="Grey" label="Last name" />
-          <FormInput placeholder="mariagrey@demo.com" label="Email" />
-          <FormInput placeholder="+234 81674***" label="Contact number" />
+          <FormInput
+            placeholder="Maria"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            label="First name"
+          />
+          <FormInput
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Grey"
+            label="Last name"
+          />
+          <FormInput
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="mariagrey@demo.com"
+            label="Email"
+          />
+          <FormInput
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="+234 81674***"
+            label="Contact number"
+          />
 
-          <DisplayInput label="State" data={user.state} />
+          {/* <FormMultipleSelect
+            defaultValue={states}
+            index="z-10"
+            // data={states.map((item) => ({ label: item, value: item }))}
+            label="State"
+            onChange={handleStatesChange}
+          /> */}
+
+          <DisplayInput label="States" data={user.states} />
           <DisplayInput label="LGA" data={user.LGA} />
 
           <input

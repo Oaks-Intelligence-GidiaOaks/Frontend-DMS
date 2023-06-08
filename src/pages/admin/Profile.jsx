@@ -1,24 +1,15 @@
 import React, { useEffect } from "react";
 import { EditNote } from "@mui/icons-material";
-import { DisplayInput, FormInput } from "../../components/form";
-import axios from "axios";
+import { FormInput } from "../../components/form";
 import { useAuth } from "../../context";
 
 const Profile = () => {
   const { user } = useAuth();
 
-  console.log(user);
-
-  useEffect(() => {
-    axios
-      .get("/me")
-      .then((res) => console.log(res.data))
-      .catch((err) => console.log(err));
-  }, []);
-
-  const handleClick = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
   };
+
   return (
     <div className="h-full sm:mx-6 mt-6 lg:mx-auto lg:w-[90%]">
       {/* <div className="flex items-center gap-6">
@@ -43,7 +34,7 @@ const Profile = () => {
           </p>
         </div>
 
-        <form action="" className="flex-1 lg:pr-16">
+        <form action="" onSubmit={handleSubmit} className="flex-1 lg:pr-16">
           <FormInput
             readOnly
             value={user.firstName}
@@ -56,17 +47,19 @@ const Profile = () => {
             placeholder="Grey"
             label="Last name"
           />
-          <FormInput readOnly placeholder="mariagrey@demo.com" label="Email" />
+          <FormInput
+            readOnly
+            value={user.email}
+            placeholder="mariagrey@demo.com"
+            label="Email"
+          />
           <FormInput placeholder="+234 81674***" label="Contact number" />
 
-          <DisplayInput label="State" data={user.state} />
-          <DisplayInput label="LGA" data={user.LGA} />
-
-          {/* <input
+          <input
             type="submit"
             value="Update"
             className="w-full mt-4 text-white p-3 rounded bg-oaksgreen cursor-pointer"
-          /> */}
+          />
         </form>
       </div>
     </div>

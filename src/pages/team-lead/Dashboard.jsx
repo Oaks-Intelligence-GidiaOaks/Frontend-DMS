@@ -18,9 +18,9 @@ const Dashboard = () => {
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
-  if (priceFluctuation) {
-    console.log(priceFluctuation);
-  }
+  // if (priceFluctuation) {
+  //   console.log(priceFluctuation);
+  // }
 
   useEffect(() => {
     try {
@@ -41,7 +41,10 @@ const Dashboard = () => {
   useEffect(() => {
     axios
       .get(`team_lead_dashboard/yearly_enumerators`)
-      .then((res) => setYearlyEnum(res.data))
+      .then((res) => {
+        setYearlyEnum(res.data);
+        console.log(res.data);
+      })
       .catch((err) => console.log(err));
 
     axios
@@ -142,7 +145,7 @@ const Dashboard = () => {
       {/* fluctuation rates */}
       <div className=" rounded-md p-3 mt-6 lg:ml-[6rem] border h-72">
         <div className="flex flex-row justify-between items-center">
-          <p>Average price fluctuation rate</p>
+          <p>Price fluctuation rate</p>
 
           <FormInputDropDown
             index="z-20"

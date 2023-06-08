@@ -1,326 +1,181 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
-import { useTable, usePagination, useRowSelect } from "react-table";
-import PopUpGrid from "./PopupGrid";
-// import { AiOutlineMenu } from "react-icons/ai";
-import * as XLSX from "xlsx";
-import MenuIcon from "@mui/icons-material/Menu";
-import Pagination from "./Pagination";
-import { usePopper } from "react-popper";
-import Checkbox from "./Checkbox";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Inject,
+  Page,
+  Sort,
+  Filter,
+  Edit,
+  CommandColumn,
+} from "@syncfusion/ej2-react-grids";
+import { useAuth } from "../../context";
+import axios from "axios";
+// import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
 
-const EditableCell = ({
-  value: initialValue,
-  row: { index },
-  column: { id },
-  updateMyData,
-}) => {
-  const [value, setValue] = useState(initialValue);
-  console.log(value);
+const TeamLeadGrid = ({ data }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const onChange = (e) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-  };
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
-  const onBlur = () => {
-    updateMyData(index, id, value);
-  };
+  let teamLeadsData = data.users;
 
-  return (
-    <input
-      readOnly={value === "id"}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      className="w-full px-1 py-1 border border-gray-300 rounded"
-    />
-  );
-};
-
-const TeamLeadGrid = ({ data: teamLeadData }) => {
-  // console.log(Object.keys(teamLeadData?.[1]).length);
-  console.log(teamLeadData);
-
-  let allTeamLeads = teamLeadData.users;
-  console.log(allTeamLeads);
-
-  const headColumns = Object.keys(allTeamLeads?.[0])
+  const dataColumns = Object.keys(teamLeadsData[0])
     .filter(
       (item) =>
-        item !== "role" &&
+        item !== "avarter" &&
+        item !== "createdAt" &&
+        item !== "firstUse" &&
+        item !== "updatedAt" &&
         item !== "enumerators" &&
         item !== "disabled" &&
+        item !== "LGA" &&
         item !== "__v" &&
-        item !== "createdAt" &&
-        item !== "created_at" &&
-        item !== "updatedAt" &&
-        item !== "user" &&
-        item !== "avarter"
+        item !== ""
     )
-    .map((item) => ({
-      Header: item,
-      accessor: item,
-      defaultHidden: true,
+    .map((it) => ({
+      field: it,
+      width: it.length + 150,
     }));
 
-  const columns = useMemo(() => headColumns, [allTeamLeads]);
-  const [data, setData] = useState(allTeamLeads);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedRow, setEditedRow] = useState(null);
-  const [selectedRowInfo, setSelectedRowInfo] = useState(null);
-  // const [tableData, setTableData] = useState(data);
+  // console.log(dataColumns);
 
-  let [referenceElement, setReferenceElement] = useState();
-  let [popperElement, setPopperElement] = useState();
-  let { styles, attributes } = usePopper(referenceElement, popperElement, {});
+  const handleMenuToggle = (event, user) => {
+    event.stopPropagation();
+    setSelectedUser(user);
+    setIsMenuOpen(!isMenuOpen);
+    const rect = event.currentTarget.getBoundingClientRect();
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    nextPage,
-    previousPage,
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    gotoPage,
-    pageCount,
-    setPageSize,
-    rows,
-    state,
-    selectedFlatRows,
-    allColumns,
-    getToggleHideAllColumnsProps,
-  } = useTable({ columns, data }, usePagination, useRowSelect, (hooks) => {
-    hooks.visibleColumns.push((columns) => [
-      {
-        id: "selection",
-        Header: ({ getToggleAllRowsSelectedProps }) => (
-          <Checkbox {...getToggleAllRowsSelectedProps()} />
-        ),
-        Cell: ({ row }) => <Checkbox {...row.getToggleRowSelectedProps()} />,
-      },
-      ...columns,
-    ]);
-  });
-
-  const handleDeleteClick = (row, event) => {
-    setSelectedRow(row.original);
-    console.log(row.original);
-    setIsModalOpen(!row.original.showModal);
+    setPopupPosition({
+      top: rect.top + rect.height,
+      left: rect.left,
+    });
   };
 
-  const deleteRow = () => {
-    if (selectedRow) {
-      const updatedData = data.filter((row) => row.id !== selectedRow.id);
-      // setData(updatedData);
+  const handleSeeMore = (user) => {
+    console.log("See More", user);
+
+    const { email, firstName, lastName, role, states, id, _id, LGA } = user;
+
+    const transformedUser = {
+      email,
+      firstName,
+      lastName,
+      role,
+      states,
+      LGA,
+      id,
+      _id,
+    };
+
+    navigate(`/admin/team_leads/${user._id}`, {
+      state: transformedUser,
+    });
+  };
+
+  const handleDelete = (user) => {
+    console.log("Delete", user);
+
+    if (user) {
+      axios
+        .put(`admin/user/disable/${user._id}`)
+        .then((res) => console.log(res.data))
+        .catch((err) => console.error(err));
     }
-
-    setIsModalOpen(false);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleResetPassword = (user) => {
+    console.log("Reset Password", user);
   };
 
-  const handleEditRow = (row) => {
-    setEditedRow(row);
-    setSelectedRowInfo(row.original);
-    setIsEditing(true);
-  };
+  const ActionTemplate = (rowData) => {
+    return (
+      <div className="action-container text-[10px]">
+        <div
+          className="hamburger-menu space-y-1 grid place-items-center cursor-pointer"
+          onClick={(e) => handleMenuToggle(e, rowData)}
+        >
+          <div className="border-2 border-blue-400 w-6"></div>
+          <div className="border-2 border-blue-400 w-6"></div>
+          <div className="border-2 border-blue-400 w-6"></div>
+        </div>
+        {selectedUser && selectedUser.index === rowData.index && isMenuOpen && (
+          <div
+            className={`popup-menu fixed flex flex-col gap-1 p-2 rounded bg-blue-50 drop-shdow-sm z-50`}
+            style={{ top: popupPosition.top, left: popupPosition.left }}
+          >
+            <button
+              className="see-more-button hover:text-gray-700"
+              onClick={() => handleSeeMore(rowData)}
+            >
+              See More
+            </button>
 
-  const handleSaveRow = (row) => {
-    console.log(row.original);
-    setIsEditing(false);
-    setEditedRow(null);
-    setSelectedRow(null);
-  };
+            <button
+              className="reset-button hover:text-gray-700"
+              onClick={() => handleResetPassword(rowData)}
+            >
+              Reset Password
+            </button>
 
-  const handleCancelRow = (row) => {
-    setIsEditing(false);
-    setEditedRow(null);
-    setSelectedRow(null);
-  };
+            <button
+              className="delete-button text-red-500 hover:text-red-900"
+              onClick={() => handleDelete(rowData)}
+            >
+              Delete
+            </button>
 
-  const resetPassword = (row) => {
-    // Perform the password reset for the given row
-    console.log("Reset password for row:", row);
-  };
-
-  const updateMyData = (rowIndex, columnId, value) => {
-    setData((old) =>
-      old.map((row, index) => {
-        if (index === rowIndex) {
-          return {
-            ...old[rowIndex],
-            [columnId]: value,
-          };
-        }
-        return row;
-      })
+            {user.role === "super_admin" && (
+              <button
+                className="delete-button text-blue-500 hover:text-gray-700"
+                onClick={() => handleDelete(rowData)}
+              >
+                Make Admin
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     );
   };
 
-  const wrapperRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef, closeModal]);
-
-  const firstPageRows = rows.slice(0, 10);
-
-  const handleOnExport = () => {
-    var wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.json_to_sheet(data);
-
-    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
-    XLSX.writeFile(wb, "Excel-sheet.xlsx");
-  };
-
   return (
-    <div className="w-full" ref={wrapperRef}>
-      {/* <button
-        className="p-3 text-white rounded-md border bg-primary"
-        onClick={handleOnExport}
-      >
-        Download
-      </button> */}
-
-      <div className="w-full overflow-x-scroll">
-        <table {...getTableProps()} className="w-full my-5 bg-white">
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th
-                    {...column.getHeaderProps()}
-                    className="border-b-[1px] border-r-[1px] px-2 border-[#C9C3C3] pt-2 text-[14px] leading-[20px] font-normal"
-                  >
-                    {column.render("Header")}
-                  </th>
-                ))}
-                <th className="border-b-[1px]  px-2 border-[#C9C3C3] pt-2 text-[14px] leading-[20px] font-normal">
-                  Actions
-                </th>
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {firstPageRows.map((row) => {
-              prepareRow(row);
-              // Keeping tracking of the editedRow and selectedRow
-              const isEditingRow =
-                editedRow && editedRow.id === row.original.id;
-
-              const isRowSelected =
-                selectedRow && selectedRow.id === row.original.id;
-
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        className="text-[11px] leading-[15px] font-normal px-2 py-3"
-                      >
-                        {isEditingRow ? (
-                          <EditableCell
-                            value={cell.value}
-                            row={row}
-                            column={cell.column}
-                            updateMyData={updateMyData}
-                          />
-                        ) : (
-                          cell.render("Cell")
-                        )}
-                      </td>
-                    );
-                  })}
-                  <td className="relative flex items-center justify-center py-3">
-                    {editedRow && editedRow.id === row.original.id ? (
-                      <>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleSaveRow(row)}
-                            className="focus:outline-none text-[11px] leading-[15px] font-normal border-[1px] py-1 px-2 border-[#82B22E] bg-[#82B22E] text-white "
-                          >
-                            Save
-                          </button>
-
-                          <button
-                            onClick={handleCancelRow}
-                            className="focus:outline-none text-[11px] leading-[15px] font-normal border-[1px] py-1 px-2 border-[#FFAD10] bg-[#FFAD10] text-white"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <button
-                        onClick={(event) => handleDeleteClick(row, event)}
-                        className="focus:outline-none"
-                      >
-                        <MenuIcon />
-                      </button>
-                    )}
-
-                    {selectedRow &&
-                      selectedRow.id === row.original.id &&
-                      isModalOpen && (
-                        <div
-                          className="absolute rounded drop-shadow-sm z-10 top-0"
-                          ref={setPopperElement}
-                          style={styles.popper}
-                          {...attributes.popper}
-                        >
-                          <PopUpGrid
-                            selectedRow={selectedRow}
-                            deleteRow={deleteRow}
-                            closeModal={closeModal}
-                            setPopperElement={setPopperElement}
-                            popperStyles={styles}
-                            handleEditRow={handleEditRow}
-                            popperAttributes={attributes}
-                            row={row}
-                            selectedRowInfo={selectedRowInfo}
-                            resetPassword={resetPassword}
-                          />
-                        </div>
-                      )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+    <div className="z-10">
+      <div className="p-3  text-base font-semibold tracking-tighter">
+        Users - Team Leads
       </div>
 
-      <Pagination
-        gotoPage={gotoPage}
-        previousPage={previousPage}
-        nextPage={nextPage}
-        canPreviousPage={true}
-        canNextPage={true}
-        pageCount={10}
-        pageIndex={0}
-        pageOptions={[1, 2, 3]}
-        pageSize={10}
-        setPageSize={setPageSize}
-      />
+      <GridComponent
+        dataSource={teamLeadsData}
+        allowPaging={true}
+        allowSorting={true}
+        pageSettings={{ pageSize: 50 }}
+        allowSelection={false}
+        height={400}
+      >
+        <ColumnsDirective>
+          {dataColumns.map(({ field, width }) => (
+            <ColumnDirective
+              visible={field === "state" || field === "_id" ? false : true}
+              key={field}
+              field={field}
+              width={width}
+            />
+          ))}
+
+          <ColumnDirective
+            headerText="Actions"
+            width="100"
+            template={ActionTemplate}
+          />
+        </ColumnsDirective>
+        <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
+      </GridComponent>
     </div>
   );
 };

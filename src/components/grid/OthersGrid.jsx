@@ -9,15 +9,9 @@ import {
   Edit,
   Sort,
   CommandColumn,
-  beginEdit,
-  Toolbar,
 } from "@syncfusion/ej2-react-grids";
-import { FoodRows, FoodColumns } from "../../data/formResponses";
 
 const OthersGrid = ({ data }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedData, setEditedData] = useState({});
-
   let dataCount = data?.totalCount;
 
   let othersData = data.data;
@@ -30,7 +24,7 @@ const OthersGrid = ({ data }) => {
       id: item.created_by.id,
       LGA: item.lga,
       name: item.name,
-      price: item.price,
+      price: item.price === 0 ? "N/A" : item.price,
       brand: item.brand.length > 1 ? item.brand : "N/A",
       _id: item._id,
     }));
@@ -39,19 +33,13 @@ const OthersGrid = ({ data }) => {
     othersData.length > 0 &&
     Object.keys(transformedData[0]).map((item) => ({
       field: item,
-      width: item.length ? item.length + 150 : 100,
+      width: item.length ? item.length + 130 : 130,
     }));
 
-  const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
   const pageSettings = { pageSize: 50 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
 
   const editSettings = {
     allowEditing: true,
-    mode: "Dialog",
-    allowAdding: true,
-    allowDeleting: true,
-    newRowPosition: "Top",
   };
 
   const commands = [
@@ -69,17 +57,37 @@ const OthersGrid = ({ data }) => {
     },
   ];
 
+  const handleSave = async (args) => {
+    console.log(args);
+    const modifiedData = args.rowData;
+    if (args.commandColumn.type === "Save") {
+      try {
+        await axios
+          .patch(
+            `form_response/other_products/${modifiedData._id}`,
+            modifiedData
+          )
+          .then((res) => {
+            alert(res.data.message);
+            console.log(res.data);
+          })
+          .catch((err) => console.error(err));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return othersData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
       allowPaging={true}
       allowSorting={true}
-      // allowFiltering={true}
       pageSettings={pageSettings}
       allowEditing={true}
       editSettings={editSettings}
       allowGrouping={true}
-      // toolbar={toolbarOptions}
+      commandClick={(args) => handleSave(args)}
     >
       <ColumnsDirective>
         {othersColumns.map(({ field, width }) => (

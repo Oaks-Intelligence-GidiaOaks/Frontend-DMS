@@ -27,6 +27,7 @@ import {
   TeamLeads,
   AddTeamLead,
   AdminNewRoute,
+  TeamLeadProfile,
 } from "./pages/admin";
 
 import TeamLead from "./components/layout/TeamLead";
@@ -35,7 +36,7 @@ import Login from "./pages/Login";
 import NewRoute from "./pages/team-lead/NewRoute";
 import { EnumeratorFormProvider, useApp, useAuth } from "./context";
 import { useState } from "react";
-import { base_url } from "./lib/paths";
+import { base_url, base_url_local } from "./lib/paths";
 import Admin from "./components/layout/Admin";
 
 function App() {
@@ -45,6 +46,8 @@ function App() {
   axios.defaults.baseURL = base_url;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
+  axios.defaults.headers.common["Access-Control-Allow-Origin"] =
+    "http://localhost:5173";
 
   const identifyRoute = (user) => {
     if (user.role === "enumerator") {
@@ -53,7 +56,16 @@ function App() {
     if (user.role === "team_lead") {
       return <Navigate replace to={"/home"} />;
     }
+
+    if (user.role === "admin" || user.role === "super_admin") {
+      return <Navigate reolace to={"/admin/home"} />;
+    }
   };
+
+  const adminRoleCheck =
+    isLoggedIn &&
+    user &&
+    (user.role === "admin" || user.role === "super_admin");
 
   return (
     <Router>
@@ -162,24 +174,12 @@ function App() {
               )
             }
           />
-          <Route
-            path="/new-lga"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <NewRoute />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
 
           {/* admin routes */}
           <Route
             path="admin/home"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminDashboard />
                 </Admin>
@@ -191,7 +191,7 @@ function App() {
           <Route
             path="admin/team_leads"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <TeamLeads />
                 </Admin>
@@ -201,9 +201,21 @@ function App() {
             }
           />
           <Route
+            path="admin/team_leads/:id"
+            element={
+              adminRoleCheck ? (
+                <Admin>
+                  <AdminEnumerators />
+                </Admin>
+              ) : (
+                <Navigate replace to={"/"} />
+              )
+            }
+          />
+          <Route
             path="admin/responses"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminFormResponses />
                 </Admin>
@@ -212,10 +224,11 @@ function App() {
               )
             }
           />
+
           <Route
             path="admin/tracker"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminTracker />
                 </Admin>
@@ -227,7 +240,7 @@ function App() {
           <Route
             path="admin/add"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AddTeamLead />
                 </Admin>
@@ -239,7 +252,7 @@ function App() {
           <Route
             path="admin/profile"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminProfile />
                 </Admin>
@@ -248,10 +261,24 @@ function App() {
               )
             }
           />
+
+          <Route
+            path="admin/profile/:id"
+            element={
+              adminRoleCheck ? (
+                <Admin>
+                  <TeamLeadProfile />
+                </Admin>
+              ) : (
+                <Navigate replace to={"/"} />
+              )
+            }
+          />
+
           <Route
             path="admin/master"
             element={
-              user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminMasterList />
                 </Admin>
@@ -263,7 +290,7 @@ function App() {
           <Route
             path="admin/new-lga"
             element={
-              isLoggedIn && user && user.role === "admin" ? (
+              adminRoleCheck ? (
                 <Admin>
                   <AdminNewRoute />
                 </Admin>

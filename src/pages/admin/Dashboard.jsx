@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MetricsCard from "../../components/MetricsCard";
 import { SubmissionRateAdmin } from "../../components/charts";
 import CategoryRate from "../../components/charts/CategoryRate";
@@ -16,10 +16,20 @@ const Dashboard = () => {
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
   const [submissionCount, setSubmissionCount] = useState(null);
+  const [coveredLgas, setCoveredLgas] = useState(null);
 
-  let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
+  let selectLGA = coveredLgas
+    ? coveredLgas.map((item) => ({ value: item, label: item }))
+    : [];
 
-  console.log(user);
+  const getCoveredLgas = () => {
+    axios
+      .get(`lga_routes`)
+      .then((res) => setCoveredLgas(res.data.data.map((it) => it.lga)))
+      .catch((err) => console.error(err));
+  };
+
+  useMemo(getCoveredLgas, []);
 
   useEffect(() => {
     axios
@@ -150,7 +160,7 @@ const Dashboard = () => {
       {/* fluctuation rates */}
       <div className=" rounded-md p-3 mt-6 lg:ml-[6rem] border h-72">
         <div className="flex flex-row justify-between items-center">
-          <p>Average price fluctuation rate</p>
+          <p>Price Fluctuation Rate</p>
 
           <div className="w-[200px]">
             <FormInputDropDown
