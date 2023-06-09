@@ -77,7 +77,8 @@ function Accomodation() {
                 className="relative px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%] mt-4"
               >
                 <>
-                  {accomodationForm[item].length > 1 && (
+                  {/* Remove item button */}
+                  {/* {accomodationForm[item].length > 1 && (
                     <button
                       className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded mx-[5%]"
                       onClick={() =>
@@ -94,7 +95,8 @@ function Accomodation() {
                         Remove
                       </span>
                     </button>
-                  )}
+                  )} */}
+
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
                       <p>Type of accomodation</p>
@@ -155,7 +157,8 @@ function Accomodation() {
                 </>
               </div>
             ))}
-            <div className="flex justify-end px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%]">
+            {/* Add new button */}
+            {/* <div className="flex justify-end px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%]">
               <button
                 className=" flex gap-[6px] items-center hover:bg-light-primary-green p-2 rounded"
                 onClick={() =>
@@ -168,7 +171,7 @@ function Accomodation() {
                 <IoMdAdd color="#72a247" size={16} />
                 <span className="font-medium text-primary-green">Add New</span>
               </button>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>

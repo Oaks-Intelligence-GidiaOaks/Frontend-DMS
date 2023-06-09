@@ -68,7 +68,8 @@ function Food() {
                   >
                     {item === "Rice" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -86,7 +87,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -158,7 +159,8 @@ function Food() {
                     )}
                     {item === "Beans" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -176,7 +178,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -260,7 +262,8 @@ function Food() {
                     )}
                     {item === "Garri" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -278,7 +281,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -448,7 +451,8 @@ function Food() {
                     )}
                     {item === "Fish" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -466,7 +470,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of 1 {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -888,7 +892,8 @@ function Food() {
                     )}
                   </div>
                 ))}
-                {["Rice", "Beans", "Garri", "Fish"].includes(item) &&
+                {/* Add item button */}
+                {/* {["Rice", "Beans", "Garri", "Fish"].includes(item) &&
                   foodForm[item][type].length <
                     calculateOptionsLength(item) && (
                     <div className="flex justify-end mt-12">
@@ -908,7 +913,7 @@ function Food() {
                         </span>
                       </button>
                     </div>
-                  )}
+                  )} */}
               </div>
             ))}
           </div>

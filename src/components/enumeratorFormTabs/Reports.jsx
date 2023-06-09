@@ -400,7 +400,7 @@ function Reports() {
             ariaLabel="rings-loading"
           />
         ) : (
-          <span className="block p-2 text-base">Submit</span>
+          <span className="block p-2 text-[14px]">Submit</span>
         )}
       </button>
     </div>

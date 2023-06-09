@@ -264,7 +264,8 @@ const Commodity = () => {
                     )}
                     {item === "Charcoal" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -282,7 +283,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -427,7 +428,8 @@ const Commodity = () => {
                     )}
                     {item === "Cement" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -445,7 +447,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -590,7 +592,8 @@ const Commodity = () => {
                     )}
                     {item === "Building Block" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -608,7 +611,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -756,7 +759,8 @@ const Commodity = () => {
                     )}
                   </div>
                 ))}
-                {["Building Block", "Charcoal", "Cement"].includes(item) &&
+                {/* Add item button */}
+                {/* {["Building Block", "Charcoal", "Cement"].includes(item) &&
                   commodityForm[item][type].length <
                     calculateOptionsLength(item) && (
                     <div className="flex justify-end mt-4 sm:mt-8 md:12">
@@ -776,7 +780,7 @@ const Commodity = () => {
                         </span>
                       </button>
                     </div>
-                  )}
+                  )} */}
               </div>
             ))}
           </div>

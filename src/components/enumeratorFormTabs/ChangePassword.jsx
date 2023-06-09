@@ -111,7 +111,7 @@ const ChangePassword = () => {
 
   return (
     <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center overflow-y-scroll py-[10vh] xs:py-0 sm:py-[10vh]">
-      <div className=" flex flex-col gap-2 h-screen xs:h-screen profile-bg min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] overflow-hidden shadow-2xl">
+      <div className=" flex flex-col gap-2 min-h-screen xs:min-h-screen profile-bg min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] overflow-hidden shadow-2xl">
         <div className="p-8 rounded-[10px] max-w-[480px] min-w-[240px] mt-8 mx-auto justify-center">
           <div className="w-20 h-20 bg-white mx-auto rounded-full flex items-center justify-center">
             <BiLock width={40} height={40} size={60} color="#72a247" />

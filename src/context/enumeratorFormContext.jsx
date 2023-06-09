@@ -778,12 +778,14 @@ export function EnumeratorFormProvider({ children }) {
     const { accomodationSectionStructure } = state;
     const { item, value, valueTitle, i } = action;
 
+    console.log(action);
+
     setState((prev) => {
       const updatedArray = [...accomodationSectionStructure[item]];
       updatedArray[i] = {
         ...updatedArray[i],
         [valueTitle]: value,
-        rooms: item.split(" ")[0],
+        rooms: value !== "" ? item.split(" ")[0] : "",
       };
       return {
         ...prev,
@@ -1361,7 +1363,6 @@ export function EnumeratorFormProvider({ children }) {
         commodityProgressPercentage,
         transportProgressPercentage,
         accomodationProgressPercentage,
-        clothingProgressPercentage,
         clothingProgressPercentage,
         progressPercentage,
         handleValue,
