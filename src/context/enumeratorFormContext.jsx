@@ -1130,7 +1130,6 @@ export function EnumeratorFormProvider({ children }) {
     localStorage.removeItem("oaks-enum-form");
     secureLocalStorage.removeItem("tp");
     setState(initialState);
-    window.location.reload();
   };
   const logOut = () => {
     try {

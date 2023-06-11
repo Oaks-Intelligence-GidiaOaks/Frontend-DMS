@@ -335,7 +335,7 @@ function EnumeratorForm() {
                   {user.LGA.map((lga, i) => (
                     <p
                       key={i}
-                      className="text-[15px] text-secondary-gray flex items-center -translate-x-[6px]"
+                      className="text-[15px] capitalize text-secondary-gray flex items-center -translate-x-[6px]"
                     >
                       <BsDot size={18} color="#72a247" />
                       <span>{lga}</span>
