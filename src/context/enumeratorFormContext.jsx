@@ -859,6 +859,14 @@ export function EnumeratorFormProvider({ children }) {
       });
     }
   };
+  const formatLGA = (LGA) => {
+    const formattedLGA = LGA.split("-");
+    if (formattedLGA.length > 1) {
+      return formattedLGA.join(" ");
+    } else {
+      return formattedLGA.join("");
+    }
+  };
   const calculateOptionsLength = (item) => {
     if (item === "Building Block") {
       return buildingBlockSizes.length;
@@ -1368,6 +1376,7 @@ export function EnumeratorFormProvider({ children }) {
         handleValue,
         logOut,
         updateTransportTab,
+        formatLGA,
       }}
     >
       {children}

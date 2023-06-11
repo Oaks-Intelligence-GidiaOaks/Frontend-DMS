@@ -45,6 +45,7 @@ function EnumeratorForm() {
     hideDuplicateNotification,
     hideErrorNotification,
     updateTransportTab,
+    formatLGA,
     logOut,
   } = useContext(EnumeratorFormContext);
 
@@ -67,7 +68,7 @@ function EnumeratorForm() {
   useEffect(() => {
     lgaRoutes
       ? updateTransportTab(
-          lgaRoutes.filter((t) => t.lga === currentLGA.toLowerCase())
+          lgaRoutes.filter((t) => t.lga === formatLGA(currentLGA.toLowerCase()))
         )
       : axios
           .get(`lga_routes`)
@@ -78,7 +79,7 @@ function EnumeratorForm() {
               ? cachedTp
               : updateTransportTab(
                   res.data.data.filter(
-                    (t) => t.lga === currentLGA.toLowerCase()
+                    (t) => t.lga === formatLGA(currentLGA.toLowerCase())
                   )
                 );
           })
@@ -127,7 +128,7 @@ function EnumeratorForm() {
                 : "justify-end xs:pr-0 sm:pr-3"
             }  max-w-[410px] xs:w-[90%]`}
           >
-            {/* {user.LGA.length > 1 && <LGAController />} */}
+            {user.LGA.length > 1 && <LGAController />}
             <button
               className="flex justify-center items-center px-3 bg-primary-green py-2 max-w-[170px] rounded"
               onClick={saveFormChanges}
