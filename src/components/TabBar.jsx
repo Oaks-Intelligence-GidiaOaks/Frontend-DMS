@@ -7,13 +7,14 @@ function TabBar() {
   const tabs = useRef([
     "Food",
     "Commodity",
+    "Clothing",
     "Transport",
     "Accomodation",
     "Reports",
   ]);
 
   return (
-    <div className="flex flex-nowrap mx-auto mt-5 w-fit pb-3">
+    <div className="flex flex-nowrap mx-auto mt-5 w-fit pb-3 max-w-[1040px]">
       {tabs.current.map((tab, index) => (
         <div
           key={index}

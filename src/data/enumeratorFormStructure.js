@@ -117,12 +117,18 @@ const singleFieldCommodityInputs = [
   "Petrol/PMS",
 ];
 
+const clothSizes = ["Small", "Medium", "Large"];
+
+const tomatoTypes = ["Fresh Tomatoes", "Dry Tomatoes"];
+
+const firewoodBundleSizes = ["Small", "Medium", "Large"];
+
 const vehicleTypes = [
   "Bike",
   "Keke",
   "Bus",
   "Taxi (e.g Bolt, Uber, Rida, Drop)",
-  "Cab (e.g Along, Cabu-Cabu",
+  "Cab (e.g Along, Cabu-Cabu)",
 ];
 
 const demoRoutes = [
@@ -175,4 +181,7 @@ export {
   binaryQuestionValues,
   demoRoutes,
   numberOfRooms,
+  clothSizes,
+  tomatoTypes,
+  firewoodBundleSizes,
 };

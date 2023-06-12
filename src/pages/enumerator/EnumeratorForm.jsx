@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { FaRegUser } from "react-icons/fa";
 import { IoSaveOutline } from "react-icons/io5";
-import { HiOutlineArrowLeft } from "react-icons/hi";
-import { BiLogOut, BiIdCard, BiError } from "react-icons/bi";
+import { HiOutlineArrowLeft, HiUserCircle } from "react-icons/hi";
+import { BiLogOut, BiIdCard, BiError, BiLock } from "react-icons/bi";
 import { BsDot } from "react-icons/bs";
 import { SlLocationPin } from "react-icons/sl";
 import { ImBlocked } from "react-icons/im";
@@ -14,16 +14,20 @@ import TabBar from "../../components/TabBar";
 
 import Food from "../../components/enumeratorFormTabs/Food";
 import Commodity from "../../components/enumeratorFormTabs/Commodity";
+import Clothing from "../../components/enumeratorFormTabs/Clothing";
 import Transport from "../../components/enumeratorFormTabs/Transport";
 import Accomodation from "../../components/enumeratorFormTabs/Accomodation";
 import Reports from "../../components/enumeratorFormTabs/Reports";
 import oaksLogo from "../../assets/oaks-logo.svg";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
-import { useAuth } from "../../context";
+import { useApp, useAuth } from "../../context";
 import axios from "axios";
 import { Rings } from "react-loader-spinner";
+import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 
 function EnumeratorForm() {
+  const { secureLocalStorage } = useApp();
+  const cachedTp = secureLocalStorage.getItem("tp") ?? {};
   const {
     state: {
       showEnumeratorProfile,
@@ -41,6 +45,7 @@ function EnumeratorForm() {
     hideDuplicateNotification,
     hideErrorNotification,
     updateTransportTab,
+    formatLGA,
     logOut,
   } = useContext(EnumeratorFormContext);
 
@@ -59,18 +64,26 @@ function EnumeratorForm() {
         e.returnValue = "";
       });
   }, []);
-
+  console.log(user);
   useEffect(() => {
-    axios
-      .get(`lga_routes`)
-      .then((res) => {
-        console.log(res.data.data);
-        setLgaRoutes(res.data);
-        updateTransportTab(
-          res.data.data.filter((t) => t.lga === currentLGA.toLowerCase())
-        );
-      })
-      .catch((err) => console.error(err));
+    lgaRoutes
+      ? updateTransportTab(
+          lgaRoutes.filter((t) => t.lga === formatLGA(currentLGA.toLowerCase()))
+        )
+      : axios
+          .get(`lga_routes`)
+          .then((res) => {
+            console.log(res.data.data);
+            setLgaRoutes(res.data.data);
+            Object.keys(cachedTp).length
+              ? cachedTp
+              : updateTransportTab(
+                  res.data.data.filter(
+                    (t) => t.lga === formatLGA(currentLGA.toLowerCase())
+                  )
+                );
+          })
+          .catch((err) => console.error(err));
   }, [currentLGA, updateTransportTab]);
 
   return (
@@ -110,7 +123,7 @@ function EnumeratorForm() {
           <ProgressBar />
           <div
             className={`flex flex-nowrap gap-5 ${
-              user.LGA.length > 1
+              ["Oredo"].length > 1
                 ? "justify-center"
                 : "justify-end xs:pr-0 sm:pr-3"
             }  max-w-[410px] xs:w-[90%]`}
@@ -136,6 +149,7 @@ function EnumeratorForm() {
             <>
               {currentFormTab === "Food" && <Food />}
               {currentFormTab === "Commodity" && <Commodity />}
+              {currentFormTab === "Clothing" && <Clothing />}
               {currentFormTab === "Transport" && <Transport />}
               {currentFormTab === "Accomodation" && <Accomodation />}
               {currentFormTab === "Reports" && <Reports />}
@@ -234,7 +248,7 @@ function EnumeratorForm() {
             >
               <MdOutlineClose size={20} />
             </div>
-            <div className="flex gap-3 justify-center items-center radiant-shadow bg-red-600 w-fit mx-auto p-3 mt-5 mb-10 rounded-full">
+            <div className="flex gap-3 justify-center items-center error-radiant-shadow bg-red-600 w-fit mx-auto p-3 mt-5 mb-10 rounded-full">
               <BiError color="white" size={30} />
             </div>
             <p className="text-center font-bold text-xl">Error</p>
@@ -321,7 +335,7 @@ function EnumeratorForm() {
                   {user.LGA.map((lga, i) => (
                     <p
                       key={i}
-                      className="text-[15px] text-secondary-gray flex items-center -translate-x-[6px]"
+                      className="text-[15px] capitalize text-secondary-gray flex items-center -translate-x-[6px]"
                     >
                       <BsDot size={18} color="#72a247" />
                       <span>{lga}</span>
@@ -349,6 +363,9 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
+
+      {/* Change password on initial login */}
+      {user.firstUse && <ChangePassword />}
     </div>
   );
 }

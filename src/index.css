@@ -181,6 +181,10 @@ input[type="radio"]:checked {
   box-shadow: 0 0 0 10px rgba(130, 178, 46, 75%),
     0 0 0 20px rgba(130, 178, 46, 50%);
 }
+.error-radiant-shadow {
+  box-shadow: 0 0 0 10px rgba(178, 46, 46, 0.509),
+    0 0 0 20px rgba(178, 46, 46, 0.5);
+}
 
 td[aria-label="food column header Food"] {
   background-color: #ebedf7 !important;

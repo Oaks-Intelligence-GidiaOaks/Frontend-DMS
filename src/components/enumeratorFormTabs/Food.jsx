@@ -14,6 +14,7 @@ import {
   fishList,
   garriTypes,
   riceBrands,
+  tomatoTypes,
   turkeyList,
 } from "../../data/enumeratorFormStructure";
 import DropDownMenu from "../DropDownMenu";
@@ -67,7 +68,8 @@ function Food() {
                   >
                     {item === "Rice" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -85,7 +87,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -157,7 +159,8 @@ function Food() {
                     )}
                     {item === "Beans" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -175,7 +178,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -259,7 +262,8 @@ function Food() {
                     )}
                     {item === "Garri" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -277,7 +281,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} - {type.split("-").join(" ")}
@@ -362,9 +366,23 @@ function Food() {
                     {item === "Tomatoes" && (
                       <>
                         <div className="flex flex-col gap-4">
+                          <p>Specify type of Tomatoes</p>
+                          <DropDownMenu
+                            list={tomatoTypes}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"type"}
+                            value={foodForm[item]["prices"][0]["type"]}
+                            section={"foodSectionStructure"}
+                            i={0}
+                          />
+                          {console.log(foodForm[item]["prices"][0]["type"])}
+                        </div>
+                        <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} (
-                            {Object.keys(foodForm[item][type][0])[0]
+                            {Object.keys(foodForm[item][type][0])[1]
                               .split("-")
                               .join(" ")}
                             )
@@ -393,11 +411,19 @@ function Food() {
                         </div>
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {item} (
-                            {Object.keys(foodForm[item][type][0])[1]
-                              .split("-")
-                              .join(" ")}
-                            )
+                            Price of {item}{" "}
+                            <span className="capitalize">
+                              (
+                              {foodForm[item]["prices"][0][
+                                "type"
+                              ].toLowerCase() === "fresh tomatoes" ||
+                              foodForm[item]["prices"][0]["type"] === ""
+                                ? Object.keys(foodForm[item][type][0])[2]
+                                    .split("-")
+                                    .join(" ")
+                                : "Big bag"}
+                              )
+                            </span>
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -425,7 +451,8 @@ function Food() {
                     )}
                     {item === "Fish" && (
                       <>
-                        {foodForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {foodForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -443,7 +470,7 @@ function Food() {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of 1 {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -751,7 +778,7 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
-                          <p>Specify type of Yam</p>
+                          <p>Specify size of Yam</p>
                           <DropDownMenu
                             list={YamList.filter(
                               (el) =>
@@ -865,7 +892,8 @@ function Food() {
                     )}
                   </div>
                 ))}
-                {["Rice", "Beans", "Garri", "Fish"].includes(item) &&
+                {/* Add item button */}
+                {/* {["Rice", "Beans", "Garri", "Fish"].includes(item) &&
                   foodForm[item][type].length <
                     calculateOptionsLength(item) && (
                     <div className="flex justify-end mt-12">
@@ -885,7 +913,7 @@ function Food() {
                         </span>
                       </button>
                     </div>
-                  )}
+                  )} */}
               </div>
             ))}
           </div>

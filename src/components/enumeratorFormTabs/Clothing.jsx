@@ -5,27 +5,26 @@ import { IoMdAdd } from "react-icons/io";
 import { MdOutlineClear } from "react-icons/md";
 import {
   accomodationTypes,
+  clothSizes,
   numberOfRooms,
 } from "../../data/enumeratorFormStructure";
 import { useEffect } from "react";
 
-function Accomodation() {
+function Clothing() {
   const {
-    state: { accomodationSectionStructure: accomodationForm },
-    setAccomodationItemValue,
-    addItem,
-    removeItem,
-    accomodationProgressPercentage,
+    state: { clothingSectionStructure: clothingForm },
+    setClothingItemValue,
+    clothingProgressPercentage,
     setCurrentFormTab,
     handleValue,
   } = useContext(EnumeratorFormContext);
 
-  const handleChange = (item, valueTitle, value, i) => {
-    setAccomodationItemValue({
+  const handleChange = (item, cloth, valueTitle, value) => {
+    setClothingItemValue({
       item,
+      cloth,
       valueTitle,
       value,
-      i,
     });
   };
 
@@ -40,7 +39,7 @@ function Accomodation() {
   };
 
   // const handleRoomsList = (type) => {
-  //   const filtered = accomodationForm["variations"]
+  //   const filtered = clothingForm["variations"]
   //     .filter((e) => e["type"] === type)
   //     .map((el) => el["rooms"]);
   //   const arr = !type
@@ -58,32 +57,76 @@ function Accomodation() {
     <div className="flex flex-col mx-auto items-center max-w-[1040px] min-h-screen pb-40">
       {/* Content */}
       <div className="flex flex-col gap-8 w-full min-h-[50vh] mt-[30px] mb-20 bg-white rounded-[10px]">
-        <p className="relative leading-[20px] text-[18px] sm:text-[20px] py-[1%] sm:py-[1%] xs:py-[2.5%]">
+        {/* <p className="relative leading-[20px] text-[18px] sm:text-[20px] py-[1%] sm:py-[1%] xs:py-[2.5%]">
           <span className="font-medium ">
             Specify the prices of the following accomodations below
           </span>
-        </p>
-        {Object.keys(accomodationForm).map((item, a) => (
+        </p> */}
+        {Object.keys(clothingForm).map((item, a) => (
           <div
             key={`${item}-${a}`}
             className="flex flex-col gap-10 rounded-[10px] login-form-shadow "
           >
             <p className="relative leading-[20px] text-[18px] sm:text-[20px] px-[5%] mt-[5%] py-[1%] sm:mt-[5%] sm:py-[1%] xs:mt-[10%] xs:py-[2.5%] slab">
-              <span className="font-medium ">{item}</span>
+              <span className="font-medium ">{item} Clothing</span>
             </p>
-            {accomodationForm[item].map((type, i) => (
+            {Object.keys(clothingForm[item]).map((cloth, ind) => {
+              return (
+                <div
+                  key={ind}
+                  className="relative flex flex-col gap-10 px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%] mt-4"
+                >
+                  {console.log(clothingForm)}
+                  <div className="flex flex-col gap-4">
+                    <p>Price of {cloth}</p>
+                    <div className="flex gap-2 relative border-b border-solid border-mid-gray">
+                      <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
+                        ₦
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Enter answer"
+                        value={clothingForm[item][cloth]["price"]}
+                        onChange={(e) =>
+                          setClothingItemValue({
+                            item,
+                            cloth,
+                            valueTitle: "price",
+                            value: handleValue(e.target.value),
+                          })
+                        }
+                        onWheel={(e) => e.target.blur()}
+                        className="flex-1 pl-8 py-2 outline-primary-green"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <p>Specify size of {cloth}</p>
+                    <DropDownMenu
+                      list={clothSizes}
+                      handleChange={handleChange}
+                      item={item}
+                      cloth={cloth}
+                      valueTitle={"size"}
+                      value={clothingForm[item][cloth]["size"]}
+                      section={"clothingSectionStructure"}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+            {/* {clothingForm[item].map((type, i) => (
               <div
                 key={`${type}-${i}`}
                 className="relative px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%] mt-4"
               >
                 <>
-                  {/* Remove item button */}
-                  {/* {accomodationForm[item].length > 1 && (
+                  {clothingForm[item].length > 1 && (
                     <button
                       className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded mx-[5%]"
                       onClick={() =>
                         removeItem({
-                          array: accomodationForm[item],
+                          array: clothingForm[item],
                           item,
                           index: i,
                           section: "accomodationSectionStructure",
@@ -95,42 +138,21 @@ function Accomodation() {
                         Remove
                       </span>
                     </button>
-                  )} */}
-
+                  )}
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4">
                       <p>Type of accomodation</p>
                       <DropDownMenu
                         list={handleAccomodationTypesList(
-                          accomodationForm[item]
+                          clothingForm[item]
                         )}
                         handleChange={handleChange}
                         item={item}
                         valueTitle={"type"}
-                        value={accomodationForm[item][i]["type"]}
+                        value={clothingForm[item][i]["type"]}
                         i={i}
                         section={"accomodationSectionStructure"}
                       />
-                      {/* <div className="flex gap-2 relative border-b border-solid border-mid-gray">
-                            <input
-                              type="text"
-                              value={
-                                foodSectionStructure[item][type][i]["brand"]
-                              }
-                              onChange={(e) =>
-                                
-                                  setFoodItemValue({
-                                    item,
-                                    type,
-                                    valueTitle: "brand",
-                                    value: e.target.value,
-                                  })
-                                
-                              }
-                              placeholder="Enter answer"
-                              className="flex-1 p-2 outline-primary-green"
-                            />
-                          </div> */}
                     </div>
                     <p>Rent for apartment</p>
                     <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -141,7 +163,7 @@ function Accomodation() {
                         type="text"
                         placeholder="Enter answer"
                         className="flex-1 pl-8 py-2 outline-primary-green"
-                        value={accomodationForm[item][i]["cost"]}
+                        value={clothingForm[item][i]["cost"]}
                         onChange={(e) =>
                           setAccomodationItemValue({
                             item,
@@ -156,8 +178,7 @@ function Accomodation() {
                   </div>
                 </>
               </div>
-            ))}
-            {/* Add new button */}
+            ))} */}
             {/* <div className="flex justify-end px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%]">
               <button
                 className=" flex gap-[6px] items-center hover:bg-light-primary-green p-2 rounded"
@@ -180,10 +201,10 @@ function Accomodation() {
         if all fields in this form section have a value
       </p>
       <button
-        disabled={accomodationProgressPercentage !== 100}
-        onClick={() => setCurrentFormTab("Reports")}
+        disabled={clothingProgressPercentage !== 100}
+        onClick={() => setCurrentFormTab("Transport")}
         className={`${
-          accomodationProgressPercentage === 100
+          clothingProgressPercentage === 100
             ? "bg-primary-green"
             : "bg-gray-300"
         } w-full rounded-lg flex justify-center items-center p-2`}
@@ -194,4 +215,4 @@ function Accomodation() {
   );
 }
 
-export default Accomodation;
+export default Clothing;

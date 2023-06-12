@@ -7,6 +7,7 @@ const DropDownMenu = ({
   list,
   item,
   type,
+  cloth,
   valueTitle,
   value,
   handleChange,
@@ -38,11 +39,17 @@ const DropDownMenu = ({
 
   // handle state change
   useEffect(() => {
-    if (item === "Charcoal" || item === "Cement" || item === "Building Block") {
+    if (
+      item === "Charcoal" ||
+      item === "Cement" ||
+      item === "Building Block" ||
+      item === "Firewood"
+    ) {
       setCommodityItemValue({
         item,
         type,
-        valueTitle: item === "Building Block" ? "size" : "weight",
+        valueTitle:
+          item === "Building Block" || item === "Firewood" ? "size" : "weight",
         value: dropDownValue,
         i,
       });
@@ -55,6 +62,8 @@ const DropDownMenu = ({
         });
       } else if (section === "accomodationSectionStructure") {
         handleChange(item, valueTitle, dropDownValue, i);
+      } else if (section === "clothingSectionStructure") {
+        handleChange(item, cloth, valueTitle, dropDownValue);
       } else {
         handleChange(item, type, valueTitle, dropDownValue, i);
       }

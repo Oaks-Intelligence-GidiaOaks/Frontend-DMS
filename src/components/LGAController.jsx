@@ -74,7 +74,7 @@ function LGAController() {
         type="text"
         value={currentLGA}
         placeholder="Change LGA"
-        className="flex w-[60%] flex-1 pl-3 outline-none rounded cursor-pointer text-[14px] bg-transparent "
+        className="flex w-[60%] capitalize flex-1 pl-3 outline-none rounded cursor-pointer text-[14px] bg-transparent "
         onFocus={() => {
           setShowDropDown(true);
           setIsFocused(true);
@@ -86,7 +86,7 @@ function LGAController() {
           {user.LGA.filter((lga) => lga !== currentLGA).map((item, i) => (
             <li
               key={i}
-              className="px-2 py-2 text-[14px] cursor-pointer hover:bg-light-primary-green flex items-center gap-2"
+              className="px-2 py-2 text-[14px] capitalize cursor-pointer hover:bg-light-primary-green flex items-center gap-2"
               onClick={() => {
                 setDropDownValue(item);
                 setState((prev) => ({ ...prev, currentLGA: item }));
