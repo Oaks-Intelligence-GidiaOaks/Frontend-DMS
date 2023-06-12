@@ -1,19 +1,61 @@
 import React, { useEffect, useState } from "react";
 import TrackerGrid from "../../components/grid/TrackerGrid";
 import MeshedLineChart from "../../components/charts/MeshedLineChart";
-import { MeshedLineChartData } from "../../data/charts";
+import {
+  allLgasChidinma,
+  allLgasAkunna,
+  allLgasChinyere,
+  allLgasTimi,
+  allLgasToju,
+} from "../../data/charts";
 import axios from "axios";
+import { Loading } from "../../components/reusable";
 
 const AdminTracker = () => {
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
 
-  if (timeOfSub) {
-    // console.log("time of submission", timeOfSub);
-  }
+  let transChartTime = null;
 
-  let firstChart = timeOfSub && timeOfSub.slice(0, 15);
-  let secondChart = timeOfSub && timeOfSub.length > 15 && timeOfSub.slice(15);
+  if (timeOfSub) {
+    let chidinma = timeOfSub
+      .filter((item) => allLgasChidinma.includes(item.lga))
+      .map((item) => ({ ...item, lga: `Chidinma` }))[0];
+
+    let toju = timeOfSub
+      .filter((item) => allLgasToju.includes(item.lga))
+      .map((item) => ({ ...item, lga: `Toju` }))[0];
+
+    let timi = timeOfSub
+      .filter((item) => allLgasTimi.includes(item.lga))
+      .map((item) => ({ ...item, lga: `Timi` }))[0];
+
+    let akunna = timeOfSub
+      .filter((item) => allLgasAkunna.includes(item.lga))
+      .map((item) => ({ ...item, lga: `Akunna` }))[0];
+
+    let chinyere = timeOfSub
+      .filter((item) => allLgasChinyere.includes(item.lga))
+      .map((item) => ({ ...item, lga: `Chinyere` }))[0];
+
+    transChartTime = new Array();
+    // transChartTime.push(...[chidinma]);
+    if (chidinma !== undefined) {
+      transChartTime.push(chidinma);
+    }
+    if (toju !== undefined) {
+      transChartTime.push(chidinma);
+    }
+    if (timi !== undefined) {
+      transChartTime.push(chidinma);
+    }
+    if (akunna !== undefined) {
+      transChartTime.push(chidinma);
+    }
+    if (chinyere !== undefined) {
+      transChartTime.push(chidinma);
+    }
+  }
 
   useEffect(() => {
     axios
@@ -30,8 +72,6 @@ const AdminTracker = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-
-  // const transformedData = trackerData && trackerData.results.map(item => ({...item, submission }))
 
   let submitted =
     trackerData &&
@@ -61,20 +101,20 @@ const AdminTracker = () => {
 
       {/* table */}
       <div className="bg-white  w-full">
-        {trackerData && <TrackerGrid data={trackerData.results} />}
+        {!trackerData ? (
+          <div className="h-32">
+            <Loading />
+          </div>
+        ) : (
+          <TrackerGrid data={trackerData.results} />
+        )}
       </div>
 
       {/* chart */}
-      <div className="p-3 flex flex-col lg:flex-row gap-3 rounded-xl drop-shadow-lg ">
-        <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
-          <MeshedLineChart data={firstChart} />
+      <div className="p-3 flex flex-col lg:flex-row overflow-x-scroll gap-3 rounded-xl drop-shadow-lg ">
+        <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg p-2">
+          <MeshedLineChart data={transChartTime ?? transChartTime} />
         </div>
-
-        {secondChart && (
-          <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
-            <MeshedLineChart data={secondChart} />
-          </div>
-        )}
       </div>
     </div>
   );

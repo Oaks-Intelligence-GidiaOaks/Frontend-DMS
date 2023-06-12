@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { FormInput, FormInputDropDown } from "../../components/form";
+import {
+  FormInput,
+  FormInputDropDown,
+  FormMultipleSelect,
+} from "../../components/form";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import { useAuth } from "../../context";
+import { useLocation } from "react-router-dom";
 
 const AddEnumerator = () => {
   const { user } = useAuth();
+
+  const location = useLocation();
+
+  let totalEnumerators = location.state?.totalEnumerators;
+  let recentlyAdded = location.state?.newlyAdded;
 
   const teamLeadStates = user.states.map((st) => ({ label: st, value: st }));
   const teamLeadLgas = user.LGA.map((st) => ({ label: st, value: st }));
@@ -29,8 +39,6 @@ const AddEnumerator = () => {
   const [userCreated, setUserCreated] = useState(false);
   const [error, setError] = useState(null);
 
-  // let lgaOptions = states ? allLgasByState[state] : [];
-
   useEffect(() => {
     let fileReader,
       isCancel = false;
@@ -43,7 +51,6 @@ const AddEnumerator = () => {
 
         if (result && !isCancel) {
           setFileDataUrl(result);
-          // console.log(result);
         }
       };
 
@@ -72,12 +79,11 @@ const AddEnumerator = () => {
 
   const handleStateChange = (selectedValue) => {
     setState(selectedValue);
-    console.log(selectedValue);
     setLga(null);
   };
 
   const handleLgaChange = (selectedValue) => {
-    setLga([selectedValue]);
+    setLga(selectedValue.map((item) => item.value));
   };
 
   const handleIdTypeChange = (selectedValue) => {
@@ -99,8 +105,6 @@ const AddEnumerator = () => {
     e.preventDefault();
 
     const { firstName, lastName, email, tel, idNo, idType } = formFields;
-
-    console.log(formFields);
 
     if (
       !firstName ||
@@ -130,17 +134,27 @@ const AddEnumerator = () => {
       avarter: fileDataUrl,
     };
 
-    // console.log(newUser);
+    let bodyFormData = new FormData();
+
+    bodyFormData.append("firstName", newUser.firstName);
+    bodyFormData.append("lastName", newUser.lastName);
+    bodyFormData.append("email", newUser.email);
+    bodyFormData.append("phoneNumber", newUser.phoneNumber);
+    bodyFormData.append("identityType", newUser.identityType);
+    bodyFormData.append("identity", newUser.identity);
+    bodyFormData.append("state", newUser.state);
+    bodyFormData.append("LGA", newUser.LGA);
+    bodyFormData.append("avarter", newUser.avarter);
+
+    console.log(bodyFormData);
 
     axios
-      .post("enumerator/new", newUser)
-      .then((user) => {
-        if (!user) {
-          console.log("error while creating user");
-        } else {
-          resetForm();
-        }
+      .post(`enumerator/new`, bodyFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       })
+      .then((res) => console.log(res.data))
       .catch((err) => console.log(err));
   };
 
@@ -149,13 +163,13 @@ const AddEnumerator = () => {
       <div className="flex items-center gap-3">
         <div className="flex items-center text-xs gap-6 bg-white p-2 rounded">
           <p>Total Enumerators</p>
-          <p className="p-2 bg-gray-100 rounded">584</p>
+          <p className="p-2 bg-gray-100 rounded">{totalEnumerators}</p>
         </div>
 
         {/* recently added */}
         <div className="flex items-center text-xs gap-6 bg-white p-2 rounded">
           <p>Recently added</p>
-          <p className="p-2 bg-gray-100 rounded">52</p>
+          <p className="p-2 bg-gray-100 rounded">{recentlyAdded}</p>
         </div>
       </div>
 
@@ -172,6 +186,7 @@ const AddEnumerator = () => {
             setFormFields((prev) => ({ ...prev, firstName: e.target.value }))
           }
         />
+
         <FormInput
           placeholder="Last name"
           label="Last name"
@@ -180,8 +195,10 @@ const AddEnumerator = () => {
             setFormFields((prev) => ({ ...prev, lastName: e.target.value }))
           }
         />
+
         <FormInput
           placeholder="Email"
+          type="email"
           label="Email address"
           value={formFields.email}
           onChange={(e) =>
@@ -205,14 +222,12 @@ const AddEnumerator = () => {
           onChange={handleStateChange}
         />
 
-        {/* {state && ( */}
-        <FormInputDropDown
+        <FormMultipleSelect
           label="LGA"
           onChange={handleLgaChange}
           data={teamLeadLgas}
           index="z-20"
         />
-        {/* )} */}
 
         <FormInputDropDown
           label="Identification(ID) type"

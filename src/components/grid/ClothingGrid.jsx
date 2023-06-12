@@ -12,6 +12,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import axios from "axios";
 import { useAuth } from "../../context";
+import { NoData } from "../reusable";
 
 const ClothingGrid = ({ data }) => {
   const {
@@ -83,6 +84,24 @@ const ClothingGrid = ({ data }) => {
     columns: ["State"],
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "category"
+      ? "Category"
+      : field === "sub_category"
+      ? "Sub Category"
+      : field === "price"
+      ? "Price"
+      : field === "size"
+      ? "Size"
+      : field;
+  };
+
   return data["data"].length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -99,6 +118,7 @@ const ClothingGrid = ({ data }) => {
         {transformedColumns?.map(({ field, width }) => (
           <ColumnDirective
             key={field}
+            headerText={checkHeaderText(field)}
             visible={field === "_id" ? false : true}
             field={field}
             allowEditing={field === "price"}
@@ -111,7 +131,9 @@ const ClothingGrid = ({ data }) => {
       <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div>No data available for current week...</div>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
+    </div>
   );
 };
 

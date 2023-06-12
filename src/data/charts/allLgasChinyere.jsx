@@ -1,0 +1,15 @@
+export const allLgasChinyere = [
+  "aiyedaade",
+  "oshogbo",
+  "olorunda",
+  "ibadan north",
+  "akinyele",
+  "ibadan",
+  "phalga",
+  "obia/akpor",
+  "emohua",
+  "sokoto",
+  "lan",
+  "ardu",
+  "yorro",
+];

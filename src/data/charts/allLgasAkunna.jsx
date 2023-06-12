@@ -1,0 +1,16 @@
+export const allLgasAkunna = [
+  "tsafe",
+  "gusau",
+  "bungudu",
+  "akure south",
+  "owo",
+  "akoko north east",
+  "potiskum",
+  "bade",
+  "damaturu",
+  "barkin ladi",
+  "jos south",
+  "jos north",
+  "wamako",
+  "dange-shuni",
+];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FormInput, FormInputDropDown } from "../../components/form";
 import { AllStates, lgasByState } from "../../data/form/states";
 import { allLgasByState } from "../../data/form/allLgasByState";
@@ -6,9 +6,12 @@ import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import FormMultipleSelect from "../../components/form/FormMultipleSelect";
 import { useAuth } from "../../context";
+import { EditNote } from "@mui/icons-material";
 
 const AddTeamLead = () => {
   const { user } = useAuth();
+  let avaterRef = useRef(null);
+
   const [formFields, setFormFields] = useState({
     firstName: "",
     lastName: "",
@@ -20,10 +23,13 @@ const AddTeamLead = () => {
   const [states, setStates] = useState([]);
   const [lgas, setLgas] = useState([]);
   const [image, setImage] = useState(null);
-  const [fileDataUrl, setFileDataUrl] = useState(null);
-  const imageMimeType = /image\/(png|jpg|jpeg)/i;
+  const [avatar, setAvatar] = useState(null);
+  const [file, setFile] = useState(null);
+  const [identityImage, setIdentityImage] = useState(null);
   const [userCreated, setUserCreated] = useState(false);
   const [lgaRoutes, setLgaRoutes] = useState(null);
+
+  const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
   useEffect(() => {
     axios
@@ -31,21 +37,6 @@ const AddTeamLead = () => {
       .then((res) => setLgaRoutes(res.data.data))
       .catch((err) => console.error(err));
   }, []);
-
-  let coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
-
-  let lgasArr = [];
-
-  if (lgaRoutes) {
-    console.log(coveredLgas);
-  }
-
-  states.length > 0 &&
-    states.map((item) => {
-      allLgasByState[item.value]
-        .filter((item) => !coveredLgas.includes(item.value))
-        .map((i) => lgasArr.push(i));
-    });
 
   useEffect(() => {
     let fileReader,
@@ -56,16 +47,38 @@ const AddTeamLead = () => {
 
       fileReader.onload = (e) => {
         const { result } = e.target;
-
         if (result && !isCancel) {
-          setFileDataUrl(result);
-          // console.log(result);
+          setAvatar(result);
         }
       };
 
       fileReader.readAsDataURL(image);
     }
-  }, [image]);
+
+    if (file) {
+      fileReader = new FileReader();
+
+      fileReader.onload = (e) => {
+        const { result } = e.target;
+        if (result && !isCancel) {
+          setIdentityImage(result);
+        }
+      };
+
+      fileReader.readAsDataURL(file);
+    }
+  }, [image, file]);
+
+  let coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
+
+  let lgasArr = [];
+
+  states.length > 0 &&
+    states.map((item) => {
+      allLgasByState[item.value]
+        .filter((item) => !coveredLgas.includes(item.value))
+        .map((i) => lgasArr.push(i));
+    });
 
   const resetForm = () => {
     setFormFields({
@@ -79,10 +92,8 @@ const AddTeamLead = () => {
 
     setStates([]);
     setLgas([]);
-    setImage(null);
-    setFileDataUrl(null);
-    setFileDataUrl(null);
-
+    setIdentityImage(null);
+    setAvatar(null);
     setUserCreated(true);
   };
 
@@ -108,15 +119,13 @@ const AddTeamLead = () => {
       return;
     }
 
-    setImage(file);
+    setFile(file);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const { firstName, lastName, email, tel, idNo, idType } = formFields;
-
-    // console.log(formFields);
 
     if (
       !firstName ||
@@ -125,7 +134,7 @@ const AddTeamLead = () => {
       !tel ||
       !idNo ||
       !idType ||
-      !fileDataUrl ||
+      !identityImage ||
       !states ||
       !lgas
     ) {
@@ -142,46 +151,87 @@ const AddTeamLead = () => {
       firstName,
       lastName,
       email,
-      // phoneNumber: tel,
-      // identityType: idType,
-      // identity: idNo,
+      phoneNumber: tel,
+      identityType: idType,
+      identity: idNo,
+      identityImage,
       role: "team_lead",
       states: transformedStates,
       LGA: transformedLgas,
-      // avarter: fileDataUrl,
+      avatar,
     };
 
-    // console.log(newUser);
+    let bodyFormData = new FormData();
 
-    axios
-      .post("user/new", newUser)
-      .then((user) => {
-        if (!user) {
-          console.log("error while creating user");
-        } else {
-          resetForm();
-        }
-      })
-      .catch((err) => console.log(err));
+    bodyFormData.append("firstName", newUser.firstName);
+    bodyFormData.append("lastName", newUser.lastName);
+    bodyFormData.append("email", newUser.email);
+    bodyFormData.append("phoneNumber", newUser.phoneNumber);
+    bodyFormData.append("identityType", newUser.identityType);
+    bodyFormData.append("identity", newUser.identity);
+    bodyFormData.append("identityImage", newUser.identityImage);
+    bodyFormData.append("state", newUser.states);
+    bodyFormData.append("LGA", newUser.LGA);
+    bodyFormData.append("avatar", newUser.avatar);
+
+    console.log(bodyFormData);
+
+    // axios
+    //   .post("user/new", newUser)
+    //   .then((user) => {
+    //     if (!user) {
+    //       console.log("error while creating user");
+    //     } else {
+    //       resetForm();
+    //     }
+    //   })
+    //   .catch((err) => console.log(err));
+  };
+
+  const handlePhotoClick = () => {
+    avaterRef.current.click();
+  };
+
+  const handleAvaterSelect = (e) => {
+    let selectedFile = e.target.files[0];
+
+    if (!selectedFile.type.match(imageMimeType)) {
+      alert("image mime type is not valid");
+      return;
+    }
+
+    setImage(selectedFile);
   };
 
   return (
     <div className="lg:w-4/5 mx-auto py-6 text-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center text-xs gap-6 bg-white p-2 rounded">
-          <p>Total Enumerators</p>
-          <p className="p-2 bg-gray-100 rounded">584</p>
-        </div>
-
-        {/* recently added */}
-        <div className="flex items-center text-xs gap-6 bg-white p-2 rounded">
-          <p>Recently added</p>
-          <p className="p-2 bg-gray-100 rounded">52</p>
-        </div>
+      <div className="mt-3 mb-4 ">
+        <p className="text-base font-bold">Create new Team Lead profile</p>
       </div>
 
-      <div className="mt-6 mb-4 ">
-        <p className="text-base font-bold">Create new Team Lead profile</p>
+      <div className="mx-auto w-fit">
+        <img
+          src={avatar}
+          alt="img"
+          className="h-44 w-44 rounded-full bg-green-200"
+        />
+
+        <p
+          onClick={handlePhotoClick}
+          className="flex justify-center cursor-pointer items-center py-3"
+        >
+          <input
+            type="file"
+            name=""
+            className="hidden"
+            ref={avaterRef}
+            onChange={handleAvaterSelect}
+            id=""
+            accept="image/*"
+          />
+          <span className="">Edit photo</span>
+          <EditNote />
+        </p>
       </div>
 
       <form action="" className="lg:w-5/6" onSubmit={handleSubmit}>
@@ -260,10 +310,10 @@ const AddTeamLead = () => {
           accept="image/*"
         />
 
-        <div className="h-24 w-full rounded-lg bg-white drop-shadow-md">
-          {fileDataUrl && (
+        <div className="h-32 w-full rounded-lg bg-white drop-shadow-md">
+          {identityImage && (
             <img
-              src={fileDataUrl}
+              src={identityImage}
               alt="file data url"
               className="h-full w-full bg-black"
             />

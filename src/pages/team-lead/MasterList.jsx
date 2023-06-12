@@ -18,14 +18,6 @@ const MasterList = () => {
   const [masterList, setMasterList] = useState(null);
   const [newMaster, setNewMaster] = useState(null);
 
-  if (newMaster) {
-    // console.log(newMaster);
-  }
-
-  if (masterList) {
-    console.log(masterList);
-  }
-
   useEffect(() => {
     axios
       .get(`form_response/master_list_data`)
@@ -41,10 +33,10 @@ const MasterList = () => {
             const {
               foodItems,
               others,
-              state,
+              state: State,
               transports,
               electricity,
-              lga,
+              lga: LGA,
               accomodations,
               created_by,
               _id,
@@ -52,9 +44,8 @@ const MasterList = () => {
 
             const foodObj = await foodItems
               .map((food, i) => ({
-                [`food_${i}`]: food.name,
-                [`foodPrice_${i}`]: food.price,
-                [`foodBrand_${i}`]: food.brand,
+                [`Price of ${food.name}`]: food.price,
+                [`Brand of ${food.name}`]: food.brand < 1 ? "N/A" : food.brand,
               }))
               .reduce((acc, obj) => {
                 return {
@@ -65,9 +56,7 @@ const MasterList = () => {
 
             const accObj = await accomodations
               .map((acc, i) => ({
-                [`accType_${i}`]: acc.type,
-                [`accPrice_${i}`]: acc.price,
-                [`accRooms_${i}`]: acc.rooms,
+                [`${acc.rooms} room ${acc.type}`]: acc.price,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -75,9 +64,9 @@ const MasterList = () => {
 
             const transportObj = await transports
               .map((transport, i) => ({
-                [`transport_${i}`]: transport.route,
-                [`transMode_${i}`]: transport.mode,
-                [`transCost_${i}`]: transport.cost,
+                [`Route ${i + 1}`]: transport.route,
+                [`Mode ${i + 1}`]: transport.mode,
+                [`Route ${i + 1} cost`]: transport.cost,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -94,9 +83,9 @@ const MasterList = () => {
 
             const othersObj = await others
               .map((item, i) => ({
-                [`prodName_${i}`]: item.name,
-                [`prodPrice_${i}`]: item.price,
-                [`prodBrand_${i}`]: item.brand,
+                [`Price of ${item.name}`]: item.price ?? "N/A",
+                [`Brand of ${item.name}`]:
+                  item.brand.length < 1 ? "N/A" : item.brand,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -106,16 +95,17 @@ const MasterList = () => {
               S_N: i + 1,
               _id,
               ID: created_by.id,
-              lga,
-              food: "food",
+              State,
+              LGA,
+              Food: "food",
               ...foodObj,
-              transport: "transport",
+              Transport: "transport",
               ...transportObj,
-              accomodation: "accomodation",
+              Accomodation: "accomodation",
               ...accObj,
-              electricity: "electricity",
+              Electricity: "electricity",
               ...electricityObj,
-              others: "commodities",
+              Others: "commodities",
               ...othersObj,
             };
 
@@ -135,12 +125,6 @@ const MasterList = () => {
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
-
-  // helper functions
-  const getTabData = (tabValue) => {
-    setActiveTab(tabValue);
-    // make request to get tab data
-  };
 
   return (
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">

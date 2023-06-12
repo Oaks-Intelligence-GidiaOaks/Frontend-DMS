@@ -12,6 +12,7 @@ import {
   Toolbar,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import { NoData } from "../reusable";
 
 const AccomodationGrid = ({ data }) => {
   let dataCount = data.totalCount;
@@ -77,6 +78,22 @@ const AccomodationGrid = ({ data }) => {
     }
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "type"
+      ? "Type"
+      : field === "rooms"
+      ? "Rooms"
+      : field === "price"
+      ? "Price"
+      : field;
+  };
+
   return accData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -93,6 +110,7 @@ const AccomodationGrid = ({ data }) => {
           <ColumnDirective
             key={field}
             field={field}
+            headerText={checkHeaderText(field)}
             allowEditing={field === "price"}
             width={width}
             visible={field !== "_id"}
@@ -103,8 +121,8 @@ const AccomodationGrid = ({ data }) => {
       <Inject services={[Page, Sort, Toolbar, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
     </div>
   );
 };

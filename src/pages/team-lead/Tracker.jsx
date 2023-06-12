@@ -6,6 +6,7 @@ import { MeshedLineChartData } from "../../data/charts";
 import axios from "axios";
 import { Download } from "@mui/icons-material";
 import { useAuth } from "../../context";
+import { Loading } from "../../components/reusable";
 
 const Tracker = () => {
   const {
@@ -14,7 +15,7 @@ const Tracker = () => {
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
 
-  console.log(trackerData);
+  // console.log(trackerData);
 
   let submitted = trackerData && trackerData.totalSubmision;
 
@@ -90,7 +91,11 @@ const Tracker = () => {
 
       {/* table */}
       <div className="bg-white  w-full">
-        {trackerData && <TrackerGrid data={trackerData.results} />}
+        {!trackerData ? (
+          <Loading />
+        ) : (
+          <TrackerGrid data={trackerData.results} />
+        )}
       </div>
 
       {/* chart */}

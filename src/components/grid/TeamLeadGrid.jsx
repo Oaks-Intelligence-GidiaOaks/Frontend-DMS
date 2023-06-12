@@ -13,7 +13,6 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { useAuth } from "../../context";
 import axios from "axios";
-// import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
 
 const TeamLeadGrid = ({ data }) => {
   const { user } = useAuth();
@@ -24,26 +23,6 @@ const TeamLeadGrid = ({ data }) => {
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
   let teamLeadsData = data.users;
-
-  const dataColumns = Object.keys(teamLeadsData[0])
-    .filter(
-      (item) =>
-        item !== "avarter" &&
-        item !== "createdAt" &&
-        item !== "firstUse" &&
-        item !== "updatedAt" &&
-        item !== "enumerators" &&
-        item !== "disabled" &&
-        item !== "LGA" &&
-        item !== "__v" &&
-        item !== ""
-    )
-    .map((it) => ({
-      field: it,
-      width: it.length + 150,
-    }));
-
-  // console.log(dataColumns);
 
   const handleMenuToggle = (event, user) => {
     event.stopPropagation();
@@ -58,8 +37,6 @@ const TeamLeadGrid = ({ data }) => {
   };
 
   const handleSeeMore = (user) => {
-    console.log("See More", user);
-
     const { email, firstName, lastName, role, states, id, _id, LGA } = user;
 
     const transformedUser = {
@@ -79,8 +56,6 @@ const TeamLeadGrid = ({ data }) => {
   };
 
   const handleDelete = (user) => {
-    console.log("Delete", user);
-
     if (user) {
       axios
         .put(`admin/user/disable/${user._id}`)
@@ -93,6 +68,10 @@ const TeamLeadGrid = ({ data }) => {
     console.log("Reset Password", user);
   };
 
+  const serialNumberTemplate = (rowData) => {
+    return rowData ? Number(rowData.index) + 1 : "";
+  };
+
   const ActionTemplate = (rowData) => {
     return (
       <div className="action-container text-[10px]">
@@ -100,9 +79,9 @@ const TeamLeadGrid = ({ data }) => {
           className="hamburger-menu space-y-1 grid place-items-center cursor-pointer"
           onClick={(e) => handleMenuToggle(e, rowData)}
         >
-          <div className="border-2 border-blue-400 w-6"></div>
-          <div className="border-2 border-blue-400 w-6"></div>
-          <div className="border-2 border-blue-400 w-6"></div>
+          <div className="border border-blue-400 w-6"></div>
+          <div className="border border-blue-400 w-6"></div>
+          <div className="border border-blue-400 w-6"></div>
         </div>
         {selectedUser && selectedUser.index === rowData.index && isMenuOpen && (
           <div
@@ -159,14 +138,26 @@ const TeamLeadGrid = ({ data }) => {
         height={400}
       >
         <ColumnsDirective>
-          {dataColumns.map(({ field, width }) => (
-            <ColumnDirective
-              visible={field === "state" || field === "_id" ? false : true}
-              key={field}
-              field={field}
-              width={width}
-            />
-          ))}
+          <ColumnDirective
+            headerText="S/N"
+            template={serialNumberTemplate}
+            width={80}
+          />
+
+          <ColumnDirective
+            field="firstName"
+            headerText="First name"
+            width={130}
+          />
+          <ColumnDirective
+            field="lastName"
+            headerText="Last name"
+            width={130}
+          />
+          <ColumnDirective field="email" headerText="Email" width={130} />
+          <ColumnDirective field="id" headerText="Id" width={130} />
+          <ColumnDirective field="states" headerText="States" width={130} />
+          <ColumnDirective field="role" headerText="Role" width={130} />
 
           <ColumnDirective
             headerText="Actions"

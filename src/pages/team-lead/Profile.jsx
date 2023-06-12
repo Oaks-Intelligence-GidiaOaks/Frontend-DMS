@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { EditNote } from "@mui/icons-material";
 import {
   DisplayInput,
@@ -12,20 +12,97 @@ import Select from "react-select";
 const Profile = () => {
   const { user } = useAuth();
 
+  const avaterRef = useRef(null);
+
+  const [submissionRate, setSubmissionRate] = useState(null);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
+  const [identityType, setIdentityType] = useState(user.identityType);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState(user.email);
   const [states, setStates] = useState(user.states);
   const [lgas, setLgas] = useState(user.LGA);
+  const [image, setImage] = useState(null);
 
-  const handleStatesChange = (selectedOptions) => {
-    setStates(selectedOptions.map((item) => item.value));
-  };
-  console.log(states);
+  const [imageUrl, setImageUrl] = useState(user.avarter.url);
+
+  const imageMimeType = /image\/(png|jpg|jpeg)/i;
+
+  let submitted = submissionRate ? submissionRate.submited : 0;
+  let noResponse = submissionRate ? submissionRate.notSubmited : 0;
+
+  useEffect(() => {
+    axios
+      .get(`team_lead_dashboard/submission_rate`)
+      .then((res) => {
+        setSubmissionRate(res.data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    let fileReader,
+      isCancel = false;
+
+    if (image) {
+      fileReader = new FileReader();
+
+      fileReader.onload = (e) => {
+        const { result } = e.target;
+        if (result && !isCancel) {
+          setImageUrl(result);
+        }
+      };
+
+      fileReader.readAsDataURL(image);
+    }
+  }, [image]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const newUser = {
+      id: user.id,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      identity,
+      identityImage,
+      avatar: imageUrl,
+      states: states,
+      LGA: lgas,
+      role: "team_lead",
+    };
+
+    let bodyFormData = new FormData();
+
+    bodyFormData.append("firstName", newUser.firstName);
+    bodyFormData.append("lastName", newUser.lastName);
+    bodyFormData.append("email", newUser.email);
+    bodyFormData.append("phoneNumber", newUser.phoneNumber);
+    bodyFormData.append("identityType", newUser.identityType);
+    bodyFormData.append("identity", newUser.identity);
+    bodyFormData.append("identityImage", newUser.identityImage);
+
+    bodyFormData.append("state", newUser.state);
+    bodyFormData.append("LGA", newUser.LGA);
+    bodyFormData.append("avarter", newUser.avarter);
+  };
+
+  const handlePhotoClick = () => {
+    avaterRef.current.click();
+  };
+
+  const handleAvaterSelect = (e) => {
+    let selectedFile = e.target.files[0];
+
+    if (!selectedFile.type.match(imageMimeType)) {
+      alert("image mime type is not valid");
+      return;
+    }
+
+    setImage(selectedFile);
   };
 
   return (
@@ -33,20 +110,36 @@ const Profile = () => {
       <div className="flex items-center gap-6">
         <div className="rounded bg-white p-3 flex items-center gap-3 text-xs">
           <p className="">Total submissions</p>
-          <p className="rounded p-1  bg-white">585</p>
+          <p className="rounded p-1  bg-white">{submitted}</p>
         </div>
 
         <div className="rounded bg-white p-3 flex items-center gap-3 text-xs">
           <p className="">No response</p>
-          <p className="rounded p-1  bg-white">52</p>
+          <p className="rounded p-1  bg-white">{noResponse}</p>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6 text-sm">
         <div className="mx-auto">
-          <img src="" alt="" className="h-44 w-44 rounded-full bg-green-500" />
+          <img
+            src={imageUrl}
+            alt="avarter Img"
+            className="h-44 w-44 rounded-full bg-green-500"
+          />
 
-          <p className="border flex justify-center items-center py-3">
+          <p
+            onClick={handlePhotoClick}
+            className="flex justify-center cursor-pointer items-center py-3"
+          >
+            <input
+              type="file"
+              name=""
+              className="hidden"
+              ref={avaterRef}
+              onChange={handleAvaterSelect}
+              id=""
+              accept="image/*"
+            />
             <span className="">Edit photo</span>
             <EditNote />
           </p>
@@ -77,14 +170,6 @@ const Profile = () => {
             placeholder="+234 81674***"
             label="Contact number"
           />
-
-          {/* <FormMultipleSelect
-            defaultValue={states}
-            index="z-10"
-            // data={states.map((item) => ({ label: item, value: item }))}
-            label="State"
-            onChange={handleStatesChange}
-          /> */}
 
           <DisplayInput label="States" data={user.states} />
           <DisplayInput label="LGA" data={user.LGA} />

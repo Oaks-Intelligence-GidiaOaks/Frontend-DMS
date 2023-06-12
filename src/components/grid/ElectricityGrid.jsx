@@ -10,6 +10,7 @@ import {
   Sort,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import { NoData } from "../reusable";
 
 const ElectricityGrid = ({ data }) => {
   let dataCount = data.totalCount;
@@ -79,6 +80,18 @@ const ElectricityGrid = ({ data }) => {
     }
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "hours_per_week"
+      ? "Hours per week"
+      : field;
+  };
+
   return elecData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -93,6 +106,7 @@ const ElectricityGrid = ({ data }) => {
         {elecColumns.map(({ field, width }) => (
           <ColumnDirective
             key={field}
+            headerText={checkHeaderText(field)}
             field={field}
             width={width}
             visible={field !== "_id"}
@@ -104,8 +118,8 @@ const ElectricityGrid = ({ data }) => {
       <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
     </div>
   );
 };

@@ -11,10 +11,8 @@ const MetricsCard = ({
   legendTwo,
   data,
 }) => {
-  // console.log(data);
-
   // team_lead
-  let totalEnumerators = data.totalEnumerators;
+  let totalEnumerators = data?.totalEnumerators;
   let submitted = data.submited;
   let totalLga = data.totalLga;
 
@@ -25,15 +23,13 @@ const MetricsCard = ({
   let notSubmitted = data.notSubmited;
   let assignedLga = data.assignedLga;
 
-  // console.log(newlyAdded);
   // admin
-
   const getValue1 = (val, vall, valll, vallll) => {
-    if (val) {
+    if (val || val === 0) {
       return val;
-    } else if (vall) {
+    } else if (vall || vall === 0) {
       return vall;
-    } else if (valll) {
+    } else if (valll || valll === 0) {
       return valll;
     } else {
       return vallll;
@@ -43,7 +39,7 @@ const MetricsCard = ({
   const getValue2 = (val, vall, valll) => {
     if (val || val === 0) {
       return val;
-    } else if (vall) {
+    } else if (vall || vall === 0) {
       return vall;
     } else {
       return valll;
@@ -55,15 +51,12 @@ const MetricsCard = ({
     value: item[1],
   }));
 
-  // console.log(transformedData);
-
   return (
-    <div className="rounded-md w-fit shrink-0 relative bg-white px-5 py-4 text-sm drop-shadow-sm flex">
-      <div className="pr-10  ">
-        <p className="font-bold  flex gap-2">
+    <div className="rounded-md w-fit shrink-0 relative bg-white px-3 py-3 text-sm drop-shadow-sm flex">
+      <div className="pr-6">
+        <p className="font-bold flex gap-1">
           <span>{lead}: </span>
           <span>
-            {" "}
             {getValue1(totalEnumerators, submitted, totalLga, totalTeamLeads)}
           </span>
         </p>
@@ -75,11 +68,11 @@ const MetricsCard = ({
 
       <div className="text-xs">
         {/* chart */}
-        <div className="h-[80px] w-[80px] ml-auto">
+        <div className="h-[70px] w-[70px] ml-auto">
           <Pie iR={0} data={transformedData} />
         </div>
 
-        <div className="mt-3">
+        <div className="">
           <div className="flex items-center sdivace-x-1">
             <div className="h-2 w-2 bg-yellow-500 mr-1" />
             <span>{legendOne}</span>

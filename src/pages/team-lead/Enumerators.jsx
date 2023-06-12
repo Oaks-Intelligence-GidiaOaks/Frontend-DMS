@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EnumeratorGrid from "../../components/grid/EnumeratorGrid";
+import { Loading, NoData } from "../../components/reusable";
 
 const Enumerators = () => {
   const [tableData, setTableData] = useState(null);
-  // const [isloading, setIsLoading] = useState(true)
-
-  // const memoizedEnumerators = useMemo(() => {
-  //   return () =>
-  //     axios
-  //       .get("admin/enumerators")
-  //       .then((res) => setTableData(res.data))
-  //       .catch((err) => console.log(err));
-  // }, []);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -40,25 +33,25 @@ const Enumerators = () => {
           </p>
         </div>
 
-        <Link
-          to="/add"
-          onClick={() => {}}
+        <div
+          onClick={() => navigate("/add", { state: tableData })}
           className="rounded bg-white border border-primary text-primary flex items-center p-3 gap-12 sm:ml-auto cursor-pointer sm:flex-initial xs:flex-1 xs:justify-between"
         >
           <p>Add new</p>
           <span>+</span>
-        </Link>
+        </div>
       </div>
 
       {/* table */}
       <div className="bg-white  w-full text-xs">
-        {tableData?.enumerators.length > 0 ? (
+        {!tableData ? (
+          <Loading />
+        ) : tableData?.enumerators.length > 0 ? (
           <EnumeratorGrid data={tableData.enumerators} />
         ) : (
-          <>
-            {/* <EnumeratorGrid /> */}
-            <p>You have no enumerators yet...</p>
-          </>
+          <div className="h-32">
+            <NoData text="You have no enumerators yet" />
+          </div>
         )}
       </div>
     </div>

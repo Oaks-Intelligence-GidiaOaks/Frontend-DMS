@@ -45,10 +45,6 @@
   border-radius: 10px;
 }
 
-/* .scrollbar-hidee::-webkit-scrollbar-thumb:hover {
-  background: #b30000;
-} */
-
 .touch-scroll {
   -webkit-overflow-scrolling: touch;
   overflow-x: "auto";
@@ -59,7 +55,6 @@
   user-select: none;
 }
 
-/* material icon cat tab */
 p > .MuiSvgIcon {
   height: 10px !important;
   width: 10px;
@@ -88,37 +83,27 @@ input::-webkit-inner-spin-button {
 }
 
 input[type="radio"] {
-  /* The native appearance is hidden */
   appearance: none;
   -webkit-appearance: none;
 
-  /* For a circular appearance we need a border-radius. */
   border-radius: 50%;
 
-  /* The background will be the radio dot's color. */
   background: #fff;
 
-  /* The border will be the spacing between the dot and the outer circle */
   border: 3px solid #fff;
 
-  /* And by creating a box-shadow with no offset and no blur, we have an outer circle */
   box-shadow: 0 0 0 1px #505565;
 }
 input[type="radio"]:checked {
-  /* The native appearance is hidden */
   appearance: none;
   -webkit-appearance: none;
 
-  /* For a circular appearance we need a border-radius. */
   border-radius: 50%;
 
-  /* The background will be the radio dot's color. */
   background: #72a247;
 
-  /* The border will be the spacing between the dot and the outer circle */
   border: 3px solid #fff;
 
-  /* And by creating a box-shadow with no offset and no blur, we have an outer circle */
   box-shadow: 0 0 0 1px #505565;
 }
 
@@ -197,32 +182,33 @@ input[type="radio"]:checked {
     0 0 0 20px rgba(130, 178, 46, 50%);
 }
 
-td[aria-label="food column header food"] {
-  color: white !important;
-  background-color: blue !important;
+td[aria-label="food column header Food"] {
+  background-color: #ebedf7 !important;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+td[aria-label="transport column header Transport"] {
+  background-color: #ebedf7 !important;
+  font-weight: 900;
   font-size: 16px;
 }
 
-td[aria-label="transport column header transport"] {
-  color: white !important;
-  background-color: blue !important;
+td[aria-label="accomodation column header Accomodation"] {
+  /* color: white !important; */
+  font-weight: 900;
+  background-color: #ebedf7 !important;
   font-size: 16px;
 }
 
-td[aria-label="accomodation column header accomodation"] {
-  color: white !important;
-  background-color: blue !important;
+td[aria-label="electricity column header Electricity"] {
+  background-color: #ebedf7 !important;
+  font-weight: 900;
   font-size: 16px;
 }
 
-td[aria-label="electricity column header electricity"] {
-  color: white !important;
-  background-color: blue !important;
-  font-size: 16px;
-}
-
-td[aria-label="commodities column header others"] {
-  color: white !important;
-  background-color: blue !important;
+td[aria-label="commodities column header Others"] {
+  background-color: #ebedf7 !important;
+  font-weight: 900;
   font-size: 16px;
 }

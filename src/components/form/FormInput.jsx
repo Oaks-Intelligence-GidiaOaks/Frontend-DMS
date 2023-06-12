@@ -1,10 +1,10 @@
 import React from "react";
 
-const FormInput = ({ placeholder, label, value, readOnly, onChange }) => (
+const FormInput = ({ placeholder, type, label, value, readOnly, onChange }) => (
   <div className="flex flex-col gap-2 py-3">
     <label htmlFor="">{label}</label>
     <input
-      type="text"
+      type={type ? type : "text"}
       placeholder={placeholder}
       value={value}
       onChange={onChange}
