@@ -31,6 +31,8 @@ export function EnumeratorFormProvider({ children }) {
   const { user, setUser, setIsLoggedIn } = useAuth();
   const { secureLocalStorage } = useApp();
 
+  const cachedTransport = secureLocalStorage.getItem("tp") ?? {};
+
   // User's saved changes
 
   const initialState = useMemo(
@@ -89,6 +91,7 @@ export function EnumeratorFormProvider({ children }) {
         Tomatoes: {
           prices: [
             {
+              type: "",
               "4-seeds": "",
               "big-basket": "",
             },
@@ -185,6 +188,7 @@ export function EnumeratorFormProvider({ children }) {
         Firewood: {
           "1-bundle": [
             {
+              size: "",
               price: "",
             },
           ],
@@ -221,20 +225,59 @@ export function EnumeratorFormProvider({ children }) {
           ],
         },
       },
-      transportSectionStructure: {
-        "Mile-2 to Marina": {
-          cost: "",
-          "mode of transportation": "",
+      clothingSectionStructure: {
+        Male: {
+          Shirt: {
+            price: "",
+            size: "",
+          },
+          "T-Shirt": {
+            price: "",
+            size: "",
+          },
+          Shorts: {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
         },
-        "Old-Ojo to Iyana-Iba": {
-          cost: "",
-          "mode of transportation": "",
+        Female: {
+          Blouse: {
+            price: "",
+            size: "",
+          },
+          Skirt: {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
+          Gown: {
+            price: "",
+            size: "",
+          },
         },
-        "Oshodi to Oyingbo": {
-          cost: "",
-          "mode of transportation": "",
+        Children: {
+          "T-Shirt": {
+            price: "",
+            size: "",
+          },
+          Trousers: {
+            price: "",
+            size: "",
+          },
+          Skirt: {
+            price: "",
+            size: "",
+          },
         },
       },
+      transportSectionStructure: cachedTransport,
       accomodationSectionStructure: {
         // variations: [
         //   {
@@ -288,6 +331,9 @@ export function EnumeratorFormProvider({ children }) {
           boolean: "",
         },
       },
+      attachedImage: {
+        url: "",
+      },
     }),
     [user.LGA]
   );
@@ -303,12 +349,31 @@ export function EnumeratorFormProvider({ children }) {
   const setCurrentLGA = (LGA) => {
     setState((prev) => ({ ...prev, currentLGA: LGA }));
   };
+  const setImageUrl = (base64) => {
+    setState((prev) => ({
+      ...prev,
+      attachedImage: {
+        url: base64,
+      },
+    }));
+  };
+  const removeImageUrl = () => {
+    setState((prev) => ({
+      ...prev,
+      attachedImage: {
+        url: "",
+      },
+    }));
+  };
   const saveFormChanges = () => {
     localStorage.setItem("oaks-enum-form", JSON.stringify(state));
     setState((prev) => ({
       ...prev,
       showSavedNotification: true,
     }));
+  };
+  const backgroundSave = () => {
+    localStorage.setItem("oaks-enum-form", JSON.stringify(state));
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
@@ -317,8 +382,6 @@ export function EnumeratorFormProvider({ children }) {
       ...prev,
       isSubmitting: true,
     }));
-
-    console.log("formSubmission:", state);
 
     try {
       fetch(`${base_url}form/add_data`, {
@@ -365,6 +428,7 @@ export function EnumeratorFormProvider({ children }) {
       }));
     }
   };
+  console.log(user);
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
       if (section === "accomodationSectionStructure") {
@@ -714,18 +778,40 @@ export function EnumeratorFormProvider({ children }) {
     const { accomodationSectionStructure } = state;
     const { item, value, valueTitle, i } = action;
 
+    console.log(action);
+
     setState((prev) => {
       const updatedArray = [...accomodationSectionStructure[item]];
       updatedArray[i] = {
         ...updatedArray[i],
         [valueTitle]: value,
-        rooms: item.split(" ")[0],
+        rooms: value !== "" ? item.split(" ")[0] : "",
       };
       return {
         ...prev,
         accomodationSectionStructure: {
           ...accomodationSectionStructure,
           [item]: updatedArray,
+        },
+      };
+    });
+  };
+  const setClothingItemValue = (action) => {
+    const { clothingSectionStructure } = state;
+    const { item, cloth, value, valueTitle } = action;
+
+    if (cloth === undefined) return;
+    setState((prev) => {
+      const updatedObject = { ...clothingSectionStructure[item] };
+      updatedObject[cloth] = {
+        ...updatedObject[cloth],
+        [valueTitle]: value,
+      };
+      return {
+        ...prev,
+        clothingSectionStructure: {
+          ...clothingSectionStructure,
+          [item]: updatedObject,
         },
       };
     });
@@ -773,6 +859,14 @@ export function EnumeratorFormProvider({ children }) {
       });
     }
   };
+  const formatLGA = (LGA) => {
+    const formattedLGA = LGA.split("-");
+    if (formattedLGA.length > 1) {
+      return formattedLGA.join(" ");
+    } else {
+      return formattedLGA.join("");
+    }
+  };
   const calculateOptionsLength = (item) => {
     if (item === "Building Block") {
       return buildingBlockSizes.length;
@@ -804,11 +898,7 @@ export function EnumeratorFormProvider({ children }) {
       const newNumber = formattedNumber.toString().slice(0, 15);
       return Number(newNumber).toLocaleString("en-us");
     }
-    if (
-      isNaN(formattedNumber) ||
-      formattedNumber.length < 1 ||
-      formattedNumber === 0
-    ) {
+    if (isNaN(formattedNumber) || formattedNumber.length < 1 || value === "") {
       return "";
     } else {
       console.log(formattedNumber.toLocaleString());
@@ -820,6 +910,7 @@ export function EnumeratorFormProvider({ children }) {
 
     const foodItems = [];
     const accomodationArray = [];
+    const clothingArray = [];
     const others = [];
 
     // Create foodItems array
@@ -878,6 +969,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (item === "Tomatoes") {
         Object.keys(state.foodSectionStructure[item]["prices"][0]).forEach(
           (type) =>
+            type !== "type" &&
             foodItems.push({
               name: `${item}_${type}`,
               price: parseInt(
@@ -886,7 +978,7 @@ export function EnumeratorFormProvider({ children }) {
                   ""
                 )
               ),
-              brand: "",
+              brand: state.foodSectionStructure[item]["prices"][0]["type"],
             })
         );
       } else {
@@ -928,6 +1020,14 @@ export function EnumeratorFormProvider({ children }) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
             name: `${item}_${type[item === "Charcoal" ? "weight" : "size"]}`,
+            price: parseInt(type["price"].replace(/,/g, "")),
+            brand: "",
+          })
+        );
+      } else if (item === "Firewood") {
+        state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
+          others.push({
+            name: `${item}_${type["size"]}`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -979,9 +1079,9 @@ export function EnumeratorFormProvider({ children }) {
         note: state.reportsSectionStructure.Notes.answer ?? "",
       },
     ];
-    const accomodations = Object.keys(
-      state.accomodationSectionStructure
-    ).forEach((key) => {
+
+    // Accomodation logic
+    Object.keys(state.accomodationSectionStructure).forEach((key) => {
       state.accomodationSectionStructure[key].forEach((value, i) =>
         accomodationArray.push({
           price: parseInt(
@@ -992,6 +1092,25 @@ export function EnumeratorFormProvider({ children }) {
         })
       );
     });
+
+    // Clothing logic for submission data structure goes here.
+    // Object.keys(state.clothingSectionStructure).forEach()
+    Object.keys(state.clothingSectionStructure).forEach((key) => {
+      Object.keys(state.clothingSectionStructure[key]).forEach((category) => {
+        clothingArray.push({
+          price: parseInt(
+            state.clothingSectionStructure[key][category]["price"].replace(
+              /,/g,
+              ""
+            )
+          ),
+          category: key,
+          sub_category: category,
+          size: state.clothingSectionStructure[key][category]["size"],
+        });
+      });
+    });
+
     const lga = state.currentLGA;
 
     object = {
@@ -1001,6 +1120,7 @@ export function EnumeratorFormProvider({ children }) {
       transports,
       questions,
       accomodations: accomodationArray,
+      clothings: clothingArray,
       lga,
     };
 
@@ -1008,6 +1128,7 @@ export function EnumeratorFormProvider({ children }) {
   };
   const resetState = () => {
     localStorage.removeItem("oaks-enum-form");
+    secureLocalStorage.removeItem("tp");
     setState(initialState);
   };
   const logOut = () => {
@@ -1058,6 +1179,7 @@ export function EnumeratorFormProvider({ children }) {
     transportSectionStructure,
     accomodationSectionStructure,
     reportsSectionStructure,
+    clothingSectionStructure,
   } = state;
 
   const totalNumOfFields = useMemo(
@@ -1068,6 +1190,7 @@ export function EnumeratorFormProvider({ children }) {
         transportSectionStructure,
         accomodationSectionStructure,
         reportsSectionStructure,
+        clothingSectionStructure,
       }),
     [
       foodSectionStructure,
@@ -1075,6 +1198,7 @@ export function EnumeratorFormProvider({ children }) {
       transportSectionStructure,
       accomodationSectionStructure,
       reportsSectionStructure,
+      clothingSectionStructure,
     ]
   );
   const numOfValidFields = useMemo(
@@ -1085,6 +1209,7 @@ export function EnumeratorFormProvider({ children }) {
         transportSectionStructure,
         accomodationSectionStructure,
         reportsSectionStructure,
+        clothingSectionStructure,
       }),
     [
       foodSectionStructure,
@@ -1092,6 +1217,7 @@ export function EnumeratorFormProvider({ children }) {
       transportSectionStructure,
       accomodationSectionStructure,
       reportsSectionStructure,
+      clothingSectionStructure,
     ]
   );
   const foodNumOfFields = useMemo(
@@ -1150,6 +1276,20 @@ export function EnumeratorFormProvider({ children }) {
       }),
     [accomodationSectionStructure]
   );
+  const clothingNumOfFields = useMemo(
+    () =>
+      countEmptyStringFields({
+        clothingSectionStructure,
+      }),
+    [clothingSectionStructure]
+  );
+  const numOfValidClothingFields = useMemo(
+    () =>
+      countValidFields({
+        clothingSectionStructure,
+      }),
+    [clothingSectionStructure]
+  );
 
   const foodProgressPercentage = useMemo(
     () => Math.trunc((numOfValidFoodFields / foodNumOfFields) * 100),
@@ -1170,10 +1310,21 @@ export function EnumeratorFormProvider({ children }) {
       ),
     [numOfValidAccomodationFields, accomodationNumOfFields]
   );
+  const clothingProgressPercentage = useMemo(
+    () => Math.trunc((numOfValidClothingFields / clothingNumOfFields) * 100),
+    [numOfValidClothingFields, accomodationNumOfFields]
+  );
   const progressPercentage = useMemo(
     () => Math.trunc((numOfValidFields / totalNumOfFields) * 100),
     [numOfValidFields, totalNumOfFields]
   );
+
+  // Save form if any change is made
+  useEffect(() => {
+    console.log(state);
+    backgroundSave();
+    secureLocalStorage.setItem("tp", state.transportSectionStructure);
+  }, [state]);
 
   // hide saved notification after three seconds
   useEffect(() => {
@@ -1194,10 +1345,13 @@ export function EnumeratorFormProvider({ children }) {
         setState,
         setCurrentFormTab,
         setCurrentLGA,
+        setImageUrl,
+        removeImageUrl,
         setFoodItemValue,
         setCommodityItemValue,
         setTransportItemValue,
         setAccomodationItemValue,
+        setClothingItemValue,
         setReportsItemValue,
         addItem,
         removeItem,
@@ -1216,10 +1370,12 @@ export function EnumeratorFormProvider({ children }) {
         commodityProgressPercentage,
         transportProgressPercentage,
         accomodationProgressPercentage,
+        clothingProgressPercentage,
         progressPercentage,
         handleValue,
         logOut,
         updateTransportTab,
+        formatLGA,
       }}
     >
       {children}

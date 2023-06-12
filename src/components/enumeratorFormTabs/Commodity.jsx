@@ -6,6 +6,7 @@ import {
   buildingBlockSizes,
   cementBrands,
   charcoalWeights,
+  firewoodBundleSizes,
 } from "../../data/enumeratorFormStructure";
 import DropDownMenu from "../DropDownMenu";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
@@ -144,11 +145,127 @@ const Commodity = () => {
                             />
                           </div>
                         </div>
+                        <div className="flex flex-col gap-4">
+                          <p>
+                            Specify size of {item} ({type.split("-").join(" ")})
+                          </p>
+                          <DropDownMenu
+                            list={firewoodBundleSizes}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"size"}
+                            value={commodityForm[item][type][0]["size"]}
+                            i={0}
+                          />
+                          <div className="flex flex-col gap-2">
+                            {/* {commodityForm[item][type][0][
+                              "weight"
+                            ] === "Other" && (
+                              <input
+                                disabled={
+                                  commodityForm[item][type][0][
+                                    "weight"
+                                  ] !== "Other"
+                                }
+                                type="text"
+                                placeholder="(Please Specify)"
+                                value={
+                                  commodityForm[item][type][0][
+                                    "answer"
+                                  ]
+                                    ? commodityForm[item][type][0][
+                                        "answer"
+                                      ]
+                                    : ""
+                                }
+                                onChange={(e) =>
+                                  
+                                    setCommodityItemValue({
+                                      item,
+                                      type,
+                                      valueTitle: "answer",
+                                      value: e.target.value,
+                                    i})
+                                  
+                                }
+                                className="flex-1 pl-4 py-2 outline-primary-green border-b border-solid border-mid-gray min-w-[200px]"
+                              />
+                            )} */}
+                          </div>
+
+                          {/* <div className="flex flex-col gap-2">
+                            {cementBrands.map((variant, i) => (
+                              <div key={i} className="flex items-center">
+                                <label
+                                  htmlFor={`cement-${type}-${variant}`}
+                                  className="flex flex-1 items-center gap-x-3 flex-wrap"
+                                >
+                                  <input
+                                    type="radio"
+                                    id={`cement-${type}-${variant}`}
+                                    value={`${variant}`}
+                                    defaultChecked={
+                                      commodityForm[item][type][0][
+                                        "weight"
+                                      ] === variant
+                                    }
+                                    onChange={(e) => {
+                                      
+                                        setCommodityItemValue({
+                                          item,
+                                          type,
+                                          valueTitle: "weight",
+                                          value: e.target.value,
+                                        }i)
+                                      )
+                                    }}
+                                    name={`cement-${type}`}
+                                    className="p-2 outline-primary-green accent-primary-green"
+                                  />
+                                  <span className="block py-2">{variant}</span>
+                                  {variant === "Other" && (
+                                    <input
+                                      disabled={
+                                        commodityForm[item][
+                                          type
+                                        ][0]["weight"] !== "Other"
+                                      }
+                                      type="text"
+                                      placeholder="(Please Specify)"
+                                      value={
+                                        commodityForm[item][
+                                          type
+                                        ][0]["answer"]
+                                          ? commodityForm[item][
+                                              type
+                                            ][0]["answer"]
+                                          : ""
+                                      }
+                                      onChange={(e) =>
+                                        
+                                          setCommodityItemValue({
+                                            item,
+                                            type,
+                                            valueTitle: "answer",
+                                            value: e.target.value,
+                                          i})
+                                        
+                                      }
+                                      className="flex-1 pl-4 py-2 outline-primary-green border-b border-solid border-mid-gray min-w-[200px]"
+                                    />
+                                  )}
+                                </label>
+                              </div>
+                            ))}
+                          </div> */}
+                        </div>
                       </>
                     )}
                     {item === "Charcoal" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -166,7 +283,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -311,7 +428,8 @@ const Commodity = () => {
                     )}
                     {item === "Cement" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -329,7 +447,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -474,7 +592,8 @@ const Commodity = () => {
                     )}
                     {item === "Building Block" && (
                       <>
-                        {commodityForm[item][type].length > 1 && (
+                        {/* Remove item button */}
+                        {/* {commodityForm[item][type].length > 1 && (
                           <button
                             className="absolute top-0 right-0 flex items-center gap-1 text-red-600 hover:bg-red-50 p-2 rounded"
                             onClick={() =>
@@ -492,7 +611,7 @@ const Commodity = () => {
                               Remove
                             </span>
                           </button>
-                        )}
+                        )} */}
                         <div className="flex flex-col gap-4">
                           <p>Price of {item}</p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -640,7 +759,8 @@ const Commodity = () => {
                     )}
                   </div>
                 ))}
-                {["Building Block", "Charcoal", "Cement"].includes(item) &&
+                {/* Add item button */}
+                {/* {["Building Block", "Charcoal", "Cement"].includes(item) &&
                   commodityForm[item][type].length <
                     calculateOptionsLength(item) && (
                     <div className="flex justify-end mt-4 sm:mt-8 md:12">
@@ -660,7 +780,7 @@ const Commodity = () => {
                         </span>
                       </button>
                     </div>
-                  )}
+                  )} */}
               </div>
             ))}
           </div>
@@ -672,7 +792,7 @@ const Commodity = () => {
       </p>
       <button
         disabled={commodityProgressPercentage !== 100}
-        onClick={() => setCurrentFormTab("Transport")}
+        onClick={() => setCurrentFormTab("Clothing")}
         className={`${
           commodityProgressPercentage === 100
             ? "bg-primary-green"
