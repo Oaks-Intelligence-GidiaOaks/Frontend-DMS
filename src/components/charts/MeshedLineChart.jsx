@@ -40,11 +40,7 @@ const arrangeTime = (time) => {
   return `${formattedDate} ${formattedTime}`;
 };
 
-console.log(formatTime("2023-05-25T20:24:32.318Z"));
-
 const MeshedLineChart = ({ data: MeshedLineD }) => {
-  console.log(MeshedLineD);
-
   const transformedData =
     MeshedLineD?.length > 0 &&
     MeshedLineD.map((item) => {
@@ -58,10 +54,9 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
       return { id, data };
     });
 
-  // console.log(transformedData);
-
   return MeshedLineD?.length > 0 ? (
     <ResponsiveLine
+      className="responsive-line-chart"
       data={transformedData}
       margin={{ top: 50, right: 110, bottom: 50, left: 70 }}
       xScale={{ type: "point" }}
@@ -110,7 +105,7 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
           itemWidth: 80,
           itemHeight: 20,
           itemOpacity: 0.75,
-          symbolSize: 12,
+          symbolSize: 8,
           symbolShape: "circle",
           symbolBorderColor: "rgba(0, 0, 0, .5)",
           effects: [
@@ -122,11 +117,17 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
               },
             },
           ],
+          itemWrapperStyle: {
+            wordBreak: "break-all",
+          },
+          itemTextStyle: {
+            fontSize: "5px",
+          },
         },
       ]}
     />
   ) : (
-    <div>No chart data..</div>
+    <div className="h-32 grid place-items-center">No chart data..</div>
   );
 };
 

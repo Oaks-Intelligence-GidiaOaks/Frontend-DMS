@@ -19,8 +19,6 @@ const arrangeTime = (time) => {
 };
 
 const TrackerGrid = ({ data }) => {
-  console.log(data);
-
   let tableData = data.map((item) => ({
     ...item,
     created_at: item.created_at
@@ -39,6 +37,10 @@ const TrackerGrid = ({ data }) => {
     allowEditing: false,
   };
 
+  const serialNumberTemplate = (rowData) => {
+    return rowData ? Number(rowData.index) + 1 : "";
+  };
+
   return data ? (
     <GridComponent
       dataSource={tableData}
@@ -50,19 +52,33 @@ const TrackerGrid = ({ data }) => {
       height={210}
     >
       <ColumnsDirective>
-        <ColumnDirective field="first_name" width={150} />
-        <ColumnDirective field="last_name" width={150} />
-        <ColumnDirective field="id" width={120} />
-        <ColumnDirective field="state" width={120} />
-        <ColumnDirective field="lga" width={150} />
-        <ColumnDirective field="status" width={150} />
+        <ColumnDirective
+          headerText="S/N"
+          width={80}
+          template={serialNumberTemplate}
+        />
+        <ColumnDirective
+          field="first_name"
+          headerText="First name"
+          width={150}
+        />
+        <ColumnDirective field="last_name" headerText="Last name" width={150} />
+        <ColumnDirective field="id" headerText="Id" width={120} />
+        <ColumnDirective field="state" headerText="State" width={120} />
+        <ColumnDirective field="lga" headerText="LGA" width={150} />
+        <ColumnDirective field="status" headerText="Status" width={150} />
 
         <ColumnDirective
           field="created_at"
-          headerText="submission_time"
+          headerText="Submission time"
           width={170}
         />
-        <ColumnDirective field="form_id" visible={false} width={120} />
+        <ColumnDirective
+          field="form_id"
+          headerText="Form id"
+          visible={false}
+          width={120}
+        />
       </ColumnsDirective>
 
       <Inject services={[Page, Sort, Edit]} />

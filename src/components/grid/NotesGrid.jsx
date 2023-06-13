@@ -9,6 +9,7 @@ import {
   Sort,
 } from "@syncfusion/ej2-react-grids";
 import axios from "axios";
+import { NoData } from "../reusable";
 
 const NotesGrid = ({ data }) => {
   let dataCount = data?.totalCount;
@@ -104,8 +105,8 @@ const NotesGrid = ({ data }) => {
       <Inject services={[Page, Sort, Edit]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
     </div>
   );
 };

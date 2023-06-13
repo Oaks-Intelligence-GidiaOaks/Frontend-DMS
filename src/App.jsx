@@ -35,7 +35,6 @@ import AddEnumerator from "./pages/team-lead/AddEnumerator";
 import Login from "./pages/Login";
 import NewRoute from "./pages/team-lead/NewRoute";
 import { EnumeratorFormProvider, useApp, useAuth } from "./context";
-import { useState } from "react";
 import { base_url, base_url_local } from "./lib/paths";
 import Admin from "./components/layout/Admin";
 
@@ -46,8 +45,6 @@ function App() {
   axios.defaults.baseURL = base_url;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
-  axios.defaults.headers.common["Access-Control-Allow-Origin"] =
-    "http://localhost:5173";
 
   const identifyRoute = (user) => {
     if (user.role === "enumerator") {

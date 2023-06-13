@@ -18,8 +18,6 @@ const Sidebar = () => {
   const { setCurrentPage, sidebarShown, setSidebarShown } = useApp();
   const { user } = useAuth();
 
-  // console.log(user);
-
   const activeStyle = "bg-gray-200 p-3 mt-3";
   const nonActiveStyle = "p-3 mt-3";
 

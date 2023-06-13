@@ -13,13 +13,12 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { TransportRows, TransportColumns } from "../../data/formResponses";
+import { NoData } from "../reusable";
 
 const TransportGrid = ({ data }) => {
   let dataCount = data.totalCount;
 
   let transportData = data.data;
-
-  console.log(transportData);
 
   const transformedData =
     transportData.length > 0 &&
@@ -80,6 +79,22 @@ const TransportGrid = ({ data }) => {
     }
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "route"
+      ? "Route"
+      : field === "cost"
+      ? "Cost"
+      : field === "mode"
+      ? "Mode"
+      : field;
+  };
+
   return transportData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -97,6 +112,7 @@ const TransportGrid = ({ data }) => {
           <ColumnDirective
             key={field}
             field={field}
+            headerText={checkHeaderText(field)}
             width={width}
             visible={field !== "_id"}
             allowEditing={field === "cost"}
@@ -108,8 +124,8 @@ const TransportGrid = ({ data }) => {
       <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
     </div>
   );
 };

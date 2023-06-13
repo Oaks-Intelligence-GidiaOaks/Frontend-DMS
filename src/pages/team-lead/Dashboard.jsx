@@ -6,9 +6,13 @@ import OaksSlider from "../../components/Slider";
 import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
+import { IoMdArrowDropdownCircle } from "react-icons/io";
+import { Loading, NoData } from "../../components/reusable";
 
 const Dashboard = () => {
   const { user, token } = useAuth();
+  const [yearDropdown, setYearDropdown] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [priceFluctuation, setPriceFluctuation] = useState(null);
   const [lga, setLga] = useState(user.LGA[0]);
   const [yearlyEnum, setYearlyEnum] = useState(null);
@@ -18,18 +22,12 @@ const Dashboard = () => {
 
   let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
 
-  // if (priceFluctuation) {
-  //   console.log(priceFluctuation);
-  // }
-
   useEffect(() => {
     try {
       setPriceFluctuation(null);
-      console.log("lga changed...");
       axios
         .get(`team_lead_dashboard/price_fluctuation?lgaFilter=${lga}`)
         .then((res) => {
-          // setLga(null);
           setPriceFluctuation(res.data);
         })
         .catch((err) => console.error(err));
@@ -43,7 +41,6 @@ const Dashboard = () => {
       .get(`team_lead_dashboard/yearly_enumerators`)
       .then((res) => {
         setYearlyEnum(res.data);
-        console.log(res.data);
       })
       .catch((err) => console.log(err));
 
@@ -63,6 +60,14 @@ const Dashboard = () => {
       .catch((err) => console.error(err));
   }, []);
 
+  const handleDropdownSelect = () => {
+    setShowDropdown((prev) => !prev);
+  };
+  const handleSelectOption = (year) => {
+    setYearDropdown(year);
+    setShowDropdown(false);
+  };
+
   return (
     <div className="overflow-x-hidden">
       <div className="mx-auto  mt-8 pb-4 lg:w-5/6">
@@ -79,7 +84,7 @@ const Dashboard = () => {
             />
           ) : (
             <div className="h-32 grid place-items-center w-1/3 p-2 drop-shadow-sm bg-white">
-              <p>loading...</p>
+              <Loading />
             </div>
           )}
 
@@ -94,7 +99,7 @@ const Dashboard = () => {
             />
           ) : (
             <div className="h-32 grid place-items-center w-1/3 p-2 drop-shadow-sm bg-white">
-              <p>loading...</p>
+              <Loading />
             </div>
           )}
 
@@ -111,7 +116,7 @@ const Dashboard = () => {
             />
           ) : (
             <div className="h-32 grid place-items-center w-1/3 p-2 drop-shadow-sm bg-white">
-              <p>loading...</p>
+              <Loading />
             </div>
           )}
         </div>
@@ -130,10 +135,31 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="flex items-start border space-x-2">
-              <span>Year</span>
+            <div className="flex items-start space-x-2 flex-col relative">
+              <div className="flex items-center space-x-4">
+                <span>Year</span>
+                <button
+                  onClick={handleDropdownSelect}
+                  className="flex items-center gap-3 rounded p-2 bg-light-gray"
+                >
+                  {yearDropdown ?? "2023"} <IoMdArrowDropdownCircle />
+                </button>
+              </div>
 
-              <span>2023</span>
+              {showDropdown && (
+                <div>
+                  <ul className="absolute w-20 border rounded drop-shadow-sm flex flex-col gap-2 bg-white right-0">
+                    <li
+                      onClick={() => handleSelectOption(2023)}
+                      className="cursor-pointer border-b p-2"
+                    >{`2023`}</li>
+                    <li
+                      onClick={() => handleSelectOption(2022)}
+                      className="cursor-pointer border-b p-2"
+                    >{`2022`}</li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
@@ -143,32 +169,32 @@ const Dashboard = () => {
       </div>
 
       {/* fluctuation rates */}
-      <div className=" rounded-md p-3 mt-6 lg:ml-[6rem] border h-72">
+      <div className=" rounded-md p-3 mt-2 lg:ml-[6rem] min-h-[18rem]">
         <div className="flex flex-row justify-between items-center">
           <p>Price fluctuation rate</p>
 
-          <FormInputDropDown
-            index="z-20"
-            data={selectLGA}
-            onChange={(selectedValue) => setLga(selectedValue)}
-          />
+          <div className="w-[160px]">
+            <FormInputDropDown
+              index="z-20"
+              data={selectLGA}
+              onChange={(selectedValue) => setLga(selectedValue)}
+            />
+          </div>
         </div>
 
-        <OaksSlider slideDefault={4} break1={2} break2={2} break3={1}>
-          {priceFluctuation ? (
-            priceFluctuation.length < 1 ? (
-              <div className="grid place-items-center h-36 border w-full">
-                <p>no data available for this LGA</p>
-              </div>
-            ) : (
-              priceFluctuation.map((item, i) => (
-                <CategoryRate key={i} Product={item} />
-              ))
-            )
-          ) : (
-            <p className="text-center my-auto font-bold">loading</p>
-          )}
-        </OaksSlider>
+        {!priceFluctuation ? (
+          <Loading />
+        ) : priceFluctuation.length > 1 ? (
+          <OaksSlider slideDefault={4} break1={2} break2={2} break3={1}>
+            {priceFluctuation.map((item, i) => (
+              <CategoryRate key={i} Product={item} />
+            ))}
+          </OaksSlider>
+        ) : (
+          <div className="h-32 ">
+            <NoData text="No Data Available for this LGA" />
+          </div>
+        )}
       </div>
     </div>
   );

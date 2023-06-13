@@ -10,6 +10,7 @@ import {
   Sort,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import { NoData } from "../reusable";
 
 const OthersGrid = ({ data }) => {
   let dataCount = data?.totalCount;
@@ -78,6 +79,22 @@ const OthersGrid = ({ data }) => {
     }
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "name"
+      ? "Name"
+      : field === "price"
+      ? "Price"
+      : field === "brand"
+      ? "Brand"
+      : field;
+  };
+
   return othersData.length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -91,7 +108,14 @@ const OthersGrid = ({ data }) => {
     >
       <ColumnsDirective>
         {othersColumns.map(({ field, width }) => (
-          <ColumnDirective key={field} field={field} width={width} />
+          <ColumnDirective
+            key={field}
+            visible={field !== "_id"}
+            headerText={checkHeaderText(field)}
+            allowEditing={field === "price"}
+            field={field}
+            width={width}
+          />
         ))}
 
         <ColumnDirective headerText="Action" width={100} commands={commands} />
@@ -99,8 +123,8 @@ const OthersGrid = ({ data }) => {
       <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div className="py-16  grid place-items-center w-full">
-      <p className="w-1/2 ">No submissions received yet...</p>
+    <div className="h-32">
+      <NoData text="No submissions received yet" />
     </div>
   );
 };

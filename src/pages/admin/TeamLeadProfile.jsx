@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { EditNote } from "@mui/icons-material";
+import { IoIosArrowBack } from "react-icons/io";
 import { FormInput, FormMultipleSelect } from "../../components/form";
 import axios from "axios";
 import { useAuth } from "../../context";
@@ -11,8 +12,6 @@ const TeamLeadProfile = () => {
   let location = useLocation();
   const navigate = useNavigate();
   let formData = location.state;
-
-  console.log(formData);
 
   const [lgaRoutes, setLgaRoutes] = useState(null);
   const [firstName, setFirstName] = useState(formData.firstName);
@@ -70,7 +69,6 @@ const TeamLeadProfile = () => {
       role: formData.role,
     };
 
-    // console.log(updatedTeamLead);
     axios
       .put(`admin/user/${formData._id}`, updatedTeamLead)
       .then((res) => resetForm())
@@ -101,20 +99,18 @@ const TeamLeadProfile = () => {
 
         <div
           onClick={() => navigate(-1)}
-          className="rounded cursor-pointer  lg:ml-auto bg-oaksGreen p-3 flex items-center gap-3 text-xs"
+          className="rounded cursor-pointer ml-auto border bg-oaksgreen px-6  lg:ml-auto bg-oaksGreen p-3 flex items-center gap-3 text-xs"
         >
-          <p className="">Back</p>
+          <div className="p-1 bg-white text-ecnter rounded">
+            <IoIosArrowBack />
+          </div>
+          <p className="text-white">Back</p>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6 text-sm">
         <div className="mx-auto">
           <img src="" alt="" className="h-44 w-44 rounded-full bg-green-500" />
-
-          <p className="border flex justify-center items-center py-3">
-            <span className="">Edit photo</span>
-            <EditNote />
-          </p>
         </div>
 
         <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>
@@ -162,7 +158,7 @@ const TeamLeadProfile = () => {
 
           {success && (
             <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
-              <span className="text-red-500 text-xs">
+              <span className="text-green-500 text-xs">
                 credential updated successfully...
               </span>
 

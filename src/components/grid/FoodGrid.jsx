@@ -17,16 +17,14 @@ import {
 import { FoodRows, FoodColumns } from "../../data/formResponses";
 import axios from "axios";
 import { useAuth } from "../../context";
+import { NoData } from "../reusable";
 
 const FoodGrid = ({ data: foodRowss }) => {
-  // console.log(foodRowss["data"]);
   const {
     user: { token },
   } = useAuth();
 
   let foodData = foodRowss["data"];
-
-  console.log(foodData);
 
   const transformedData =
     foodData.length > 0 &&
@@ -45,11 +43,6 @@ const FoodGrid = ({ data: foodRowss }) => {
       field: item,
       width: item.length < 4 ? 120 : item.length + 130,
     }));
-
-  // console.log(transformedColumns);
-
-  // const [isEditMode, setIsEditMode] = useState(false);
-  // const [editedData, setEditedData] = useState({});
 
   const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
@@ -95,6 +88,20 @@ const FoodGrid = ({ data: foodRowss }) => {
     columns: ["State"],
   };
 
+  const checkHeaderText = (field) => {
+    return field === "S_N"
+      ? "S/N"
+      : field === "id"
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "name"
+      ? "Name"
+      : field === "price"
+      ? "Price"
+      : field;
+  };
+
   return foodRowss["data"].length > 0 ? (
     <GridComponent
       dataSource={transformedData}
@@ -111,6 +118,7 @@ const FoodGrid = ({ data: foodRowss }) => {
         {transformedColumns?.map(({ field, width }) => (
           <ColumnDirective
             key={field}
+            headerText={checkHeaderText(field)}
             visible={field === "_id" ? false : true}
             field={field}
             allowEditing={field === "price"}
@@ -123,7 +131,9 @@ const FoodGrid = ({ data: foodRowss }) => {
       <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
     </GridComponent>
   ) : (
-    <div>No data available for current week...</div>
+    <div className="h-32">
+      <NoData text="No Submissions received yet" />
+    </div>
   );
 };
 

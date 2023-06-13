@@ -36,7 +36,7 @@ const AdminSidebar = () => {
       } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
     >
       <div className="ml-10 flex flex-col h-full">
-        <p className="mt-2">Admin</p>
+        <p className="mt-2 capitalize">{user.role.replace("_", " ")}</p>
 
         <NavLink
           className={({ isActive }) =>
@@ -46,7 +46,11 @@ const AdminSidebar = () => {
           to="/admin/profile"
         >
           <div className="flex items-start ">
-            <img src="avatar.png" alt="avatar" />
+            <img
+              src="avatar.png"
+              alt="avatar"
+              className="h-10 w-10 border border-oaksyellow rounded-full"
+            />
             <div className="text-[12px] p-1">
               <p className="text-[16px]">
                 {user.firstName + " " + user.lastName}
@@ -54,7 +58,7 @@ const AdminSidebar = () => {
               <span>{user.id}</span>
             </div>
 
-            <img src={right} alt="" className="ml-auto p-2" />
+            <img src={right} alt="" className="ml-auto p-2 rounded" />
           </div>
         </NavLink>
 

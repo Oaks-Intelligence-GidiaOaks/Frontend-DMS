@@ -7,7 +7,6 @@ import {
   PowerSettingsNew,
   Shuffle,
   Summarize,
-  Download,
 } from "@mui/icons-material";
 
 import {
@@ -21,6 +20,7 @@ import {
 } from "../../components/grid";
 import OaksSlider from "../../components/Slider";
 import axios from "axios";
+import { Loading } from "../../components/reusable";
 
 const FormResponses = () => {
   const [activeTab, setActiveTab] = useState("food");
@@ -34,8 +34,6 @@ const FormResponses = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [sub, setSub] = useState(null);
-
-  // console.log()
 
   // styles
   const activeStyle = "bg-oaksgreen text-white";
@@ -53,82 +51,134 @@ const FormResponses = () => {
     axios
       .get(`team_lead_dashboard/submission_rate`)
       .then((res) => {
-        console.log(res.data);
         setSub(res.data);
       })
       .catch((err) => console.error(err));
   }, []);
 
   const getFood = async () => {
-    await axios.get("form_response/food_product").then((res) => {
-      setFoodData(res.data);
-      setActiveTab("food");
-    });
+    try {
+      setIsLoading(true);
+      await axios
+        .get("form_response/food_product")
+        .then((res) => {
+          setFoodData(res.data);
+          setActiveTab("food");
+        })
+        .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getTransport = async () => {
-    await axios
-      .get("form_response/transport")
-      .then((res) => {
-        setTransportData(res.data);
-        setActiveTab("transport");
-      })
-      .catch((err) => console.error(err));
+    try {
+      setIsLoading(true);
+
+      await axios
+        .get("form_response/transport")
+        .then((res) => {
+          setTransportData(res.data);
+          setActiveTab("transport");
+        })
+        .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getAccomodation = async () => {
-    await axios
-      .get("form_response/accomodation")
-      .then((res) => {
-        setAccomodationData(res.data);
-        setActiveTab("accomodation");
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+
+      await axios
+        .get("form_response/accomodation")
+        .then((res) => {
+          setAccomodationData(res.data);
+          setActiveTab("accomodation");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getElectricity = async () => {
-    await axios
-      .get("form_response/electricity")
-      .then((res) => {
-        setElectricityData(res.data);
-        setActiveTab("electricity");
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+      await axios
+        .get("form_response/electricity")
+        .then((res) => {
+          setElectricityData(res.data);
+          setActiveTab("electricity");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getOthers = async () => {
-    await axios
-      .get("form_response/other_products")
-      .then((res) => {
-        setOthersData(res.data);
-        setActiveTab("others");
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+      await axios
+        .get("form_response/other_products")
+        .then((res) => {
+          setOthersData(res.data);
+          setActiveTab("others");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getNotes = async () => {
-    await axios
-      .get("form_response/questions")
-      .then((res) => {
-        setNotesData(res.data);
-        setActiveTab("notes");
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+      await axios
+        .get("form_response/questions")
+        .then((res) => {
+          setNotesData(res.data);
+          setActiveTab("notes");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getClothing = async () => {
-    await axios
-      .get("form_response/clothings")
-      .then((res) => {
-        setClothingData(res.data);
-        // console.log(res.data);
-        setActiveTab("clothing");
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+      await axios
+        .get("form_response/clothings")
+        .then((res) => {
+          setClothingData(res.data);
+          setActiveTab("clothing");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="rounded justify-between bg-oaksyellow p-3 flex xs:flex-1 md:flex-initial items-center gap-4 text-xs">
           <p className="text-white whitespace-nowrap">Expected submissions</p>
@@ -232,7 +282,9 @@ const FormResponses = () => {
 
       <div className="bg-white h-80 w-full">
         {isLoading ? (
-          <p>loading...</p>
+          <div className="h-32">
+            <Loading />
+          </div>
         ) : (
           <>
             {activeTab === "food" && <FoodGrid data={foodData} />}
