@@ -94,7 +94,13 @@ function EnumeratorLogin() {
                 "Invalid ID or Password, please try again"
               );
             }
+            if (others.message === "Invalid password, please try again") {
+              return setErrorResponse(
+                "Invalid password, please input correct password."
+              );
+            }
             console.log(others);
+            console.log(others.status);
             if (
               others &&
               others.message &&
