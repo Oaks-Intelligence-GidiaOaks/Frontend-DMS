@@ -65,7 +65,13 @@ const TeamLeadGrid = ({ data }) => {
   };
 
   const handleResetPassword = (user) => {
-    console.log("Reset Password", user);
+    const { id } = user;
+    axios
+      .put("password/reset", {id: id})
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
   const serialNumberTemplate = (rowData) => {

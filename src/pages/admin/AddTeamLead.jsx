@@ -6,7 +6,7 @@ import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import FormMultipleSelect from "../../components/form/FormMultipleSelect";
 import { useAuth } from "../../context";
-import { EditNote } from "@mui/icons-material";
+import { EditNote, Email } from "@mui/icons-material";
 
 const AddTeamLead = () => {
   const { user } = useAuth();
@@ -162,48 +162,36 @@ const AddTeamLead = () => {
 
     let transformedLgas = lgas.map((l) => l.value);
 
-    const newUser = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber: tel,
-      identityType: idType,
-      identity: idNo,
-      identityImage,
-      role: "team_lead",
-      states: transformedStates,
-      LGA: transformedLgas,
-      avatar,
-    };
+    const formData = new FormData();
 
-    console.log(newUser);
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("phoneNumber", tel);
+    formData.append("identityType", idType);
+    formData.append("identity", idNo);
+    formData.append("identityImage", identityImage);
+    formData.append("avatar", avatar);
+    formData.append("role", "team_lead");
 
-    let bodyFormData = new FormData();
+    // Append list items to form data
+    transformedLgas.forEach(lga => formData.append("LGA", lga));
+    transformedStates.forEach(state => formData.append("states", state));
 
-    bodyFormData.append("firstName", firstName);
-    bodyFormData.append("lastName", lastName);
-    bodyFormData.append("email", email);
-    bodyFormData.append("phoneNumber", tel);
-    bodyFormData.append("identityType", idType);
-    // bodyFormData.append("identity", idNo);
-    bodyFormData.append("identityImage", identityImage);
-    bodyFormData.append("state", transformedStates);
-    bodyFormData.append("LGA", transformedLgas);
-    // bodyFormData.append("avatar", avatar);
-    bodyFormData.append("role", "team_lead");
-
-    // console.log(bodyFormData);
-
-    // axios
-    //   .post("user/new", newUser)
-    //   .then((user) => {
-    //     if (!user) {
-    //       console.log("error while creating user");
-    //     } else {
-    //       resetForm();
-    //     }
-    //   })
-    //   .catch((err) => console.log(err));
+    axios
+      .post("user/new", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((user) => {
+        if (!user) {
+          console.log("error while creating user");
+        } else {
+          resetForm();
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -258,6 +246,7 @@ const AddTeamLead = () => {
           placeholder="Email"
           label="Email address"
           value={formFields.email}
+          type={Email}
           onChange={(e) =>
             setFormFields((prev) => ({ ...prev, email: e.target.value }))
           }
