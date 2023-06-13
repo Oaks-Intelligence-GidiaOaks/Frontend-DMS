@@ -27,6 +27,7 @@ const AddTeamLead = () => {
   const [file, setFile] = useState(null);
   const [identityImage, setIdentityImage] = useState(null);
   const [userCreated, setUserCreated] = useState(false);
+  const [error, setError] = useState(null);
   const [lgaRoutes, setLgaRoutes] = useState(null);
 
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
@@ -98,7 +99,6 @@ const AddTeamLead = () => {
   };
 
   const handleStateChange = (selectedOptions) => {
-    console.log(selectedOptions);
     setStates(selectedOptions);
     setLgas([]);
   };
@@ -122,9 +122,23 @@ const AddTeamLead = () => {
     setFile(file);
   };
 
+  const handleAvaterSelect = (e) => {
+    let selectedFile = e.target.files[0];
+
+    if (!selectedFile.type.match(imageMimeType)) {
+      alert("image mime type is not valid");
+      return;
+    }
+
+    setImage(selectedFile);
+  };
+
+  const handlePhotoClick = () => {
+    avaterRef.current.click();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const { firstName, lastName, email, tel, idNo, idType } = formFields;
 
     if (
@@ -135,10 +149,11 @@ const AddTeamLead = () => {
       !idNo ||
       !idType ||
       !identityImage ||
+      !avatar ||
       !states ||
       !lgas
     ) {
-      console.log("Error in form fields, please input all fields");
+      setError("Please input all fields");
 
       return;
     }
@@ -161,20 +176,23 @@ const AddTeamLead = () => {
       avatar,
     };
 
+    console.log(newUser);
+
     let bodyFormData = new FormData();
 
-    bodyFormData.append("firstName", newUser.firstName);
-    bodyFormData.append("lastName", newUser.lastName);
-    bodyFormData.append("email", newUser.email);
-    bodyFormData.append("phoneNumber", newUser.phoneNumber);
-    bodyFormData.append("identityType", newUser.identityType);
-    bodyFormData.append("identity", newUser.identity);
-    bodyFormData.append("identityImage", newUser.identityImage);
-    bodyFormData.append("state", newUser.states);
-    bodyFormData.append("LGA", newUser.LGA);
-    bodyFormData.append("avatar", newUser.avatar);
+    bodyFormData.append("firstName", firstName);
+    bodyFormData.append("lastName", lastName);
+    bodyFormData.append("email", email);
+    bodyFormData.append("phoneNumber", tel);
+    bodyFormData.append("identityType", idType);
+    // bodyFormData.append("identity", idNo);
+    bodyFormData.append("identityImage", identityImage);
+    bodyFormData.append("state", transformedStates);
+    bodyFormData.append("LGA", transformedLgas);
+    // bodyFormData.append("avatar", avatar);
+    bodyFormData.append("role", "team_lead");
 
-    console.log(bodyFormData);
+    // console.log(bodyFormData);
 
     // axios
     //   .post("user/new", newUser)
@@ -186,21 +204,6 @@ const AddTeamLead = () => {
     //     }
     //   })
     //   .catch((err) => console.log(err));
-  };
-
-  const handlePhotoClick = () => {
-    avaterRef.current.click();
-  };
-
-  const handleAvaterSelect = (e) => {
-    let selectedFile = e.target.files[0];
-
-    if (!selectedFile.type.match(imageMimeType)) {
-      alert("image mime type is not valid");
-      return;
-    }
-
-    setImage(selectedFile);
   };
 
   return (
