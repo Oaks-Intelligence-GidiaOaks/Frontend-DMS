@@ -194,16 +194,16 @@ const AddTeamLead = () => {
 
     // console.log(bodyFormData);
 
-    // axios
-    //   .post("user/new", newUser)
-    //   .then((user) => {
-    //     if (!user) {
-    //       console.log("error while creating user");
-    //     } else {
-    //       resetForm();
-    //     }
-    //   })
-    //   .catch((err) => console.log(err));
+    axios
+      .post("user/new", newUser)
+      .then((user) => {
+        if (!user) {
+          console.log("error while creating user");
+        } else {
+          resetForm();
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
