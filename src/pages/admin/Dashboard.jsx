@@ -9,7 +9,6 @@ import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
 import { Loading, NoData } from "../../components/reusable";
-import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 
 const Dashboard = () => {
   const { user, token } = useAuth();

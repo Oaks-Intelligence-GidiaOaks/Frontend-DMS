@@ -10,9 +10,9 @@ import EnumeratorFormContext from "../../context/enumeratorFormContext";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
 
-  const { logOut } = useContext(EnumeratorFormContext);
+  // const { logOut } = useContext(EnumeratorFormContext);
   const [form, setForm] = useState({
     oldPassword: "",
     password: "",
@@ -69,7 +69,7 @@ const ChangePassword = () => {
       try {
         axios
           .put(
-            "password/update/enumerator",
+           user?.role === "enumerator" ? "password/update/enumerator" : "password/update",
             {
               oldPassword: oldPassword,
               password: password,

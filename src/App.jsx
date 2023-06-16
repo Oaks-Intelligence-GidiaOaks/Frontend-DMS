@@ -65,7 +65,7 @@ function App() {
     (user.role === "admin" || user.role === "super_admin");
 
   return (
-    <Router>
+
       <div className="h-screen">
         <Routes>
           <Route
@@ -300,7 +300,7 @@ function App() {
           <Route path="*" element={<p>This route doesn't exist</p>} />
         </Routes>
       </div>
-    </Router>
+
   );
 }
 

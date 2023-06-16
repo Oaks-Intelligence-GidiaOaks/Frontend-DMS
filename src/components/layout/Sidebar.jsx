@@ -32,7 +32,7 @@ const Sidebar = () => {
     <div
       className={`w-72 xs:absolute md:static top-0 left-0 ${
         sidebarShown ? "xs:initial" : "xs:hidden"
-      } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
+      } sm:block left-0 z-10 lg:shrink-0 h-full text-sm bg-white `}
     >
       <div className="ml-10 flex flex-col h-full">
         <p className="mt-2 capitalize">{user?.role.replace("_", " ")}</p>
