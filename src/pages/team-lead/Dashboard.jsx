@@ -7,7 +7,7 @@ import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
-import { Loading, NoData } from "../../components/reusable";
+import { Loading, NoData, UpdatePassword } from "../../components/reusable";
 
 const Dashboard = () => {
   const { user, token } = useAuth();
@@ -37,13 +37,20 @@ const Dashboard = () => {
   }, [lga]);
 
   useEffect(() => {
-    axios
-      .get(`team_lead_dashboard/yearly_enumerators`)
-      .then((res) => {
-        setYearlyEnum(res.data);
-      })
-      .catch((err) => console.log(err));
+    try {
+      setYearlyEnum(null);
+      axios
+        .get(`team_lead_dashboard/yearly_enumerators?yearFilter=${2023}`)
+        .then((res) => {
+          setYearlyEnum(res.data);
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    }
+  }, [yearDropdown]);
 
+  useEffect(() => {
     axios
       .get("team_lead_dashboard/enumerators_count")
       .then((res) => setEnumeratorsCount(res.data))
@@ -164,7 +171,13 @@ const Dashboard = () => {
           </div>
 
           {/* charts */}
-          <SubmissionRate data={yearlyEnum ?? yearlyEnum} />
+          {yearlyEnum ? (
+            <SubmissionRate data={yearlyEnum ?? yearlyEnum} />
+          ) : (
+            <div className="h-32">
+              <Loading />
+            </div>
+          )}
         </div>
       </div>
 

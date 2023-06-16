@@ -1,9 +1,11 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
-import { useApp } from "../../context";
+import { useApp, useAuth } from "../../context";
+import { UpdatePassword } from "../reusable";
 
 const TeamLead = ({ children }) => {
+  const { user } = useAuth();
   const { sidebarShown } = useApp();
   // console.log(sidebarShown);
 

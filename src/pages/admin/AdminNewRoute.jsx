@@ -9,6 +9,7 @@ import { Rings } from "react-loader-spinner";
 
 const AdminNewRoute = () => {
   const [isReadOnly, setIsReadOnly] = useState(true);
+  const [activeTab, setActiveTab] = useState("create");
 
   const [state, setState] = useState(null);
   const [lga, setLga] = useState(null);
@@ -16,10 +17,8 @@ const AdminNewRoute = () => {
 
   const [route1Start, setRoute1Start] = useState(null);
   const [route1End, setRoute1End] = useState(null);
-
   const [route2Start, setRoute2Start] = useState(null);
   const [route2End, setRoute2End] = useState(null);
-
   const [route3Start, setRoute3Start] = useState(null);
   const [route3End, setRoute3End] = useState(null);
 
@@ -29,19 +28,23 @@ const AdminNewRoute = () => {
 
   const coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
 
-  // let lgaOptions = state ? allLgasByState[state] : [];
+  let routesLga = lgaRoutes && lga && lgaRoutes.filter((it) => it.lga === lga);
 
   let lgaOptions = state ? allLgasByState[state].map((it) => it.value) : [];
 
   let filteredLgas =
     lgaOptions.length > 0 &&
+    coveredLgas &&
     lgaOptions
       .filter((val) => !coveredLgas.includes(val))
       .map((it) => ({ label: it, value: it }));
 
-  if (lgaOptions) {
-    // console.log(finalResult);/
-  }
+  let currentLgas =
+    lgaOptions.length > 0 &&
+    coveredLgas &&
+    lgaOptions
+      .filter((val) => coveredLgas.includes(val))
+      .map((it) => ({ label: it, value: it }));
 
   useEffect(() => {
     axios
@@ -110,32 +113,72 @@ const AdminNewRoute = () => {
     };
     setLoading(true);
 
-    axios
-      .post("/lga_routes", newRoutes)
-      .then((res) => {
-        setSubmitted(true);
-        setLoading(false);
-        resetForm();
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-        setErrors(err.message);
-      });
+    if (activeTab === "create") {
+      axios
+        .post("/lga_routes", newRoutes)
+        .then((res) => {
+          setSubmitted(true);
+          setLoading(false);
+          resetForm();
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+          setErrors(err.message);
+        });
+    }
+
+    if (activeTab === "update") {
+      axios
+        .patch(`/lga_routes/${{}}`, newRoutes)
+        .then((res) => {
+          setSubmitted(true);
+          setLoading(false);
+          resetForm();
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+          setErrors(err.message);
+        });
+    }
   };
+
+  let activeTabStyle =
+    "bg-blue-500 text-white my-6  p-2 cursor-pointer rounded";
+  let nonActiveTabStyle = "text-black my-6 cursor-pointer rounded";
 
   return (
     <div className="lg:w-3/5 lg:pl-16">
-      <div className="my-6">
-        <h2 className="text-sm font-bold ">Create New LGA Route</h2>
+      <div className="flex items-center space-x-6">
+        <div
+          className={
+            activeTab === "create" ? activeTabStyle : nonActiveTabStyle
+          }
+          onClick={() => {
+            setActiveTab("create");
+            setLga(null);
+          }}
+        >
+          <h2 className="text-sm font-bold ">Create New LGA Route</h2>
+        </div>
+
+        <div
+          className={
+            activeTab === "update" ? activeTabStyle : nonActiveTabStyle
+          }
+          onClick={() => {
+            setActiveTab("update");
+            setLga(null);
+          }}
+        >
+          <h2 className="text-sm font-bold ">Update LGA Route</h2>
+        </div>
       </div>
 
-      <form
-        action=""
-        className="border w-full px-2"
-        onSubmit={handleFormSubmit}
-      >
+      <form action="" className="w-full px-2" onSubmit={handleFormSubmit}>
         <FormInputDropDown
           label="State"
           data={AllStates}
@@ -143,14 +186,23 @@ const AdminNewRoute = () => {
           index="z-20"
         />
 
-        <FormInputDropDown
-          label="LGA"
-          onChange={onChangeLga}
-          data={filteredLgas}
-          index="z-10"
-        />
+        {activeTab === "create" ? (
+          <FormInputDropDown
+            label="LGA"
+            onChange={onChangeLga}
+            data={filteredLgas}
+            index="z-10"
+          />
+        ) : (
+          <FormInputDropDown
+            label="LGA"
+            onChange={onChangeLga}
+            data={currentLgas}
+            index="z-10"
+          />
+        )}
 
-        {lga && (
+        {lga && activeTab === "create" && (
           <>
             <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
               <FormInputEditable
@@ -201,6 +253,53 @@ const AdminNewRoute = () => {
             </div>
           </>
         )}
+
+        {lga && activeTab === "update" && (
+          <>
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                label="Route 1 - Start"
+                data={routesLga[0].routes[0].start}
+                onChange={(selectedOption) => setRoute1Start(selectedOption)}
+              />
+
+              <FormInputEditable
+                label="Route 1 - End"
+                data={routesLga[0].routes[0].end}
+                onChange={(selectedOption) => setRoute1End(selectedOption)}
+              />
+            </div>
+
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                label="Route 2 - Start"
+                data={routesLga[0].routes[1].start}
+                onChange={(selectedOption) => setRoute2Start(selectedOption)}
+              />
+
+              <FormInputEditable
+                label="Route 2 - End"
+                data={routesLga[0].routes[1].end}
+                onChange={(selectedOption) => setRoute2End(selectedOption)}
+              />
+            </div>
+
+            <div className="bg-white py-4 my-2 rounded-md drop-shadow-sm lg:items-center flex flex-col lg:flex-row flex-wrap lg:space-x-6">
+              <FormInputEditable
+                onChange={(selectedOption) => setRoute3Start(selectedOption)}
+                label="Route 3 - Start"
+                data={routesLga[0].routes[2].start}
+              />
+
+              <FormInputEditable
+                onChange={(selectedOption) => setRoute3End(selectedOption)}
+                label="Route 3 - End"
+                data={routesLga[0].routes[2].end}
+              />
+            </div>
+          </>
+        )}
+
         {errors && (
           <p className="p-2 py-3 flex px-3 items-center justify-between rounded bg-white">
             <span className="text-red-500 text-xs">

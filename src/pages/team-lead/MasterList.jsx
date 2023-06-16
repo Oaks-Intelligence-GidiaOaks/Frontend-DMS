@@ -21,7 +21,7 @@ const MasterList = () => {
   useEffect(() => {
     axios
       .get(`form_response/master_list_data`)
-      .then((res) => setMasterList(res.data))
+      .then((res) => setMasterList(res.data.forms))
       .catch((err) => console.log(err));
   }, []);
 
@@ -44,8 +44,9 @@ const MasterList = () => {
 
             const foodObj = await foodItems
               .map((food, i) => ({
-                [`Price of ${food.name}`]: food.price,
-                [`Brand of ${food.name}`]: food.brand < 1 ? "N/A" : food.brand,
+                [`Price of ${food?.name}`]: food?.price,
+                [`Brand of ${food?.name}`]:
+                  food?.brand < 1 ? "N/A" : food?.brand,
               }))
               .reduce((acc, obj) => {
                 return {
@@ -56,7 +57,7 @@ const MasterList = () => {
 
             const accObj = await accomodations
               .map((acc, i) => ({
-                [`${acc.rooms} room ${acc.type}`]: acc.price,
+                [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -64,9 +65,9 @@ const MasterList = () => {
 
             const transportObj = await transports
               .map((transport, i) => ({
-                [`Route ${i + 1}`]: transport.route,
-                [`Mode ${i + 1}`]: transport.mode,
-                [`Route ${i + 1} cost`]: transport.cost,
+                [`Route ${i + 1}`]: transport?.route,
+                [`Mode ${i + 1}`]: transport?.mode,
+                [`Route ${i + 1} cost`]: transport?.cost,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -83,9 +84,9 @@ const MasterList = () => {
 
             const othersObj = await others
               .map((item, i) => ({
-                [`Price of ${item.name}`]: item.price ?? "N/A",
-                [`Brand of ${item.name}`]:
-                  item.brand.length < 1 ? "N/A" : item.brand,
+                [`Price of ${item?.name}`]: item.price ?? "N/A",
+                [`Brand of ${item?.name}`]:
+                  item?.brand?.length < 1 ? "N/A" : item?.brand,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -94,7 +95,7 @@ const MasterList = () => {
             const transformedObj = {
               S_N: i + 1,
               _id,
-              ID: created_by.id,
+              ID: created_by?.id,
               State,
               LGA,
               Food: "food",

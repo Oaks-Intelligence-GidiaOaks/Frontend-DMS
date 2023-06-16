@@ -142,21 +142,21 @@ const AddEnumerator = () => {
     bodyFormData.append("identity", newUser.identity);
     bodyFormData.append("state", newUser.state);
     bodyFormData.append("LGA", newUser.LGA);
-    bodyFormData.append("identityImage", newUser.avarter);
+    bodyFormData.append("identityImage", newUser.identityImage);
 
-    console.log(bodyFormData);
+    // console.log(newUser);
 
-    // axios
-    //   .post(`enumerator/new`, bodyFormData, {
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     resetForm();
-    //   })
-    //   .catch((err) => console.log(err));
+    axios
+      .post(`enumerator/new`, bodyFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        resetForm();
+      })
+      .catch((err) => console.log(err));
   };
 
   return (

@@ -3,6 +3,7 @@ import { EditNote } from "@mui/icons-material";
 import { FormInput } from "../../components/form";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { Rings } from "react-loader-spinner";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -13,9 +14,10 @@ const Profile = () => {
   const [email, setEmail] = useState(user.email);
   const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(user.avarter.url);
+  const [imageUrl, setImageUrl] = useState(user.avatar.url);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
@@ -39,7 +41,6 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!firstName || !lastName || !email || !phoneNumber) {
       setError("Please fill all form fields...");
       return;
@@ -51,28 +52,48 @@ const Profile = () => {
       email,
       phoneNumber,
       id: user.id,
+      avatar: imageUrl,
       role: user.role,
       states: [],
       LGA: [],
     };
 
-    console.log(updatedUser);
+    let formData = new FormData();
 
-    // try {
-    //   axios
-    //     .put(`me/update`, updatedUser)
-    //     .then((res) => {
-    //       if (res.data) {
-    //         console.log(res.data);
-    //         setSuccess("Successfully updated profile");
-    //       } else {
-    //         setSuccess("Error updating profile");
-    //       }
-    //     })
-    //     .catch((err) => console.error(err));
-    // } catch (err) {
-    //   console.error(err);
-    // }
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("id", user.id);
+    formData.append("avatar", imageUrl);
+    // formData.append("role", user.role);
+
+    user.states.forEach((state) => formData.append("states", state));
+    user.LGA.forEach((lga) => formData.append("LGA", lga));
+
+    try {
+      setIsLoading(true);
+      axios
+        .put(`me/update`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          if (res.data) {
+            console.log(res.data);
+            setSuccess("Successfully updated profile");
+          } else {
+            setSuccess("Error updating profile");
+            setIsLoading(false);
+          }
+        })
+        .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePhotoClick = () => {
@@ -120,26 +141,27 @@ const Profile = () => {
 
         <form action="" onSubmit={handleSubmit} className="flex-1 lg:pr-16">
           <FormInput
-            readOnly
-            value={user.firstName}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             placeholder="Maria"
             label="First name"
           />
           <FormInput
-            readOnly
-            value={user.lastName}
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             placeholder="Grey"
             label="Last name"
           />
           <FormInput
-            readOnly
-            value={user.email}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="mariagrey@demo.com"
             label="Email"
           />
           <FormInput
             onChange={(e) => setPhoneNumber(e.target.value)}
             placeholder="+234 81674***"
+            value={phoneNumber}
             label="Contact number"
           />
 
@@ -159,7 +181,6 @@ const Profile = () => {
           {success && (
             <div className="p-2 px-4 rounded flex items-center justify-between bg-white">
               <span className="text-green-500">{success}</span>
-
               <span
                 onClick={() => setSuccess(null)}
                 className="h-6 w-6 bg-gray-400 rounded-full text-white cursor-pointer grid place-items-center"
@@ -169,11 +190,26 @@ const Profile = () => {
             </div>
           )}
 
-          <input
+          <button
             type="submit"
             value="Update"
-            className="w-full mt-4 text-white p-3 rounded bg-oaksgreen cursor-pointer"
-          />
+            className="w-full mt-4 text-white grid place-items-center p-3 rounded bg-oaksgreen cursor-pointer"
+          >
+            {isLoading ? (
+              <Rings
+                height="30"
+                width="30"
+                color="#ffffff"
+                radius="6"
+                wrapperStyle={{ backgoundColor: "yellow" }}
+                wrapperClass=""
+                visible={true}
+                ariaLabel="rings-loading"
+              />
+            ) : (
+              "update"
+            )}
+          </button>
         </form>
       </div>
     </div>

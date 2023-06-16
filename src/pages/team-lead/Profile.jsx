@@ -24,7 +24,7 @@ const Profile = () => {
   const [lgas, setLgas] = useState(user.LGA);
   const [image, setImage] = useState(null);
 
-  const [imageUrl, setImageUrl] = useState(user.avarter.url);
+  const [imageUrl, setImageUrl] = useState(user.avatar.url);
 
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
@@ -124,10 +124,10 @@ const Profile = () => {
           <img
             src={imageUrl}
             alt="avarter Img"
-            className="h-44 w-44 rounded-full bg-green-500"
+            className="h-44 border w-44 rounded-full bg-green-500"
           />
 
-          <p
+          {/* <p
             onClick={handlePhotoClick}
             className="flex justify-center cursor-pointer items-center py-3"
           >
@@ -142,7 +142,7 @@ const Profile = () => {
             />
             <span className="">Edit photo</span>
             <EditNote />
-          </p>
+          </p> */}
         </div>
 
         <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>

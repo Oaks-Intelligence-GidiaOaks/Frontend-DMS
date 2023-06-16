@@ -88,6 +88,13 @@ function EnumeratorLogin() {
         })
           .then((res) => res.json())
           .then(({ user, ...others }) => {
+            if (!user) {
+              setIsLoading(false);
+              return setErrorResponse(
+                "Invalid ID or Password, please try again"
+              );
+            }
+
             setIsLoading(false);
             if (others.message === "Invalid Id or password, please try again") {
               return setErrorResponse(
@@ -135,7 +142,7 @@ function EnumeratorLogin() {
           })
           .catch((error) => {
             setIsLoading(false);
-            setErrorResponse(
+            return setErrorResponse(
               "Can't connect to the server at the moment please check your network and try again."
             );
             console.log("error:", error);

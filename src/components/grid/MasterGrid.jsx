@@ -21,6 +21,8 @@ const MasterGrid = ({ data: masterRow }) => {
 
   let downloadData = masterRow;
 
+  console.log(masterRow);
+
   let masterColumn =
     masterRow && masterRow.length > 0
       ? Object.keys(masterRow[0]).map((item) => (
@@ -44,44 +46,6 @@ const MasterGrid = ({ data: masterRow }) => {
     allowDeleting: true,
     newRowPosition: "Top",
   };
-
-  // const actionTemplate = (props) => {
-  //   return (
-  //     <button onClick={() => console.log("button clicked")}>
-  //       {props.data.action}
-  //     </button>
-  //   );
-  // };
-
-  // const foodTemplate = (props) => (
-  //   <div className="bg-red-500 text-white rounded px-1 text-center text-xs w-full">
-  //     {props.food}
-  //   </div>
-  // );
-
-  // const HousingTemplate = (props) => (
-  //   <div className="bg-red-500 text-white rounded px-1 text-center text-xs w-full">
-  //     {props.accomodation}
-  //   </div>
-  // );
-
-  // const OthersTemplate = (props) => (
-  //   <div className="bg-red-500 text-white rounded px-1 text-center text-xs w-full">
-  //     {props.others}
-  //   </div>
-  // );
-
-  // const TransportTemplate = (props) => (
-  //   <div className="bg-red-500 text-white rounded px-1 text-center text-xs w-full">
-  //     {props.routes}
-  //   </div>
-  // );
-
-  // const ElectricityTemplate = (props) => (
-  //   <div className="bg-red-500 text-white rounded px-1 text-center text-xs w-full">
-  //     {props.electricity}
-  //   </div>
-  // );
 
   const handleDownload = () => {
     var wb = XLSX.utils.book_new();

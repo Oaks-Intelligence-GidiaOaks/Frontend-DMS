@@ -14,7 +14,7 @@ import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
 const Dashboard = () => {
   const { user, token } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [yearDropdown, setYearDropdown] = useState(null);
+  const [yearDropdown, setYearDropdown] = useState("");
   const [priceFluctuation, setPriceFluctuation] = useState(null);
   const [lga, setLga] = useState(user.LGA[0]);
   const [totalLgas, setTotalLgas] = useState(null);
@@ -72,13 +72,21 @@ const Dashboard = () => {
         setEnumeratorsCount(res.data);
       })
       .catch((err) => console.err);
-    axios
-      .get("admin_dashboard/submission_count")
-      .then((res) => {
-        setSubmissionCount(res.data.submissionsArray);
-      })
-      .catch((err) => console.err);
   }, []);
+
+  useEffect(() => {
+    try {
+      setSubmissionCount(null);
+      axios
+        .get(`admin_dashboard/submission_count?yearFilter=${yearDropdown}`)
+        .then((res) => {
+          setSubmissionCount(res.data.submissionsArray);
+        })
+        .catch((err) => console.err);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [yearDropdown]);
 
   const handleDropdownSelect = () => {
     setShowDropdown((prev) => !prev);

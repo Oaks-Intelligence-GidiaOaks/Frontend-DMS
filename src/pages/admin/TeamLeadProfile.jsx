@@ -6,6 +6,8 @@ import axios from "axios";
 import { useAuth } from "../../context";
 import { useLocation, useNavigate } from "react-router-dom";
 import { allLgasByState } from "../../data/form/allLgasByState";
+import { AllStates } from "../../data/form/allStates";
+import { Rings } from "react-loader-spinner";
 
 const TeamLeadProfile = () => {
   const { user } = useAuth();
@@ -13,16 +15,19 @@ const TeamLeadProfile = () => {
   const navigate = useNavigate();
   let formData = location.state;
 
+  console.log(formData);
+
   const [lgaRoutes, setLgaRoutes] = useState(null);
   const [firstName, setFirstName] = useState(formData.firstName);
   const [lastName, setLastName] = useState(formData.lastName);
   const [email, setEmail] = useState(formData.email);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(formData.phoneNumber);
   const [states, setStates] = useState(formData.states);
   const [lgas, setLgas] = useState([]);
 
   const [errors, setErrors] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   let allLgaOptions = [];
   let coveredLgas = lgaRoutes && lgaRoutes.map((it) => it.lga);
@@ -49,6 +54,7 @@ const TeamLeadProfile = () => {
     setPhoneNumber("");
     setEmail(formData.email);
     setStates(formData.states);
+    // setIsLoading(false);
   };
 
   const handleSubmit = (e) => {
@@ -69,10 +75,18 @@ const TeamLeadProfile = () => {
       role: formData.role,
     };
 
-    axios
-      .put(`admin/user/${formData._id}`, updatedTeamLead)
-      .then((res) => resetForm())
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+
+      axios
+        .put(`admin/user/${formData._id}`, updatedTeamLead)
+        .then((res) => resetForm())
+        .catch((err) => console.log(err));
+    } catch (err) {
+      setErrors("error occured, please check your network..");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleStatesChange = (selectedOptions) => {
@@ -87,16 +101,6 @@ const TeamLeadProfile = () => {
   return (
     <div className="h-full sm:mx-6 mt-6 lg:mx-auto lg:w-[90%]">
       <div className="flex items-center gap-6">
-        <div className="rounded bg-white p-3 flex items-center gap-3 text-xs">
-          <p className="">Total submissions</p>
-          <p className="rounded p-1  bg-white">585</p>
-        </div>
-
-        <div className="rounded bg-white p-3 flex items-center gap-3 text-xs">
-          <p className="">No response</p>
-          <p className="rounded p-1  bg-white">52</p>
-        </div>
-
         <div
           onClick={() => navigate(-1)}
           className="rounded cursor-pointer ml-auto border bg-oaksgreen px-6  lg:ml-auto bg-oaksGreen p-3 flex items-center gap-3 text-xs"
@@ -110,7 +114,11 @@ const TeamLeadProfile = () => {
 
       <div className="flex flex-col lg:flex-row gap-6 mt-6 text-sm">
         <div className="mx-auto">
-          <img src="" alt="" className="h-44 w-44 rounded-full bg-green-500" />
+          <img
+            src={formData.avatar.url}
+            alt=""
+            className="h-44 w-44 rounded-full bg-green-500"
+          />
         </div>
 
         <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>
@@ -138,7 +146,6 @@ const TeamLeadProfile = () => {
             onChange={(e) => setPhoneNumber(e.target.value)}
             label="Contact number"
           />
-
           <FormMultipleSelect
             defaultValue={formData.states.map((item) => ({
               value: item,
@@ -147,15 +154,17 @@ const TeamLeadProfile = () => {
             label="State"
             index="z-10"
             onChange={handleStatesChange}
-            data={formData.states.map((item) => ({ value: item, label: item }))}
+            data={AllStates}
           />
-
           <FormMultipleSelect
             label="LGA"
             data={allLgaOptions}
+            defaultValue={formData.LGA.map((item) => ({
+              value: item,
+              label: item,
+            }))}
             onChange={handleLgasChange}
           />
-
           {success && (
             <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
               <span className="text-green-500 text-xs">
@@ -170,7 +179,6 @@ const TeamLeadProfile = () => {
               </span>
             </p>
           )}
-
           {errors && (
             <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
               <span className="text-red-500 text-xs">
@@ -185,12 +193,25 @@ const TeamLeadProfile = () => {
               </span>
             </p>
           )}
-
-          <input
+          <button
             type="submit"
-            value="Update"
             className="w-full mt-4 text-white p-3 rounded bg-oaksgreen cursor-pointer"
-          />
+          >
+            {isLoading ? (
+              <Rings
+                height="36"
+                width="36"
+                color="#ffffff"
+                radius="6"
+                wrapperStyle={{ backgoundColor: "yellow" }}
+                wrapperClass=""
+                visible={true}
+                ariaLabel="rings-loading"
+              />
+            ) : (
+              " Update"
+            )}
+          </button>
         </form>
       </div>
     </div>

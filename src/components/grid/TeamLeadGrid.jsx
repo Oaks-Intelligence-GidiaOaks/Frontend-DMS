@@ -13,6 +13,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { TableModal } from "../reusable";
 
 const TeamLeadGrid = ({ data }) => {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ const TeamLeadGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [tableModal, setTableModal] = useState(null);
 
   let teamLeadsData = data.users;
 
@@ -37,17 +39,32 @@ const TeamLeadGrid = ({ data }) => {
   };
 
   const handleSeeMore = (user) => {
-    const { email, firstName, lastName, role, states, id, _id, LGA } = user;
-
-    const transformedUser = {
+    const {
       email,
       firstName,
       lastName,
       role,
       states,
+      id,
+      _id,
+      LGA,
+      avatar,
+      phoneNumber,
+    } = user;
+
+    console.log(user);
+
+    const transformedUser = {
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      role,
+      states,
       LGA,
       id,
       _id,
+      avatar,
     };
 
     navigate(`/admin/team_leads/${user._id}`, {
@@ -59,13 +76,50 @@ const TeamLeadGrid = ({ data }) => {
     if (user) {
       axios
         .put(`admin/user/disable/${user._id}`)
-        .then((res) => console.log(res.data))
+        .then((res) => {
+          setIsMenuOpen(false);
+          // console.log(res.data);
+          setTableModal(`Disabled user id ${user.id} successfully`);
+        })
         .catch((err) => console.error(err));
     }
   };
 
   const handleResetPassword = (user) => {
-    console.log("Reset Password", user);
+    const { id } = user;
+
+    setIsMenuOpen(false);
+
+    axios
+      .put("password/reset", { id: id })
+      .then((res) => {
+        // console.log(res.data);
+        setTableModal(`Password reset for ${id} successfully`);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleMakeAdmin = (user) => {
+    const { firstName, lastName, phoneNumber, role, id, states, LGA, email } =
+      user;
+
+    axios
+      .put(`admin/user/${user._id}`, {
+        firstName,
+        lastName,
+        phoneNumber,
+        role: "admin",
+        email,
+        LGA,
+        states,
+        id,
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsMenuOpen(false);
+        setTableModal(`User ${user.id} upgraded to Admin`);
+      })
+      .catch((err) => console.error(err));
   };
 
   const serialNumberTemplate = (rowData) => {
@@ -112,7 +166,7 @@ const TeamLeadGrid = ({ data }) => {
             {user.role === "super_admin" && (
               <button
                 className="delete-button text-blue-500 hover:text-gray-700"
-                onClick={() => handleDelete(rowData)}
+                onClick={() => handleMakeAdmin(rowData)}
               >
                 Make Admin
               </button>
@@ -125,7 +179,7 @@ const TeamLeadGrid = ({ data }) => {
 
   return (
     <div className="z-10">
-      <div className="p-3  text-base font-semibold tracking-tighter">
+      <div className="p-3  text-base font-semibold tracking-tighter relative">
         Users - Team Leads
       </div>
 
@@ -167,6 +221,15 @@ const TeamLeadGrid = ({ data }) => {
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
+
+      {tableModal && (
+        <div className="absolute top-30">
+          <TableModal
+            text={tableModal}
+            closeModal={() => setTableModal(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };

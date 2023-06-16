@@ -45,7 +45,11 @@ const Sidebar = () => {
           to="/profile"
         >
           <div className="flex items-start ">
-            <img src="avatar.png" alt="avatar" />
+            <img
+              src={user.avatar.url}
+              className="h-10 w-10 border rounded-full mr-2"
+              alt="avatar"
+            />
             <div className="text-[12px] p-1">
               <p className="text-[16px]">
                 {user.firstName} {user.lastName}{" "}
