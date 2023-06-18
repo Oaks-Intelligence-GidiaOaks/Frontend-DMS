@@ -9,7 +9,9 @@ const Admin = ({ children }) => {
   const { sidebarShown } = useApp();
   const { user } = useAuth();
 
-  return (
+  return user?.firstUse ? (
+    <ChangePassword />
+  ) : (
     <div className="bg-[#FAF9F9] h-full flex w-full relative">
       <AdminSidebar />
 
@@ -19,7 +21,7 @@ const Admin = ({ children }) => {
         {/* main content */}
         <div className=" z-10 px-3 relative">{children}</div>
       </div>
-      {user?.firstUse && <ChangePassword />} 
+      {user?.firstUse && <ChangePassword />}
     </div>
   );
 };
