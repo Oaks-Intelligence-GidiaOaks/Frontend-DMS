@@ -65,242 +65,240 @@ function App() {
     (user.role === "admin" || user.role === "super_admin");
 
   return (
-    <Router>
-      <div className="h-screen">
-        <Routes>
-          <Route
-            path="/"
-            element={isLoggedIn && user ? identifyRoute(user) : <Login />}
-          />
-          {/* enumerator routes */}
-          <Route
-            path="/form"
-            element={
-              isLoggedIn && user && user.role === "enumerator" ? (
-                <EnumeratorFormProvider>
-                  <EnumeratorForm />
-                </EnumeratorFormProvider>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+    <div className="h-screen">
+      <Routes>
+        <Route
+          path="/"
+          element={isLoggedIn && user ? identifyRoute(user) : <Login />}
+        />
+        {/* enumerator routes */}
+        <Route
+          path="/form"
+          element={
+            isLoggedIn && user && user.role === "enumerator" ? (
+              <EnumeratorFormProvider>
+                <EnumeratorForm />
+              </EnumeratorFormProvider>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          {/* team lead routes */}
-          <Route
-            path="/home"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <Dashboard />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/enumerators"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <Enumerators />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/responses"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <FormResponses />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/tracker"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <Tracker />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/add"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <AddEnumerator />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              isLoggedIn && user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <Profile />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/master"
-            element={
-              user && user.role === "team_lead" ? (
-                <TeamLead>
-                  <MasterList />
-                </TeamLead>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+        {/* team lead routes */}
+        <Route
+          path="/home"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <Dashboard />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/enumerators"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <Enumerators />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/responses"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <FormResponses />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/tracker"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <Tracker />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/add"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <AddEnumerator />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isLoggedIn && user && user.role === "team_lead" ? (
+              <TeamLead>
+                <Profile />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="/master"
+          element={
+            user && user.role === "team_lead" ? (
+              <TeamLead>
+                <MasterList />
+              </TeamLead>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          {/* admin routes */}
-          <Route
-            path="admin/home"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminDashboard />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/team_leads"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <TeamLeads />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/team_leads/:id"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminEnumerators />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/responses"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminFormResponses />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+        {/* admin routes */}
+        <Route
+          path="admin/home"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminDashboard />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/team_leads"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <TeamLeads />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/team_leads/:id"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminEnumerators />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/responses"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminFormResponses />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          <Route
-            path="admin/tracker"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminTracker />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/add"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AddTeamLead />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/profile"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminProfile />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+        <Route
+          path="admin/tracker"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminTracker />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/add"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AddTeamLead />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/profile"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminProfile />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          <Route
-            path="admin/profile/:id"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <TeamLeadProfile />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+        <Route
+          path="admin/profile/:id"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <TeamLeadProfile />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          <Route
-            path="admin/master"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminMasterList />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="admin/new-lga"
-            element={
-              adminRoleCheck ? (
-                <Admin>
-                  <AdminNewRoute />
-                </Admin>
-              ) : (
-                <Navigate replace to={"/"} />
-              )
-            }
-          />
+        <Route
+          path="admin/master"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminMasterList />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/new-lga"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <AdminNewRoute />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
 
-          <Route path="*" element={<p>This route doesn't exist</p>} />
-        </Routes>
-      </div>
-    </Router>
+        <Route path="*" element={<p>This route doesn't exist</p>} />
+      </Routes>
+    </div>
   );
 }
 

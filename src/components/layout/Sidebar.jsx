@@ -32,7 +32,7 @@ const Sidebar = () => {
     <div
       className={`w-72 xs:absolute md:static top-0 left-0 ${
         sidebarShown ? "xs:initial" : "xs:hidden"
-      } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
+      } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white `}
     >
       <div className="ml-10 flex flex-col h-full">
         <p className="mt-2 capitalize">{user?.role.replace("_", " ")}</p>
@@ -45,7 +45,11 @@ const Sidebar = () => {
           to="/profile"
         >
           <div className="flex items-start ">
-            <img src="avatar.png" alt="avatar" />
+            <img
+              src={user.avatar.url}
+              className="h-10 w-10 border rounded-full mr-2"
+              alt="avatar"
+            />
             <div className="text-[12px] p-1">
               <p className="text-[16px]">
                 {user.firstName} {user.lastName}{" "}

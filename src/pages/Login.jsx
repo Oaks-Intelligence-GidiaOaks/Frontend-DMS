@@ -3,7 +3,7 @@ import { HiUserCircle } from "react-icons/hi";
 import oaksLogo from "../assets/oaks-logo.svg";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
-import { base_url } from "../lib/paths";
+import { base_url, base_url_local } from "../lib/paths";
 import { Rings } from "react-loader-spinner";
 import secureLocalStorage from "react-secure-storage";
 import { useApp } from "../context";
@@ -88,6 +88,13 @@ function EnumeratorLogin() {
         })
           .then((res) => res.json())
           .then(({ user, ...others }) => {
+            if (!user) {
+              setIsLoading(false);
+              return setErrorResponse(
+                "Invalid ID or Password, please try again"
+              );
+            }
+
             setIsLoading(false);
             if (others.message === "Invalid Id or password, please try again") {
               return setErrorResponse(
@@ -141,7 +148,7 @@ function EnumeratorLogin() {
           })
           .catch((error) => {
             setIsLoading(false);
-            setErrorResponse(
+            return setErrorResponse(
               "Can't connect to the server at the moment please check your network and try again."
             );
             console.log("error:", error);

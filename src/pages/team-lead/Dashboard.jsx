@@ -7,11 +7,17 @@ import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
-import { Loading, NoData } from "../../components/reusable";
+import {
+  Loading,
+  NoData,
+  UpdatePassword,
+  YearDropDown,
+} from "../../components/reusable";
+import getCurrentYear from "../../lib/helpers";
 
 const Dashboard = () => {
   const { user, token } = useAuth();
-  const [yearDropdown, setYearDropdown] = useState(null);
+  const [yearDropdown, setYearDropdown] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [priceFluctuation, setPriceFluctuation] = useState(null);
   const [lga, setLga] = useState(user.LGA[0]);
@@ -37,13 +43,22 @@ const Dashboard = () => {
   }, [lga]);
 
   useEffect(() => {
-    axios
-      .get(`team_lead_dashboard/yearly_enumerators`)
-      .then((res) => {
-        setYearlyEnum(res.data);
-      })
-      .catch((err) => console.log(err));
+    try {
+      setYearlyEnum(null);
+      axios
+        .get(
+          `team_lead_dashboard/yearly_enumerators?yearFilter=${yearDropdown}`
+        )
+        .then((res) => {
+          setYearlyEnum(res.data);
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    }
+  }, [yearDropdown]);
 
+  useEffect(() => {
     axios
       .get("team_lead_dashboard/enumerators_count")
       .then((res) => setEnumeratorsCount(res.data))
@@ -135,7 +150,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="flex items-start space-x-2 flex-col relative">
+            {/* <div className="flex items-start space-x-2 flex-col relative">
               <div className="flex items-center space-x-4">
                 <span>Year</span>
                 <button
@@ -160,11 +175,24 @@ const Dashboard = () => {
                   </ul>
                 </div>
               )}
-            </div>
+            </div> */}
+
+            <YearDropDown
+              startYear={2019}
+              endYear={getCurrentYear()}
+              selectedYear={yearDropdown}
+              onChange={(selectedValue) => handleSelectOption(selectedValue)}
+            />
           </div>
 
           {/* charts */}
-          <SubmissionRate data={yearlyEnum ?? yearlyEnum} />
+          {yearlyEnum ? (
+            <SubmissionRate data={yearlyEnum ?? yearlyEnum} />
+          ) : (
+            <div className="h-32">
+              <Loading />
+            </div>
+          )}
         </div>
       </div>
 

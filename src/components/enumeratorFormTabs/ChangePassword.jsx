@@ -10,9 +10,9 @@ import EnumeratorFormContext from "../../context/enumeratorFormContext";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
 
-  const { logOut } = useContext(EnumeratorFormContext);
+  // const { logOut } = useContext(EnumeratorFormContext);
   const [form, setForm] = useState({
     oldPassword: "",
     password: "",
@@ -69,7 +69,7 @@ const ChangePassword = () => {
       try {
         axios
           .put(
-            "password/update/enumerator",
+           user?.role === "enumerator" ? "password/update/enumerator" : "password/update",
             {
               oldPassword: oldPassword,
               password: password,
@@ -125,7 +125,7 @@ const ChangePassword = () => {
           {/* Form */}
           <div className="flex sm:min-w-[30vw] flex-col mt-10 sm:mt-4 sm:px-10">
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px] text-white">
+              <label htmlFor="password" className="text-[14px]">
                 Old Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -155,7 +155,7 @@ const ChangePassword = () => {
               <p className="text-red-500 text-xs mt-1"></p>
             </div>
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px] text-white">
+              <label htmlFor="password" className="text-[14px]">
                 New Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -185,7 +185,7 @@ const ChangePassword = () => {
               <p className="text-red-500 text-xs mt-1"></p>
             </div>
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px] text-white">
+              <label htmlFor="password" className="text-[14px]">
                 Confirm New Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -239,7 +239,7 @@ const ChangePassword = () => {
 
             <button
               type="submit"
-              className="mt-7 bg-transparent text-white border border-solid border-white rounded-[4px] flex items-center justify-center hover:bg-[#FFAD10] duration-200 ease-in-out hover:border-none hover:scale-110 hover:shadow-lg"
+              className="mt-7 bg-transparent border border-solid rounded-[4px] flex items-center justify-center hover:bg-[#FFAD10] duration-200 ease-in-out hover:border-none hover:scale-110 hover:shadow-lg"
               onClick={handleSubmit}
             >
               {isLoading ? (

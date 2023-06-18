@@ -10,10 +10,7 @@ import {
   Edit,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
-import { ElectricityColumns, ElectricityRows } from "../../data/formResponses";
-import { FormInput } from "../form";
 import axios from "axios";
-import Modal from "react-modal";
 
 const EnumeratorGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -22,7 +19,6 @@ const EnumeratorGrid = ({ data }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tableData, setTableData] = useState(data ?? data);
 
-  // console.log(tableData);
   const customStyles = {
     content: {
       top: "50%",
@@ -107,6 +103,10 @@ const EnumeratorGrid = ({ data }) => {
     );
   };
 
+  const serialNumberTemplate = (rowData) => {
+    return rowData ? Number(rowData.index) + 1 : "";
+  };
+
   const onActionBegin = (args) => {
     // console.log(args);
   };
@@ -140,8 +140,6 @@ const EnumeratorGrid = ({ data }) => {
     }
   };
 
-  const [showModal, setShowModal] = useState(false);
-
   return (
     <div className="z-10">
       <GridComponent
@@ -149,12 +147,18 @@ const EnumeratorGrid = ({ data }) => {
         allowPaging={true}
         allowSorting={true}
         editSettings={editOptions}
-        pageSettings={{ pageSize: 50 }}
-        height={400}
+        pageSettings={{ pageSize: 60 }}
+        height={340}
         actionBegin={onActionBegin}
         actionComplete={onActionComplete}
       >
         <ColumnsDirective>
+          <ColumnDirective
+            width={80}
+            allowEditing={false}
+            template={serialNumberTemplate}
+            headerText="S/N"
+          />
           <ColumnDirective isPrimaryKey={true} field="id" width={120} />
           <ColumnDirective width={150} field="firstName" />
           <ColumnDirective width={150} field="lastName" />

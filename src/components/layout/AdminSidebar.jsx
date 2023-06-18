@@ -47,10 +47,11 @@ const AdminSidebar = () => {
         >
           <div className="flex items-start ">
             <img
-              src="avatar.png"
+              src={user.avatar.url}
               alt="avatar"
-              className="h-10 w-10 border border-oaksyellow rounded-full"
+              className="h-10 w-10 border rounded-full mr-auto"
             />
+
             <div className="text-[12px] p-1">
               <p className="text-[16px]">
                 {user.firstName + " " + user.lastName}

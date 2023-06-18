@@ -14,50 +14,37 @@ import { Loading } from "../../components/reusable";
 const AdminTracker = () => {
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
+  const [allTeamLeads, setAllTeamLeads] = useState(null);
 
   let transChartTime = null;
 
-  if (timeOfSub) {
-    let chidinma = timeOfSub
-      .filter((item) => allLgasChidinma.includes(item.lga))
-      .map((item) => ({ ...item, lga: `Chidinma` }))[0];
+  if (timeOfSub && allTeamLeads) {
+    transChartTime = [];
 
-    let toju = timeOfSub
-      .filter((item) => allLgasToju.includes(item.lga))
-      .map((item) => ({ ...item, lga: `Toju` }))[0];
+    allTeamLeads.map((lead) => {
+      let leadData = timeOfSub.filter((submission) =>
+        lead?.LGA.includes(submission?.lga)
+      );
 
-    let timi = timeOfSub
-      .filter((item) => allLgasTimi.includes(item.lga))
-      .map((item) => ({ ...item, lga: `Timi` }))[0];
+      if (leadData.length > 0) {
+        let newLeadData = leadData.map((item) => ({
+          ...item,
+          lga: lead.firstName,
+        }))[0];
 
-    let akunna = timeOfSub
-      .filter((item) => allLgasAkunna.includes(item.lga))
-      .map((item) => ({ ...item, lga: `Akunna` }))[0];
-
-    let chinyere = timeOfSub
-      .filter((item) => allLgasChinyere.includes(item.lga))
-      .map((item) => ({ ...item, lga: `Chinyere` }))[0];
-
-    transChartTime = new Array();
-    // transChartTime.push(...[chidinma]);
-    if (chidinma !== undefined) {
-      transChartTime.push(chidinma);
-    }
-    if (toju !== undefined) {
-      transChartTime.push(chidinma);
-    }
-    if (timi !== undefined) {
-      transChartTime.push(chidinma);
-    }
-    if (akunna !== undefined) {
-      transChartTime.push(chidinma);
-    }
-    if (chinyere !== undefined) {
-      transChartTime.push(chidinma);
-    }
+        transChartTime.push(newLeadData);
+      }
+    });
   }
 
   useEffect(() => {
+    axios
+      .get(`admin/team_lead`)
+      .then((res) => {
+        setAllTeamLeads(res.data.users);
+      })
+      .catch((err) => console.error(err));
+
     axios
       .get("form_response/admin_response_tracker")
       .then((res) => {
@@ -82,7 +69,7 @@ const AdminTracker = () => {
     trackerData?.results?.filter((item) => item.status === false).length;
 
   return (
-    <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-3">
         <div className="rounded bg-primary p-3 flex items-center justify-between  xs:flex-1 md:flex-initial gap-6 xs:gap-16 shrink-0 text-xs">
           <p className="text-white">Submitted</p>
@@ -113,7 +100,7 @@ const AdminTracker = () => {
       {/* chart */}
       <div className="p-3 flex flex-col lg:flex-row overflow-x-scroll gap-3 rounded-xl drop-shadow-lg ">
         <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg p-2">
-          <MeshedLineChart data={transChartTime ?? transChartTime} />
+          {transChartTime && <MeshedLineChart data={transChartTime} />}
         </div>
       </div>
     </div>

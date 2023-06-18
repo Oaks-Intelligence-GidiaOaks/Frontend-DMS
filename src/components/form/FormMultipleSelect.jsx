@@ -9,7 +9,14 @@ const options = [
   { value: "Bayelsa", label: "Bayelsa" },
 ];
 
-const FormMultipleSelect = ({ label, data, index, onChange, defaultValue }) => {
+const FormMultipleSelect = ({
+  label,
+  data,
+  index,
+  onChange,
+  defaultValue,
+  ref,
+}) => {
   const [value, setValue] = useState(defaultValue ?? []);
 
   const handleChange = (selectedOption) => {
@@ -25,7 +32,13 @@ const FormMultipleSelect = ({ label, data, index, onChange, defaultValue }) => {
       <div
         className={`w-full ${index} bg-white text-xs rounded drop-shadow-sm`}
       >
-        <Select isMulti options={data} value={value} onChange={handleChange} />
+        <Select
+          ref={ref}
+          isMulti
+          options={data}
+          value={value}
+          onChange={handleChange}
+        />
       </div>
     </div>
   );

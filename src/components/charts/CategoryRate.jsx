@@ -56,8 +56,6 @@ export const data = {
 };
 
 const CategoryRate = ({ Product }) => {
-  // console.log(Product);
-
   const transformedProd = {
     id: Product.name,
     data: Product.weeklyPrice.map((item) => ({
@@ -65,8 +63,6 @@ const CategoryRate = ({ Product }) => {
       y: item.y,
     })),
   };
-
-  // console.log(transformedProd);
 
   return (
     <div className="flex flex-col text-xs shrink-0 flex-grow-0 space-y-2 rounded-lg w-[276px] p-4 bg-white drop-shadow-sm">

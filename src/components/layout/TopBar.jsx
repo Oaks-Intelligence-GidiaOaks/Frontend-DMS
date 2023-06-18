@@ -14,7 +14,7 @@ const TopBar = () => {
   // console.log(currentPage);
 
   return (
-    <div className="p-2 px-6 drop-shadow-sm flex sticky top-0 bg-white w-full z-40">
+    <div className="p-2 px-6 drop-shadow-sm flex sticky top-0 bg-white w-full z-50">
       <div className="flex space-x-3 items-center flex-1  capitalize">
         <div className="sm:hidden xs:block">
           <AiOutlineMenu

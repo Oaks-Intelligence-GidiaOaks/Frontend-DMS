@@ -199,7 +199,12 @@ td[aria-label="transport column header Transport"] {
 }
 
 td[aria-label="accomodation column header Accomodation"] {
-  /* color: white !important; */
+  font-weight: 900;
+  background-color: #ebedf7 !important;
+  font-size: 16px;
+}
+
+td[aria-label="Clothing column header Clothing"] {
   font-weight: 900;
   background-color: #ebedf7 !important;
   font-size: 16px;
@@ -215,4 +220,21 @@ td[aria-label="commodities column header Others"] {
   background-color: #ebedf7 !important;
   font-weight: 900;
   font-size: 16px;
+}
+
+.custom-datepicker .e-input-group.e-control-wrapper {
+  border: 2px solid green;
+}
+
+#datepicker {
+  border: none !important;
+  outline: none !important;
+}
+.e-input-group {
+  border: none !important;
+  outline: none !important;
+}
+input.e-input:focus {
+  border: none !important;
+  outline: none !important;
 }
