@@ -14,6 +14,8 @@ import {
   Logout,
 } from "@mui/icons-material";
 import LogoutButton from "../LogoutButton";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { FaCrown } from "react-icons/fa";
 
 const AdminSidebar = () => {
   const { user } = useAuth();
@@ -36,7 +38,10 @@ const AdminSidebar = () => {
       } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
     >
       <div className="ml-10 flex flex-col h-full">
-        <p className="mt-2 capitalize">{user.role.replace("_", " ")}</p>
+        <p className="mt-2 capitalize p-1 px-2 text-white bg-oaksgreen w-fit flex items-center gap-2 rounded">
+          {user?.role === "admin" ? <MdAdminPanelSettings /> : <FaCrown />}
+          {user.role.replace("_", " ")}
+        </p>
 
         <NavLink
           className={({ isActive }) =>

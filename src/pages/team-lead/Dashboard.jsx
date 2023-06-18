@@ -26,7 +26,10 @@ const Dashboard = () => {
   const [submissionRate, setSubmissionRate] = useState(null);
   const [lgaCount, setLgaCount] = useState(null);
 
-  let selectLGA = user.LGA.map((item) => ({ value: item, label: item }));
+  let selectLGA = user.LGA.map((item) => ({
+    value: item,
+    label: item.charAt(0).toUpperCase() + item.slice(1),
+  }));
 
   useEffect(() => {
     try {
