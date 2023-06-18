@@ -147,14 +147,15 @@ const EnumeratorGrid = ({ data }) => {
         allowPaging={true}
         allowSorting={true}
         editSettings={editOptions}
-        pageSettings={{ pageSize: 50 }}
-        height={400}
+        pageSettings={{ pageSize: 60 }}
+        height={340}
         actionBegin={onActionBegin}
         actionComplete={onActionComplete}
       >
         <ColumnsDirective>
           <ColumnDirective
             width={80}
+            allowEditing={false}
             template={serialNumberTemplate}
             headerText="S/N"
           />

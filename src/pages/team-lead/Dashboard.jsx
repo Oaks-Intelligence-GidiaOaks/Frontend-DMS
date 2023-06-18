@@ -7,11 +7,17 @@ import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
 import { IoMdArrowDropdownCircle } from "react-icons/io";
-import { Loading, NoData, UpdatePassword } from "../../components/reusable";
+import {
+  Loading,
+  NoData,
+  UpdatePassword,
+  YearDropDown,
+} from "../../components/reusable";
+import getCurrentYear from "../../lib/helpers";
 
 const Dashboard = () => {
   const { user, token } = useAuth();
-  const [yearDropdown, setYearDropdown] = useState(null);
+  const [yearDropdown, setYearDropdown] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [priceFluctuation, setPriceFluctuation] = useState(null);
   const [lga, setLga] = useState(user.LGA[0]);
@@ -40,7 +46,9 @@ const Dashboard = () => {
     try {
       setYearlyEnum(null);
       axios
-        .get(`team_lead_dashboard/yearly_enumerators?yearFilter=${2023}`)
+        .get(
+          `team_lead_dashboard/yearly_enumerators?yearFilter=${yearDropdown}`
+        )
         .then((res) => {
           setYearlyEnum(res.data);
         })
@@ -142,7 +150,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="flex items-start space-x-2 flex-col relative">
+            {/* <div className="flex items-start space-x-2 flex-col relative">
               <div className="flex items-center space-x-4">
                 <span>Year</span>
                 <button
@@ -167,7 +175,14 @@ const Dashboard = () => {
                   </ul>
                 </div>
               )}
-            </div>
+            </div> */}
+
+            <YearDropDown
+              startYear={2019}
+              endYear={getCurrentYear()}
+              selectedYear={yearDropdown}
+              onChange={(selectedValue) => handleSelectOption(selectedValue)}
+            />
           </div>
 
           {/* charts */}

@@ -165,7 +165,7 @@ const AdminNewRoute = () => {
           <h2 className="text-sm font-bold ">Create New LGA Route</h2>
         </div>
 
-        <div
+        {/* <div
           className={
             activeTab === "update" ? activeTabStyle : nonActiveTabStyle
           }
@@ -175,7 +175,7 @@ const AdminNewRoute = () => {
           }}
         >
           <h2 className="text-sm font-bold ">Update LGA Route</h2>
-        </div>
+        </div> */}
       </div>
 
       <form action="" className="w-full px-2" onSubmit={handleFormSubmit}>
@@ -331,7 +331,7 @@ const AdminNewRoute = () => {
         )}
 
         <button
-          className="bg-oaksgreen w-full text-xs mx-2 text-white p-3 
+          className="bg-oaksgreen w-full text-xs grid place-items-center mx-2 text-white p-3 
         my-6 rounded"
         >
           {loading ? (

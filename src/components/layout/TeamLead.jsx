@@ -10,7 +10,9 @@ const TeamLead = ({ children }) => {
   const { sidebarShown } = useApp();
   // console.log(sidebarShown);
 
-  return (
+  return user?.firstUse ? (
+    <ChangePassword />
+  ) : (
     <div className="bg-[#FAF9F9] h-full flex w-full relative">
       <Sidebar />
 

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import {
   FormInput,
   FormInputDropDown,
+  FormInputNumber,
   FormMultipleSelect,
 } from "../../components/form";
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import { useAuth } from "../../context";
 import { useLocation } from "react-router-dom";
+import { RingsCircle } from "../../components/reusable";
 
 const AddEnumerator = () => {
   const { user } = useAuth();
@@ -38,6 +40,7 @@ const AddEnumerator = () => {
 
   const [userCreated, setUserCreated] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let fileReader,
@@ -73,6 +76,7 @@ const AddEnumerator = () => {
     setImage(null);
     setFileDataUrl(null);
     setUserCreated(true);
+    setIsLoading(false);
   };
 
   const handleStateChange = (selectedValue) => {
@@ -146,17 +150,21 @@ const AddEnumerator = () => {
 
     // console.log(newUser);
 
-    axios
-      .post(`enumerator/new`, bodyFormData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        resetForm();
-      })
-      .catch((err) => console.log(err));
+    try {
+      setIsLoading(true);
+      axios
+        .post(`enumerator/new`, bodyFormData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          resetForm();
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -207,7 +215,7 @@ const AddEnumerator = () => {
           }
         />
 
-        <FormInput
+        <FormInputNumber
           placeholder="090 26******"
           label="Contact number"
           value={formFields.tel}
@@ -238,10 +246,10 @@ const AddEnumerator = () => {
           onChange={handleIdTypeChange}
         />
 
-        <FormInput
+        <FormInputNumber
           placeholder="ID number"
           label="Identification(ID) Number"
-          value={formFields.image}
+          value={formFields.idNo}
           onChange={(e) =>
             setFormFields((prev) => ({ ...prev, idNo: e.target.value }))
           }
@@ -280,10 +288,12 @@ const AddEnumerator = () => {
           </p>
         )}
 
-        <input
+        <button
           type="submit"
-          className="w-full mt-4 text-white p-3 rounded bg-oaksgreen"
-        />
+          className="w-full mt-4 grid place-items-center text-white p-3 rounded bg-oaksgreen"
+        >
+          {isLoading ? <RingsCircle /> : `Submit`}
+        </button>
       </form>
     </div>
   );

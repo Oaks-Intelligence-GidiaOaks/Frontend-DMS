@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FormInput, FormInputDropDown } from "../../components/form";
+import {
+  FormInput,
+  FormInputDropDown,
+  FormInputNumber,
+} from "../../components/form";
 import { AllStates, lgasByState } from "../../data/form/states";
 import { allLgasByState } from "../../data/form/allLgasByState";
 import { IdTypes } from "../../data/form/others";
@@ -7,6 +11,7 @@ import axios from "axios";
 import FormMultipleSelect from "../../components/form/FormMultipleSelect";
 import { useAuth } from "../../context";
 import { EditNote, Email } from "@mui/icons-material";
+import { RingsCircle } from "../../components/reusable";
 
 const AddTeamLead = () => {
   const { user } = useAuth();
@@ -29,6 +34,8 @@ const AddTeamLead = () => {
   const [userCreated, setUserCreated] = useState(false);
   const [error, setError] = useState(null);
   const [lgaRoutes, setLgaRoutes] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [stateValues, setStateValues] = useState([]);
 
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
@@ -92,10 +99,13 @@ const AddTeamLead = () => {
     });
 
     setStates([]);
+    lgasArr = [];
     setLgas([]);
+    setStateValues([]);
     setIdentityImage(null);
     setAvatar(null);
     setUserCreated(true);
+    setIsLoading(false);
   };
 
   const handleStateChange = (selectedOptions) => {
@@ -178,25 +188,29 @@ const AddTeamLead = () => {
     transformedLgas.forEach((lga) => formData.append("LGA", lga));
     transformedStates.forEach((state) => formData.append("states", state));
 
-    console.log(formData);
-
-    axios
-      .post("user/new", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((user) => {
-        if (!user) {
-          console.log("error while creating user");
-        } else {
-          resetForm();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setError("could not complete registration, try again...");
-      });
+    try {
+      setIsLoading(true);
+      axios
+        .post("user/new", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((user) => {
+          if (!user) {
+            console.log("error while creating user");
+          } else {
+            resetForm();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsLoading(false);
+          setError("could not complete registration, try again...");
+        });
+    } catch (err) {
+      setError("Error occured, Please check your network connection");
+    }
   };
 
   return (
@@ -257,13 +271,13 @@ const AddTeamLead = () => {
           }
         />
 
-        <FormInput
-          placeholder="090 26******"
+        <FormInputNumber
           label="Contact number"
-          value={formFields.tel}
           onChange={(e) =>
             setFormFields((prev) => ({ ...prev, tel: e.target.value }))
           }
+          placeholder="090 26***"
+          value={formFields.tel}
         />
 
         <FormMultipleSelect
@@ -290,7 +304,7 @@ const AddTeamLead = () => {
           onChange={handleIdTypeChange}
         />
 
-        <FormInput
+        <FormInputNumber
           placeholder="ID number"
           label="Identification(ID) Number"
           value={formFields.image}
@@ -345,13 +359,13 @@ const AddTeamLead = () => {
           </p>
         )}
 
-        <input
-          type="submit"
-          className="w-full mt-4 text-white p-3 rounded bg-oaksgreen"
-        />
+        <button className="w-full mt-4 text-white grid place-items-center p-3 rounded bg-oaksgreen">
+          {isLoading ? <RingsCircle /> : "Submit"}
+        </button>
       </form>
     </div>
   );
+  ``;
 };
 
 export default AddTeamLead;

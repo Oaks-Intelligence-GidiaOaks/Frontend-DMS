@@ -8,7 +8,9 @@ import OaksSlider from "../../components/Slider";
 import axios from "axios";
 import { useAuth } from "../../context";
 import { FormInputDropDown } from "../../components/form";
-import { Loading, NoData } from "../../components/reusable";
+import { Loading, NoData, YearDropDown } from "../../components/reusable";
+import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
+import getCurrentYear from "../../lib/helpers";
 
 const Dashboard = () => {
   const { user, token } = useAuth();
@@ -24,7 +26,10 @@ const Dashboard = () => {
   const [coveredLgas, setCoveredLgas] = useState(null);
 
   let selectLGA = coveredLgas
-    ? coveredLgas.map((item) => ({ value: item, label: item }))
+    ? coveredLgas.map((item) => ({
+        value: item,
+        label: item.charAt(0).toUpperCase() + item.slice(1),
+      }))
     : [];
 
   const getCoveredLgas = () => {
@@ -168,32 +173,12 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-2 flex-col relative">
-              <div className="flex items-center space-x-4">
-                <span>Year</span>
-                <button
-                  onClick={handleDropdownSelect}
-                  className="flex items-center gap-3 rounded p-2 bg-light-gray"
-                >
-                  {yearDropdown ?? "2023"} <IoMdArrowDropdownCircle />
-                </button>
-              </div>
-
-              {showDropdown && (
-                <div>
-                  <ul className="absolute w-20 border rounded drop-shadow-sm flex flex-col gap-2 bg-white right-0">
-                    <li
-                      onClick={() => handleSelectOption(2023)}
-                      className="cursor-pointer border-b p-2"
-                    >{`2023`}</li>
-                    <li
-                      onClick={() => handleSelectOption(2022)}
-                      className="cursor-pointer border-b p-2"
-                    >{`2022`}</li>
-                  </ul>
-                </div>
-              )}
-            </div>
+            <YearDropDown
+              startYear={2019}
+              endYear={getCurrentYear()}
+              selectedYear={yearDropdown}
+              onChange={(selectedValue) => handleSelectOption(selectedValue)}
+            />
           </div>
 
           {/* charts */}

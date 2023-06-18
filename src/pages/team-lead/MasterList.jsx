@@ -38,6 +38,7 @@ const MasterList = () => {
               electricity,
               lga: LGA,
               accomodations,
+              clothings,
               created_by,
               _id,
             } = master;
@@ -49,6 +50,20 @@ const MasterList = () => {
                   food?.brand < 1 ? "N/A" : food?.brand,
               }))
               .reduce((acc, obj) => {
+                return {
+                  ...acc,
+                  ...obj,
+                };
+              }, {});
+
+            const clothingsObj = await clothings
+              ?.map((cloth, i) => ({
+                [`Cloth category`]: cloth?.category,
+                [`Cloth subcategory`]: cloth?.sub_category,
+                [`Cloth size`]: cloth?.size,
+                [`Cloth Price`]: cloth?.price,
+              }))
+              ?.reduce((acc, obj) => {
                 return {
                   ...acc,
                   ...obj,
@@ -104,6 +119,8 @@ const MasterList = () => {
               ...transportObj,
               Accomodation: "accomodation",
               ...accObj,
+              Clothing: "Clothing",
+              ...clothingsObj,
               Electricity: "electricity",
               ...electricityObj,
               Others: "commodities",

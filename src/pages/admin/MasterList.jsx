@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from "react";
-import CategoryTab from "../../components/CategoryTab";
-import {
-  Restaurant,
-  DirectionsCar,
-  Home,
-  PowerSettingsNew,
-  Shuffle,
-  Summarize,
-  Download,
-} from "@mui/icons-material";
+import * as XLSX from "xlsx";
 
 import MasterGrid from "../../components/grid/MasterGrid";
 import axios from "axios";
 
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
+import { BiDownload } from "react-icons/bi";
 
 const MasterList = () => {
   const [activeTab, setActiveTab] = useState("food");
@@ -36,7 +28,6 @@ const MasterList = () => {
           `form_response/master_list_data?startDateFilter=${startDateValue}&endDateFilter=${endDateValue}&page=${pageNo}`
         )
         .then((res) => {
-          console.log(res.data);
           setMasterList(res.data.forms);
           setTotalDataCount(res.data.total);
         })
@@ -44,7 +35,7 @@ const MasterList = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [endDateValue]);
+  }, [endDateValue, pageNo]);
 
   useEffect(() => {
     async function transformData() {
@@ -57,14 +48,29 @@ const MasterList = () => {
               state: State,
               transports,
               electricity,
+              clothings,
               lga: LGA,
               accomodations,
               created_by,
               _id,
             } = master;
 
+            const clothingsObj = await clothings
+              ?.map((cloth, i) => ({
+                [`Cloth category`]: cloth?.category,
+                [`Cloth subcategory`]: cloth?.sub_category,
+                [`Cloth size`]: cloth?.size,
+                [`Cloth Price`]: cloth?.price,
+              }))
+              ?.reduce((acc, obj) => {
+                return {
+                  ...acc,
+                  ...obj,
+                };
+              }, {});
+
             const foodObj = await foodItems
-              .map((food, i) => ({
+              ?.map((food, i) => ({
                 [`Price of ${food?.name}`]: food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
@@ -84,8 +90,6 @@ const MasterList = () => {
                 return { ...acc, ...obj };
               }, {});
 
-            // console.log(transports);
-
             const transportObj = await transports
               ?.map((transport, i) => ({
                 [`Route ${i + 1}`]: transport?.route,
@@ -94,18 +98,18 @@ const MasterList = () => {
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
+              }, {});
+
+            const electricityObj =
+              (await electricity.length) > 0 &&
+              electricity?.reduce((acc, obj) => {
+                let key = Object.keys(obj)[0];
+                let value = Object.values(obj);
+
+                acc[key] = value;
+
+                return acc;
               });
-
-            console.log(transportObj);
-
-            const electricityObj = await electricity.reduce((acc, obj) => {
-              let key = Object.keys(obj)[0];
-              let value = Object.values(obj);
-
-              acc[key] = value;
-
-              return acc;
-            });
 
             const othersObj = await others
               .map((item, i) => ({
@@ -115,7 +119,7 @@ const MasterList = () => {
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
-              });
+              }, {});
 
             const transformedObj = {
               S_N: i + 1,
@@ -129,11 +133,15 @@ const MasterList = () => {
               ...transportObj,
               Accomodation: "accomodation",
               ...accObj,
+              Clothing: "Clothing",
+              ...clothingsObj,
               Electricity: "electricity",
               ...electricityObj,
               Others: "commodities",
               ...othersObj,
             };
+
+            console.log(transformedObj);
 
             return transformedObj;
           })
@@ -150,17 +158,29 @@ const MasterList = () => {
   let paginationItems =
     totalDataCount && masterList && totalDataCount / masterList.length;
 
-  let PageNumers = () => {
+  let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
+    let numArr = [];
+
     for (let i = 0; i < paginationItems; i++) {
-      return (
-        <p
-          onClick={() => setPageNo(i + 1)}
-          className="h-6 w-6 cursor-pointer mx-2 text-center text-blue-500 bg-gray-200 text-sm rounded-full"
-        >
-          {i + 1}
-        </p>
-      );
+      numArr.push(i + 1);
     }
+
+    return (
+      <div className="flex flex-wrap space-x-2">
+        {numArr.length > 0 &&
+          numArr.map((singleNo) => (
+            <button
+              className={`grid place-items-center my-1 text-xs text-gray-800 h-5 w-5  rounded-full ${
+                singleNo === pageNo ? "bg-oaksgreen text-white" : "bg-gray-200"
+              } `}
+              key={singleNo}
+              onClick={() => setPageNo(singleNo)}
+            >
+              <span>{singleNo}</span>
+            </button>
+          ))}
+      </div>
+    );
   };
 
   const handleStartDateChange = (args) => {
@@ -173,51 +193,60 @@ const MasterList = () => {
     let formatDate = new Date(args.value).toISOString().split("T")[0];
 
     setEndDateValue(`${formatDate}`);
-    console.log(formatDate);
+    // console.log(formatDate);
   };
 
   const handlePageNumberChange = (no) => {
     setPageNo(no);
   };
 
+  const handleDownload = () => {
+    var wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(newMaster);
+
+    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
+    XLSX.writeFile(wb, "Excel-sheet.xlsx");
+  };
+
   return (
-    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
-      <div className="flex items-center gap-3 flex-wrap">
-        {/* <div className="rounded justify-between bg-oaksyellow p-3 flex xs:flex-1 md:flex-initial items-center gap-4 text-xs">
-          <p className="text-white whitespace-nowrap">Expected submissions</p>
-          <p className="rounded p-1  bg-white">{}</p>
-        </div> */}
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-3">
+      <div className="flex flex-col-reverse space-y-6 lg:flex-row  items-end justify-between">
+        <div className="flex items-center justify-around">
+          <div className="w-32">
+            <p className="mb-2 text-center">From</p>
+            <div className="border px-2 rounded">
+              <DatePickerComponent
+                cssClass="custom-datepicker"
+                id="datepicker"
+                change={handleStartDateChange}
+              />
+            </div>
+          </div>
 
-        {/* <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white border border-oaksyellow">
-          <p className="">Submissions</p>
-          <p className="p-1 bg-gray-100 rounded text-sm">.</p>
-        </div> */}
+          <div className="border border-gray-900 mx-3 w-6 my-auto" />
 
-        {/* <div className="rounded bg-white border border-oaksyellow  flex items-center p-3 gap-10 xs:gap-6 lg:ml-auto cursor-pointer">
-          <p>No response</p>
-          <p className="bg-gray-100 p-1 rounded text-sm px-2">18</p>
-        </div> */}
-      </div>
-
-      <div className="flex items-center w-full justify-around gap-16">
-        <div className="w-32">
-          <p>From</p>
-          <DatePickerComponent
-            id="datepicker"
-            // value={startDateValue}
-            // min={minDate}
-            change={handleStartDateChange}
-            // max={maxDate}
-          />
+          <div className="w-32">
+            <p className="mb-2 text-center">To</p>
+            <div className="border px-2 rounded">
+              <DatePickerComponent
+                change={handleEndDateChange}
+                id="datepicker"
+                // value={endDateValue}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="w-32">
-          <p>To</p>
-          <DatePickerComponent
-            change={handleEndDateChange}
-            id="datepicker"
-            // value={endDateValue}
-          />
+        <div className="">
+          <button
+            onClick={handleDownload}
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
+          >
+            <div className="w-fit p-1 rounded text-black bg-gray-100">
+              <BiDownload />
+            </div>
+            <span className="pr-6 text-xs">Download</span>
+          </button>
         </div>
       </div>
 
@@ -226,12 +255,7 @@ const MasterList = () => {
         <MasterGrid data={newMaster ?? newMaster} />
 
         <div className="p-2 border ">
-          <div className="ml-auto border flex items-center">
-            {<PageNumers />}
-            {/* <p className="h-6 w-6 mx-2 text-center text-blue-500 bg-gray-200 text-sm rounded-full">
-              1
-            </p> */}
-          </div>
+          <div className="ml-auto flex items-center">{<PageNumbers />}</div>
         </div>
       </div>
     </div>

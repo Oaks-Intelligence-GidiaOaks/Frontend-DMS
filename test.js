@@ -39,3 +39,12 @@ const states = [
 ];
 
 console.log(states);
+
+// const test = [
+//   {
+//     hours_per_week: 30
+//   },
+//    {
+//     hours_per_week: 30
+//   },
+// ]

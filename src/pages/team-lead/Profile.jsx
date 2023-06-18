@@ -8,6 +8,7 @@ import {
 import axios from "axios";
 import { useAuth } from "../../context";
 import Select from "react-select";
+import { RingsCircle } from "../../components/reusable";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -18,13 +19,18 @@ const Profile = () => {
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [identityType, setIdentityType] = useState(user.identityType);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [identity, setIdentity] = useState(user.identity);
+
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [email, setEmail] = useState(user.email);
   const [states, setStates] = useState(user.states);
   const [lgas, setLgas] = useState(user.LGA);
   const [image, setImage] = useState(null);
 
   const [imageUrl, setImageUrl] = useState(user.avatar.url);
+  const [errors, setErrors] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
@@ -68,7 +74,6 @@ const Profile = () => {
       email,
       phoneNumber,
       identity,
-      identityImage,
       avatar: imageUrl,
       states: states,
       LGA: lgas,
@@ -83,11 +88,26 @@ const Profile = () => {
     bodyFormData.append("phoneNumber", newUser.phoneNumber);
     bodyFormData.append("identityType", newUser.identityType);
     bodyFormData.append("identity", newUser.identity);
-    bodyFormData.append("identityImage", newUser.identityImage);
 
     bodyFormData.append("state", newUser.state);
     bodyFormData.append("LGA", newUser.LGA);
-    bodyFormData.append("avarter", newUser.avarter);
+    bodyFormData.append("avatar", newUser.avatar);
+
+    try {
+      setIsLoading(true);
+
+      axios
+        .put(`me/update`, bodyFormData)
+        .then((res) => {
+          setSuccess(true);
+          // console.log("successful");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      setErrors("error occured, please check your network..");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePhotoClick = () => {
@@ -127,7 +147,7 @@ const Profile = () => {
             className="h-44 border w-44 rounded-full bg-green-500"
           />
 
-          {/* <p
+          <p
             onClick={handlePhotoClick}
             className="flex justify-center cursor-pointer items-center py-3"
           >
@@ -142,7 +162,7 @@ const Profile = () => {
             />
             <span className="">Edit photo</span>
             <EditNote />
-          </p> */}
+          </p>
         </div>
 
         <form action="" className="flex-1 lg:pr-16" onSubmit={handleSubmit}>
@@ -174,11 +194,42 @@ const Profile = () => {
           <DisplayInput label="States" data={user.states} />
           <DisplayInput label="LGA" data={user.LGA} />
 
-          <input
+          {success && (
+            <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
+              <span className="text-green-500 text-xs">
+                credential updated successfully...
+              </span>
+
+              <span
+                className="cursor-pointer h-6 w-6 text-center rounded-full bg-gray-400 text-white"
+                onClick={() => setSuccess(null)}
+              >
+                x
+              </span>
+            </p>
+          )}
+
+          {errors && (
+            <p className="w-full flex items-center  p-3 rounded bg-white px-4 justify-between ">
+              <span className="text-red-500 text-xs">
+                please fill all form fields...
+              </span>
+
+              <span
+                className="cursor-pointer h-6 w-6 text-center rounded-full bg-gray-400 text-white"
+                onClick={() => setErrors(null)}
+              >
+                x
+              </span>
+            </p>
+          )}
+
+          <button
             type="submit"
-            value="Update"
-            className="w-full mt-4 text-white p-3 rounded bg-oaksgreen cursor-pointer"
-          />
+            className="w-full mt-4 text-white p-3 grid place-items-center rounded bg-oaksgreen cursor-pointer"
+          >
+            {isLoading ? <RingsCircle /> : `Update`}
+          </button>
         </form>
       </div>
     </div>
