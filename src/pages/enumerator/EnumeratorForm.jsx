@@ -248,7 +248,8 @@ function EnumeratorForm() {
             </p>
             <p className="text-center px-3 xs:px-1 sm:px-3 pt-2">
               Our records tell us you've already submitted for{" "}
-              <span className="font-semibold">{currentLGA} LGA</span> this week.
+              <span className="font-semibold capitalize">{currentLGA} </span>
+              <span className="font-semibold">LGA</span> this week.
             </p>
             <div className="mt-5 flex justify-center">
               {user.LGA.length > 1 && <LGAController />}
