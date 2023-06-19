@@ -338,7 +338,7 @@ export function EnumeratorFormProvider({ children }) {
     [user.LGA]
   );
 
-  const savedState = JSON.parse(localStorage.getItem("oaks-enum-form"));
+  const savedState = JSON.parse(secureLocalStorage.getItem("oaks-enum-form"));
 
   // If user has saved changes use changes else use initial state
   const [state, setState] = useState(savedState ?? initialState);
@@ -366,14 +366,14 @@ export function EnumeratorFormProvider({ children }) {
     }));
   };
   const saveFormChanges = () => {
-    localStorage.setItem("oaks-enum-form", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form", JSON.stringify(state));
     setState((prev) => ({
       ...prev,
       showSavedNotification: true,
     }));
   };
   const backgroundSave = () => {
-    localStorage.setItem("oaks-enum-form", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form", JSON.stringify(state));
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();

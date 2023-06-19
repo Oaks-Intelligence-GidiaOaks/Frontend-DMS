@@ -53,7 +53,7 @@ const UpdatePassword = () => {
   };
 
   return (
-    <div className="h-[100vh] w-[100vw] absolute grid bg-red-500 place-items-center backdrop-blur-sm bg-transparent">
+    <div className="min-h-[100vh] w-[100vw] absolute grid bg-red-500 place-items-center backdrop-blur-sm bg-transparent">
       <div className="border rounded-md h-[500px] w-[300px] p-3 bg-oaksGreen backdrop-blur-lg">
         <form action="" onSubmit={handleSubmit}>
           <PasswordField

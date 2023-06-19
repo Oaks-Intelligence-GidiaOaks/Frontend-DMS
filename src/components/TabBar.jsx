@@ -14,7 +14,7 @@ function TabBar() {
   ]);
 
   return (
-    <div className="flex flex-nowrap mx-auto my-5 w-fit pt-3 max-w-[1040px] bg-white">
+    <div className="flex flex-nowrap mx-auto my-2 w-fit pt-3 max-w-[1040px] bg-white">
       {tabs.current.map((tab, index) => (
         <div
           key={index}

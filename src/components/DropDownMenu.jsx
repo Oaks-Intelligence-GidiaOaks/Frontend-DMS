@@ -75,14 +75,14 @@ const DropDownMenu = ({
   return (
     <div
       ref={dropDownRef}
-      className="flex flex-col relative gap-2 border-b border-solid border-mid-gray"
+      className="flex flex-col relative gap-2 border border-solid border-mid-gray rounded-md"
     >
       <input
         readOnly
         type="text"
         value={value}
         placeholder="Select answer"
-        className="flex-1 pl-3 py-2 outline-primary-green rounded cursor-pointer"
+        className="flex-1 pl-3 py-2 outline-primary-green rounded-md cursor-pointer"
         onFocus={() => {
           setShowDropDown(true);
           setIsFocused(true);

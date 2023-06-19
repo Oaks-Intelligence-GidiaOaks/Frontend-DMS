@@ -69,7 +69,9 @@ const ChangePassword = () => {
       try {
         axios
           .put(
-           user?.role === "enumerator" ? "password/update/enumerator" : "password/update",
+            user?.role === "enumerator"
+              ? "password/update/enumerator"
+              : "password/update",
             {
               oldPassword: oldPassword,
               password: password,
@@ -110,8 +112,8 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center overflow-y-scroll py-[10vh] xs:py-0 sm:py-[10vh]">
-      <div className=" flex flex-col gap-2 min-h-screen xs:min-h-screen profile-bg min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] overflow-hidden shadow-2xl">
+    <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen max-h-screen justify-center overflow-y-scroll py-[10vh] xs:py-0 sm:py-[10vh]">
+      <div className="flex flex-col gap-2 h-fit profile-bg bg-[#72a247] min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] shadow-2xl">
         <div className="p-8 rounded-[10px] max-w-[480px] min-w-[240px] mt-8 mx-auto justify-center">
           <div className="w-20 h-20 bg-white mx-auto rounded-full flex items-center justify-center">
             <BiLock width={40} height={40} size={60} color="#72a247" />
@@ -125,7 +127,7 @@ const ChangePassword = () => {
           {/* Form */}
           <div className="flex sm:min-w-[30vw] flex-col mt-10 sm:mt-4 sm:px-10">
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px]">
+              <label htmlFor="password" className="text-[14px] text-white">
                 Old Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -155,7 +157,7 @@ const ChangePassword = () => {
               <p className="text-red-500 text-xs mt-1"></p>
             </div>
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px]">
+              <label htmlFor="password" className="text-[14px] text-white">
                 New Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -185,7 +187,7 @@ const ChangePassword = () => {
               <p className="text-red-500 text-xs mt-1"></p>
             </div>
             <div className="flex flex-col mt-4">
-              <label htmlFor="password" className="text-[14px]">
+              <label htmlFor="password" className="text-[14px] text-white">
                 Confirm New Password
               </label>
               <div className="flex border-[1px] border-solid border-gray-300 mt-1 rounded-[4px] overflow-visible">
@@ -254,7 +256,9 @@ const ChangePassword = () => {
                   ariaLabel="rings-loading"
                 />
               ) : (
-                <span className="block p-2 text-[14px]">Change Password</span>
+                <span className="block p-2 text-[14px] text-white">
+                  Change Password
+                </span>
               )}
             </button>
           </div>

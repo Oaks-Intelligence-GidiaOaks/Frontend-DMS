@@ -120,7 +120,7 @@ function EnumeratorForm() {
           {/* Enumerator account */}
           <div className="mx-auto max-w-[1040px] pt-5 pl-3">
             <button
-              className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg rounded"
+              className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg bg-[#72a247] rounded"
               onClick={() => showProfile()}
             >
               <div className="flex items-center justify-center bg-white rounded-full p-1">
@@ -133,7 +133,7 @@ function EnumeratorForm() {
           </div>
 
           {/* Info Bar */}
-          <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
+          <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 pb-14 xs:pb-4 max-w-[1040px] mx-auto">
             <ProgressBar />
             <div
               className={`flex flex-nowrap gap-5 ${
@@ -151,17 +151,17 @@ function EnumeratorForm() {
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Tab Bar */}
-          <div
-            className={`sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll ${
-              currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
-                ? "bg-light-gray"
-                : "bg-[#EDF2F6]"
-            }`}
-          >
-            <TabBar />
-          </div>
+        {/* Tab Bar */}
+        <div
+          className={`sticky top-0 z-10 w-full fix-scrollbar overflow-x-scroll ${
+            currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
+              ? "bg-white"
+              : "bg-[#EDF2F6]"
+          }`}
+        >
+          <TabBar />
         </div>
         <div className={`max-w-[1280px] mx-auto justify-center`}>
           {/* Form */}
@@ -284,7 +284,7 @@ function EnumeratorForm() {
       {/* Enumerator Profile */}
       {showEnumeratorProfile && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center overflow-y-scroll py-[10vh] xs:py-0 sm:py-[10vh]">
-          <div className=" flex flex-col gap-2 profile-bg h-fit min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] overflow-hidden login-form-shadow">
+          <div className=" flex flex-col gap-2 profile-bg bg-[#72a247] h-fit min-w-[280px] max-w-[640px] sm:min-w-[360px] xs:w-screen mx-3 xs:mx-0 sm:mx-3 rounded-[10px] xs:rounded-none sm:rounded-[10px] overflow-hidden login-form-shadow">
             <button
               className="flex gap-1 items-center justify-center px-3 py-3 w-fit rounded"
               onClick={() => hideProfile()}
