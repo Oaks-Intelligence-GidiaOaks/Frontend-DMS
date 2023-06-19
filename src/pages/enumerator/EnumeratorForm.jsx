@@ -115,7 +115,7 @@ function EnumeratorForm() {
             currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
               ? "bg-white"
               : "bg-[#EDF2F6]"
-          } relative`}
+          }`}
         >
           {/* Enumerator account */}
           <div className="mx-auto max-w-[1040px] pt-5 pl-3">
