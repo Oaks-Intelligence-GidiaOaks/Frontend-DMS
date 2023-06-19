@@ -155,9 +155,9 @@ function EnumeratorForm() {
 
         {/* Tab Bar */}
         <div
-          className={`sticky top-0 bg-white z-10 w-full fix-scrollbar overflow-x-scroll ${
+          className={`sticky top-0 z-10 w-full fix-scrollbar overflow-x-scroll ${
             currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
-              ? "bg-light-gray"
+              ? "bg-white"
               : "bg-[#EDF2F6]"
           }`}
         >
