@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from "react";
-import CategoryTab from "../../components/CategoryTab";
-import {
-  Restaurant,
-  DirectionsCar,
-  Home,
-  PowerSettingsNew,
-  Shuffle,
-  Summarize,
-  Download,
-} from "@mui/icons-material";
 
 import MasterGrid from "../../components/grid/MasterGrid";
 import axios from "axios";
 
 const MasterList = () => {
-  const [activeTab, setActiveTab] = useState("food");
   const [masterList, setMasterList] = useState(null);
   const [newMaster, setNewMaster] = useState(null);
+  let [totalDataCount, setTotalDataCount] = useState(null);
+  let [pageNo, setPageNo] = useState(1);
 
   useEffect(() => {
     axios
-      .get(`form_response/master_list_data`)
-      .then((res) => setMasterList(res.data.forms))
+      .get(
+        `form_response/master_list_data?startDateFilter=${``}&endDateFilter=${``}&page=${pageNo}`
+      )
+      .then((res) => {
+        setMasterList(res.data.forms);
+        setTotalDataCount(res.data.total);
+      })
       .catch((err) => console.log(err));
-  }, []);
+  }, [pageNo]);
 
   useEffect(() => {
     async function transformData() {
@@ -140,6 +136,34 @@ const MasterList = () => {
     masterList ? transformData() : null;
   }, [masterList]);
 
+  let paginationItems =
+    totalDataCount && masterList && totalDataCount / masterList.length;
+
+  let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
+    let numArr = [];
+
+    for (let i = 0; i < paginationItems; i++) {
+      numArr.push(i + 1);
+    }
+
+    return (
+      <div className="flex flex-wrap space-x-2">
+        {numArr.length > 0 &&
+          numArr.map((singleNo) => (
+            <button
+              className={`grid place-items-center my-1 text-xs text-gray-800 h-5 w-5  rounded-full ${
+                singleNo === pageNo ? "bg-oaksgreen text-white" : "bg-gray-200"
+              } `}
+              key={singleNo}
+              onClick={() => setPageNo(singleNo)}
+            >
+              <span>{singleNo}</span>
+            </button>
+          ))}
+      </div>
+    );
+  };
+
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
@@ -170,6 +194,10 @@ const MasterList = () => {
       {/* table */}
       <div className="bg-white h-80 w-full text-[6px]">
         <MasterGrid data={newMaster ?? newMaster} />
+
+        <div className="p-2 border ">
+          <div className="ml-auto flex items-center">{<PageNumbers />}</div>
+        </div>
       </div>
     </div>
   );

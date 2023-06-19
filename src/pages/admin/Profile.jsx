@@ -14,7 +14,10 @@ const Profile = () => {
   const [email, setEmail] = useState(user.email);
   const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(user.avatar.url);
+  const [imageUrl, setImageUrl] = useState(
+    user.avatar.url ||
+      `https://res.cloudinary.com/emmaotuonye1/image/upload/v1686759696/avatars/Avatar-2_lmptpe.png`
+  );
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +86,7 @@ const Profile = () => {
           if (res.data) {
             console.log(res.data);
             setSuccess("Successfully updated profile");
+            setIsLoading(false);
           } else {
             setSuccess("Error updating profile");
             setIsLoading(false);
@@ -91,8 +95,6 @@ const Profile = () => {
         .catch((err) => console.error(err));
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 

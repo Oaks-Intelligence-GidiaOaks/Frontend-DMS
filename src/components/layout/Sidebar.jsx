@@ -50,7 +50,10 @@ const Sidebar = () => {
         >
           <div className="flex items-start ">
             <img
-              src={user.avatar.url}
+              src={
+                user.avatar.url ||
+                `https://res.cloudinary.com/emmaotuonye1/image/upload/v1687122736/avatars/cmogk2u8cxngvjcenow2.png`
+              }
               className="h-10 w-10 border rounded-full mr-2"
               alt="avatar"
             />

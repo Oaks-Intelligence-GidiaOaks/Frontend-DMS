@@ -52,7 +52,10 @@ const AdminSidebar = () => {
         >
           <div className="flex items-start ">
             <img
-              src={user.avatar.url}
+              src={
+                user.avatar.url ||
+                `https://res.cloudinary.com/emmaotuonye1/image/upload/v1686759696/avatars/Avatar-2_lmptpe.png`
+              }
               alt="avatar"
               className="h-10 w-10 border rounded-full mr-auto"
             />

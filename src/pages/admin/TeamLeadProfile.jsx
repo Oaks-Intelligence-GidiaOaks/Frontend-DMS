@@ -15,15 +15,13 @@ const TeamLeadProfile = () => {
   const navigate = useNavigate();
   let formData = location.state;
 
-  console.log(formData);
-
   const [lgaRoutes, setLgaRoutes] = useState(null);
   const [firstName, setFirstName] = useState(formData.firstName);
   const [lastName, setLastName] = useState(formData.lastName);
   const [email, setEmail] = useState(formData.email);
   const [phoneNumber, setPhoneNumber] = useState(formData.phoneNumber);
   const [states, setStates] = useState(formData.states);
-  const [lgas, setLgas] = useState([]);
+  const [lgas, setLgas] = useState(formData.LGA);
 
   const [errors, setErrors] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -51,10 +49,11 @@ const TeamLeadProfile = () => {
     setFirstName(formData.firstName);
     setLastName(formData.lastName);
     setLgas(formData.lgas);
-    setPhoneNumber("");
+    setPhoneNumber(formData.phoneNumber);
     setEmail(formData.email);
     setStates(formData.states);
-    // setIsLoading(false);
+    setIsLoading(false);
+    navigate("/admin/team_leads");
   };
 
   const handleSubmit = (e) => {
@@ -74,6 +73,8 @@ const TeamLeadProfile = () => {
       id: formData.id,
       role: formData.role,
     };
+
+    console.log(updatedTeamLead);
 
     try {
       setIsLoading(true);

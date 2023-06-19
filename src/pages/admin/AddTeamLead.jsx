@@ -84,7 +84,7 @@ const AddTeamLead = () => {
   states.length > 0 &&
     states.map((item) => {
       allLgasByState[item.value]
-        .filter((item) => !coveredLgas.includes(item.value))
+        .filter((item) => coveredLgas.includes(item.value))
         .map((i) => lgasArr.push(i));
     });
 

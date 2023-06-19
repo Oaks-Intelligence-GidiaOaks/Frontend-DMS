@@ -8,12 +8,12 @@ import {
 import { IdTypes } from "../../data/form/others";
 import axios from "axios";
 import { useAuth } from "../../context";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RingsCircle } from "../../components/reusable";
 
 const AddEnumerator = () => {
   const { user } = useAuth();
-
+  const navigate = useNavigate();
   const location = useLocation();
 
   let totalEnumerators = location.state?.totalEnumerators;
@@ -77,6 +77,7 @@ const AddEnumerator = () => {
     setFileDataUrl(null);
     setUserCreated(true);
     setIsLoading(false);
+    navigate("/add");
   };
 
   const handleStateChange = (selectedValue) => {
@@ -145,10 +146,9 @@ const AddEnumerator = () => {
     bodyFormData.append("identityType", newUser.identityType);
     bodyFormData.append("identity", newUser.identity);
     bodyFormData.append("state", newUser.state);
-    bodyFormData.append("LGA", newUser.LGA);
+    // bodyFormData.append("LGA", newUser.LGA);
     bodyFormData.append("identityImage", newUser.identityImage);
-
-    // console.log(newUser);
+    newUser.LGA?.map((item) => bodyFormData.append("LGA", `${item}`));
 
     try {
       setIsLoading(true);
@@ -161,7 +161,11 @@ const AddEnumerator = () => {
         .then((res) => {
           resetForm();
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          setIsLoading(false);
+          setError(err);
+          console.log(err);
+        });
     } catch (err) {
       console.error(err);
     }

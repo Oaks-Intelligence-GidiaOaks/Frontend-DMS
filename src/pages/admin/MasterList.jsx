@@ -210,8 +210,8 @@ const MasterList = () => {
 
   return (
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-3">
-      <div className="flex flex-col-reverse space-y-6 lg:flex-row  items-end justify-between">
-        <div className="flex items-center justify-around">
+      <div className="flex flex-col space-y-6 lg:flex-row  items-end justify-between">
+        <div className="flex items-center justify-around mr-auto">
           <div className="w-32">
             <p className="mb-2 text-center">From</p>
             <div className="border px-2 rounded">
