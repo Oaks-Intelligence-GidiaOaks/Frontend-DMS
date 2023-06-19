@@ -133,7 +133,7 @@ function EnumeratorForm() {
           </div>
 
           {/* Info Bar */}
-          <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
+          <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 pb-14 xs:pb-4 max-w-[1040px] mx-auto">
             <ProgressBar />
             <div
               className={`flex flex-nowrap gap-5 ${
@@ -155,7 +155,7 @@ function EnumeratorForm() {
 
         {/* Tab Bar */}
         <div
-          className={`sticky top-0 bg-white z-10 w-full pt-14 xs:pt-4 fix-scrollbar overflow-x-scroll ${
+          className={`sticky top-0 bg-white z-10 w-full fix-scrollbar overflow-x-scroll ${
             currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
               ? "bg-light-gray"
               : "bg-[#EDF2F6]"
