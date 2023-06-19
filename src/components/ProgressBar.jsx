@@ -16,9 +16,9 @@ function ProgressBar() {
           ({numOfValidFields}/{totalNumOfFields})
         </span>
       </div>
-      <div className="w-full h-1 rounded bg-gray-300">
+      <div className="w-full h-1 rounded-lg bg-gray-300">
         <div
-          className={`h-1 rounded bg-primary-green`}
+          className={`h-1 rounded-lg bg-primary-green`}
           style={{ width: progressPercentage + "%" }}
         ></div>
       </div>

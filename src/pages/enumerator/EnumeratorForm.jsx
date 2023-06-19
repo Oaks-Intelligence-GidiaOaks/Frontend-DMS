@@ -89,7 +89,13 @@ function EnumeratorForm() {
   return (
     <div>
       {/* Title Bar */}
-      <div className="bg-light-gray">
+      <div
+        className={`${
+          currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
+            ? "bg-light-gray"
+            : "bg-[#D1E5F5]"
+        }`}
+      >
         <div className="flex justify-between max-w-[1280px] mx-auto items-center px-10 lg:px-10 md:px-4 sm:px-4 xs:px-4 py-3">
           <img
             src={oaksLogo}
@@ -102,75 +108,90 @@ function EnumeratorForm() {
           </p>
         </div>
       </div>
-      <div className="max-w-[1280px] mx-auto justify-center">
-        {/* Enumerator account */}
-        <div className="mx-auto max-w-[1040px] mt-5 pl-3">
-          <button
-            className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg rounded"
-            onClick={() => showProfile()}
-          >
-            <div className="flex items-center justify-center bg-white rounded-full p-1">
-              <FaRegUser size={16} color="#777777" />
-            </div>
-            <span className="text-white font-medium">
-              {user.firstName} {user.lastName}
-            </span>
-          </button>
-        </div>
 
-        {/* Info Bar */}
-        <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
-          <ProgressBar />
-          <div
-            className={`flex flex-nowrap gap-5 ${
-              ["Oredo"].length > 1
-                ? "justify-center"
-                : "justify-end xs:pr-0 sm:pr-3"
-            }  max-w-[410px] xs:w-[90%]`}
-          >
-            {user.LGA.length > 1 && <LGAController />}
+      <div>
+        <div
+          className={`${
+            currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
+              ? "bg-white"
+              : "bg-[#EDF2F6]"
+          }`}
+        >
+          {/* Enumerator account */}
+          <div className="mx-auto max-w-[1040px] pt-5 pl-3">
             <button
-              className="flex justify-center items-center px-3 bg-primary-green py-2 max-w-[170px] rounded"
-              onClick={saveFormChanges}
+              className="flex gap-3 items-center justify-center px-5 py-2 w-fit profile-btn-bg rounded"
+              onClick={() => showProfile()}
             >
-              <span className="text-white text-[14px] ">Save Changes</span>
+              <div className="flex items-center justify-center bg-white rounded-full p-1">
+                <FaRegUser size={16} color="#777777" />
+              </div>
+              <span className="text-white font-medium">
+                {user.firstName} {user.lastName}
+              </span>
             </button>
           </div>
-        </div>
 
-        {/* Tab Bar */}
-        <div className="sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll">
-          <TabBar />
-        </div>
-
-        {/* Form */}
-        <div className="min-h-[100vh] bg-white px-4">
-          {lgaRoutes ? (
-            <>
-              {currentFormTab === "Food" && <Food />}
-              {currentFormTab === "Commodity" && <Commodity />}
-              {currentFormTab === "Clothing" && <Clothing />}
-              {currentFormTab === "Transport" && <Transport />}
-              {currentFormTab === "Accomodation" && <Accomodation />}
-              {currentFormTab === "Reports" && <Reports />}
-            </>
-          ) : (
-            <div className="w-full min-h-[50vh] flex justify-center gap-2 flex-col items-center ">
-              <Rings
-                height="60"
-                width="60"
-                color="#72a247"
-                radius="30"
-                wrapperClass=""
-                visible={true}
-                ariaLabel="rings-loading"
-              />
-              <p>Loading</p>
+          {/* Info Bar */}
+          <div className="flex flex-wrap gap-y-10 justify-around sm:justify-between items-end mt-10 max-w-[1040px] mx-auto">
+            <ProgressBar />
+            <div
+              className={`flex flex-nowrap gap-5 ${
+                user?.LGA.length > 1
+                  ? "justify-center"
+                  : "justify-end xs:pr-0 sm:pr-3"
+              }  max-w-[410px] xs:w-[90%]`}
+            >
+              {user.LGA.length > 1 && <LGAController />}
+              <button
+                className="flex justify-center items-center px-3 bg-primary-green py-2 max-w-[170px] rounded"
+                onClick={saveFormChanges}
+              >
+                <span className="text-white text-[14px] ">Save Changes</span>
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Tab Bar */}
+          <div
+            className={`sticky top-0 bg-white z-10 w-full mt-14 xs:mt-4 fix-scrollbar overflow-x-scroll ${
+              currentLGA.toLowerCase() === user.LGA[0].toLowerCase()
+                ? "bg-light-gray"
+                : "bg-[#EDF2F6]"
+            }`}
+          >
+            <TabBar />
+          </div>
+        </div>
+        <div className={`max-w-[1280px] mx-auto justify-center`}>
+          {/* Form */}
+          <div className="min-h-[100vh] bg-white px-4">
+            {lgaRoutes ? (
+              <>
+                {currentFormTab === "Food" && <Food />}
+                {currentFormTab === "Commodity" && <Commodity />}
+                {currentFormTab === "Clothing" && <Clothing />}
+                {currentFormTab === "Transport" && <Transport />}
+                {currentFormTab === "Accomodation" && <Accomodation />}
+                {currentFormTab === "Reports" && <Reports />}
+              </>
+            ) : (
+              <div className="w-full min-h-[50vh] flex justify-center gap-2 flex-col items-center ">
+                <Rings
+                  height="60"
+                  width="60"
+                  color="#72a247"
+                  radius="30"
+                  wrapperClass=""
+                  visible={true}
+                  ariaLabel="rings-loading"
+                />
+                <p>Loading</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
       {/* Saved changes notification */}
       {showSavedNotification && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center items-center">
@@ -185,7 +206,6 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
-
       {/* Submitted notification */}
       {showSubmissionNotification && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center items-center">
@@ -210,7 +230,6 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
-
       {/* Already Submitted notification */}
       {showDuplicateNotification && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center items-center">
@@ -229,7 +248,8 @@ function EnumeratorForm() {
             </p>
             <p className="text-center px-3 xs:px-1 sm:px-3 pt-2">
               Our records tell us you've already submitted for{" "}
-              <span className="font-semibold">{currentLGA} LGA</span> this week.
+              <span className="font-semibold capitalize">{currentLGA} </span>
+              <span className="font-semibold">LGA</span> this week.
             </p>
             <div className="mt-5 flex justify-center">
               {user.LGA.length > 1 && <LGAController />}
@@ -237,7 +257,6 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
-
       {/* Error notification */}
       {showErrorNotification && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center items-center">
@@ -262,7 +281,6 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
-
       {/* Enumerator Profile */}
       {showEnumeratorProfile && (
         <div className="fixed top-0 left-0 flex backdrop-blur-sm z-20 w-screen h-screen justify-center overflow-y-scroll py-[10vh] xs:py-0 sm:py-[10vh]">
@@ -363,7 +381,6 @@ function EnumeratorForm() {
           </div>
         </div>
       )}
-
       {/* Change password on initial login */}
       {user.firstUse && <ChangePassword />}
     </div>
