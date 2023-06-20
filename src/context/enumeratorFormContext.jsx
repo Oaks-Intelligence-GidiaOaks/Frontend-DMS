@@ -921,7 +921,7 @@ export function EnumeratorFormProvider({ children }) {
             let j = 0;
             while (state.foodSectionStructure[item][type][j]) {
               foodItems.push({
-                name: `${item}_${type}`,
+                name: `${item} (${type})`,
                 price: parseInt(
                   state.foodSectionStructure[item][type][j]["price"].replace(
                     /,/g,
@@ -971,7 +971,7 @@ export function EnumeratorFormProvider({ children }) {
           (type) =>
             type !== "type" &&
             foodItems.push({
-              name: `${item}_${type}`,
+              name: `${item} (${type})`,
               price: parseInt(
                 state.foodSectionStructure[item]["prices"][0][type].replace(
                   /,/g,
@@ -984,7 +984,7 @@ export function EnumeratorFormProvider({ children }) {
       } else {
         Object.keys(state.foodSectionStructure[item]).forEach((type) => {
           foodItems.push({
-            name: `${item}_${type}`,
+            name: `${item} (${type})`,
             price: parseInt(
               state.foodSectionStructure[item][type][0]["price"].replace(
                 /,/g,
@@ -1004,7 +1004,7 @@ export function EnumeratorFormProvider({ children }) {
           let j = 0;
           while (state.commoditySectionStructure[item][type][j]) {
             others.push({
-              name: `${item}_${type}`,
+              name: `${item} (${type})`,
               price: parseInt(
                 state.commoditySectionStructure[item][type][j]["price"].replace(
                   /,/g,
@@ -1019,7 +1019,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (["Charcoal", "Building Block"].includes(item)) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
-            name: `${item}_${type[item === "Charcoal" ? "weight" : "size"]}`,
+            name: `${item} (${type[item === "Charcoal" ? "weight" : "size"]})`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -1027,7 +1027,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (item === "Firewood") {
         state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
           others.push({
-            name: `${item}_${type["size"]}`,
+            name: `${item} (${type["size"]})`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -1035,7 +1035,7 @@ export function EnumeratorFormProvider({ children }) {
       } else {
         Object.keys(state.commoditySectionStructure[item]).forEach((type) => {
           others.push({
-            name: `${item}_${type}`,
+            name: `${item} (${type})`,
             price: parseInt(
               state.commoditySectionStructure[item][type][0]["price"].replace(
                 /,/g,
