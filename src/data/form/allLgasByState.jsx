@@ -98,7 +98,7 @@ export const allLgasByState = {
     { value: "orumba-north", label: "Orumba North" },
     { value: "orumba-south", label: "Orumba South" },
     { value: "oyi", label: "Oyi" },
-    { value: "idemili-south", label: "Idemili South" },
+    { value: "idemili south", label: "Idemili South" },
   ],
 
   bauchi: [
