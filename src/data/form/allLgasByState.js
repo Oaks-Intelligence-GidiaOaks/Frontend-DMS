@@ -1,4 +1,4 @@
-export const allLgasByState = {
+const oldAllLgasByState = {
   abia: [
     { value: "aba north", label: "Aba North" },
     { value: "aba south", label: "Aba South" },
@@ -126,7 +126,7 @@ export const allLgasByState = {
   bayelsa: [
     { value: "brass", label: "Brass" },
     { value: "ekermor", label: "Ekermor" },
-    { value: "kolokuma/opokuma", label: "Kolokuma/Opokuma" },
+    { value: "kolokuma/opokuma", label: "Kolokuma/opokuma" },
     { value: "nembe", label: "Nembe" },
     { value: "ogbia", label: "Ogbia" },
     { value: "sagbama", label: "Sagbama" },
@@ -345,8 +345,8 @@ export const allLgasByState = {
     { value: "isu", label: "Isu" },
     { value: "mbaitoli", label: "mbaitoli" },
     { value: "onuimo", label: "Onuimo" },
-    { value: "owerri north", label: "Owerri north" },
-    { value: "owerri municipal", label: "Owerri municipal" },
+    { value: "owerri north", label: "Owerri North" },
+    { value: "owerri municipal", label: "Owerri Municipal" },
   ],
   jigawa: [
     { value: "aki", label: "Aki" },
@@ -433,7 +433,7 @@ export const allLgasByState = {
     { value: "makoda", label: "Makoda" },
     { value: "minjibir", label: "Minjibir" },
     { value: "municipal", label: "Municipal" },
-    { value: "nassarawa", label: "Nassarawa" },
+    { value: "nasarawa", label: "Nasarawa" },
     { value: "rimin gado", label: "Rimin Gado" },
     { value: "rogo", label: "Rogo" },
     { value: "shannon", label: "Shannon" },
@@ -504,7 +504,7 @@ export const allLgasByState = {
     { value: "suru", label: "Suru" },
     { value: "wasagu/danko", label: "Wasagu/Danko" },
     { value: "zuru", label: "Zuru" },
-    { value: "yelwa yauri", label: "Yelwa yauri" },
+    { value: "yelwa yauri", label: "Yelwa Yauri" },
     { value: "kalgo", label: "Kalgo" },
   ],
   kogi: [
@@ -619,7 +619,7 @@ export const allLgasByState = {
   ogun: [
     { value: "abeokuta north", label: "Abeokuta North" },
     { value: "abeokuta south", label: "Abeokuta South" },
-    { value: "ado/odo", label: "Ado-Odo/Ota" },
+    { value: "ado/odo", label: "Ado Odo/ota" },
     { value: "ewekoro", label: "Ewekoro" },
     { value: "ifo", label: "Ifo" },
     { value: "ijebu east", label: "Ijebu East" },
@@ -702,10 +702,10 @@ export const allLgasByState = {
     { value: "egbeda", label: "Egbeda" },
     { value: "ibadan", label: "Ibadan" },
     { value: "ibadan north", label: "Ibadan North" },
-    { value: "ibadan north-east", label: "Ibadan North-East" },
-    { value: "ibadan north-west", label: "Ibadan North-West" },
-    { value: "ibadan south-east", label: "Ibadan South-East" },
-    { value: "ibadan south-west", label: "Ibadan South-West" },
+    { value: "ibadan north-east", label: "Ibadan North East" },
+    { value: "ibadan north-west", label: "Ibadan North West" },
+    { value: "ibadan south-east", label: "Ibadan South East" },
+    { value: "ibadan south-west", label: "Ibadan South West" },
     { value: "ibarapa central", label: "Ibarapa Central" },
     { value: "ibarapa east", label: "Ibarapa East" },
     { value: "ibarapa north", label: "Ibarapa North" },
@@ -772,7 +772,7 @@ export const allLgasByState = {
     { value: "gokana", label: "Gokana" },
     { value: "ikwerre", label: "Ikwerre" },
     { value: "khana", label: "Khana" },
-    { value: "obio/akpor", label: "Obio/Akpor" },
+    { value: "obio/akpor", label: "Obio/akpor" },
     { value: "ogba/egbema/ndoni", label: "Ogba/Egbema/Ndoni" },
     { value: "ogu/bolo", label: "Ogu/Bolo" },
     { value: "okrika", label: "Okrika" },
@@ -787,7 +787,7 @@ export const allLgasByState = {
   sokoto: [
     { value: "binji", label: "Binji" },
     { value: "bodinga", label: "Bodinga" },
-    { value: "dange shuni", label: "Dange-Shuni" },
+    { value: "dange shuni", label: "Dange Shuni" },
     { value: "gada", label: "Gada" },
     { value: "goronyo", label: "Goronyo" },
     { value: "gudu", label: "Gudu" },
@@ -865,4 +865,18 @@ export const allLgasByState = {
   ],
 };
 
-// const coveredLgas
+export const allLgasByState = Object.entries(oldAllLgasByState).reduce(
+  (acc, [state, lgas]) => {
+    let mappedLgas = lgas.map((lga) => ({
+      value: lga.label,
+      label: lga.label,
+    }));
+    acc[state] = mappedLgas;
+    return acc;
+  },
+  {}
+);
+
+// console.log(allLgasByState);
+
+// export { allLgasByState };

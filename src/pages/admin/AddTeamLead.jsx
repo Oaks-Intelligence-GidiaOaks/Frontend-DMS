@@ -88,6 +88,10 @@ const AddTeamLead = () => {
         .map((i) => lgasArr.push(i));
     });
 
+  if (lgasArr.length > 0) {
+    console.log(lgasArr);
+  }
+
   const resetForm = () => {
     setFormFields({
       firstName: "",

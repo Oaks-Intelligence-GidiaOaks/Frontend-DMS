@@ -10,10 +10,12 @@ import {
   Edit,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
+import { TableModal } from "../reusable";
 import axios from "axios";
 
 const EnumeratorGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const [tableModal, setTableModal] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [isEditing, setIsEditing] = useState(false);
@@ -47,11 +49,34 @@ const EnumeratorGrid = ({ data }) => {
   ];
 
   const handleDelete = (user) => {
-    console.log("Delete", user);
+    // setIsMenuOpen(false);
+
+    if (user) {
+      axios
+        .put(`admin/user/disable/${user._id}`)
+        .then((res) => {
+          setIsMenuOpen(false);
+          setTableModal(`Disabled user id ${user.id} successfully`);
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const handleResetPassword = (user) => {
-    console.log("Reset Password", user);
+    setIsMenuOpen(false);
+    const { id } = user;
+
+    try {
+      axios
+        .put("password/reset", { id: id })
+        .then((res) => {
+          setTableModal(`Password reset for ${id} successful`);
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+      setTableModal(`Error resetting passwor, try again!`);
+    }
   };
 
   const ActionTemplate = (rowData) => {
@@ -79,7 +104,7 @@ const EnumeratorGrid = ({ data }) => {
         </div>
         {selectedUser && selectedUser.index === rowData.index && isMenuOpen && (
           <div
-            className={`popup-menu fixed flex flex-col gap-2 p-2 rounded bg-blue-50 drop-shdow-sm z-50`}
+            className={`popup-menu fixed text-[10px] flex flex-col gap-2 p-2 rounded bg-blue-50 drop-shdow-sm z-50`}
             style={{ top: popupPosition.top, left: popupPosition.left }}
           >
             <button
@@ -141,7 +166,7 @@ const EnumeratorGrid = ({ data }) => {
   };
 
   return (
-    <div className="z-10">
+    <div className="z-10 relative">
       <GridComponent
         dataSource={tableData}
         allowPaging={true}
@@ -173,17 +198,26 @@ const EnumeratorGrid = ({ data }) => {
           <ColumnDirective width={150} allowEditing={false} field="role" />
           <ColumnDirective width={150} allowEditing={false} field="state" />
           <ColumnDirective width={150} allowEditing={false} field="LGA" />
+          <ColumnDirective headerText="Edit" width={120} commands={commands} />
 
-          {/* <ColumnDirective
+          <ColumnDirective
             headerText="Actions"
             allowEditing={false}
             width="100"
             template={ActionTemplate}
-          /> */}
-          <ColumnDirective headerText="Edit" width={120} commands={commands} />
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
+
+      {tableModal && (
+        <div className="absolute top-0 bg-[rgba(0,0,0,.2)] h-full w-full grid place-items-center">
+          <TableModal
+            text={tableModal}
+            closeModal={() => setTableModal(null)}
+          />
+        </div>
+      )}
     </div>
   );
 };

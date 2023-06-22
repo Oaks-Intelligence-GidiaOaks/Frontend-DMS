@@ -47,26 +47,26 @@ export const options = {
 
 const SubmissionRate = ({ data }) => {
   const labels = [];
-  const submitted = [];
-  const notSubmitted = [];
+  const added = [];
+  const removed = [];
 
   data?.map((item) => {
-    labels.push(item.month);
-    submitted.push(item.submitted);
-    notSubmitted.push(item.notSubmitted);
+    labels.push(item?.month);
+    added.push(item?.added);
+    removed.push(item?.removed);
   });
 
   const transformedData = {
     labels,
     datasets: [
       {
-        label: "Submitted",
-        data: submitted,
+        label: "Added",
+        data: added,
         backgroundColor: "#FFAD10",
       },
       {
-        label: "no response",
-        data: notSubmitted,
+        label: "Removed",
+        data: removed,
         backgroundColor: "#FA0D0D",
       },
     ],

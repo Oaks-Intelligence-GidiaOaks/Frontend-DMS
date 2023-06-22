@@ -52,8 +52,6 @@ const TeamLeadGrid = ({ data }) => {
       phoneNumber,
     } = user;
 
-    console.log(user);
-
     const transformedUser = {
       email,
       firstName,
@@ -78,7 +76,6 @@ const TeamLeadGrid = ({ data }) => {
         .put(`admin/user/disable/${user._id}`)
         .then((res) => {
           setIsMenuOpen(false);
-          // console.log(res.data);
           setTableModal(`Disabled user id ${user.id} successfully`);
         })
         .catch((err) => console.error(err));
@@ -93,8 +90,7 @@ const TeamLeadGrid = ({ data }) => {
     axios
       .put("password/reset", { id: id })
       .then((res) => {
-        // console.log(res.data);
-        setTableModal(`Password reset for ${id} successfully`);
+        setTableModal(`Password reset for ${id} successful`);
       })
       .catch((err) => console.log(err));
   };
@@ -178,8 +174,8 @@ const TeamLeadGrid = ({ data }) => {
   };
 
   return (
-    <div className="z-10">
-      <div className="p-3  text-base font-semibold tracking-tighter relative">
+    <div className="z-10 relative">
+      <div className="p-3  text-base font-semibold tracking-tighter">
         Users - Team Leads
       </div>
 
@@ -208,9 +204,9 @@ const TeamLeadGrid = ({ data }) => {
             headerText="Last name"
             width={130}
           />
-          <ColumnDirective field="email" headerText="Email" width={130} />
+          <ColumnDirective field="email" headerText="Email" width={210} />
           <ColumnDirective field="id" headerText="Id" width={130} />
-          <ColumnDirective field="states" headerText="States" width={130} />
+          {/* <ColumnDirective field="states" headerText="States" width={130} /> */}
           <ColumnDirective field="role" headerText="Role" width={130} />
 
           <ColumnDirective
@@ -223,7 +219,7 @@ const TeamLeadGrid = ({ data }) => {
       </GridComponent>
 
       {tableModal && (
-        <div className="absolute top-30">
+        <div className="absolute top-0 bg-[rgba(0,0,0,.2)] h-full w-full grid place-items-center">
           <TableModal
             text={tableModal}
             closeModal={() => setTableModal(null)}

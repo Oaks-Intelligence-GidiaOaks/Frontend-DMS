@@ -6,6 +6,7 @@ import {
   Home,
   PowerSettingsNew,
   Shuffle,
+  Accessibility,
   Summarize,
   Download,
 } from "@mui/icons-material";
@@ -235,7 +236,11 @@ const FormResponses = () => {
           }`}
           onClick={() => getClothing()}
         >
-          <CategoryTab text="Clothing" Icon={Home} activeTab={activeTab} />
+          <CategoryTab
+            text="Clothing"
+            Icon={Accessibility}
+            activeTab={activeTab}
+          />
         </div>
 
         <div
