@@ -101,15 +101,15 @@ const MasterList = () => {
               }, {});
 
             const electricityObj =
-              (await electricity.length) > 0 &&
-              electricity?.reduce((acc, obj) => {
+              electricity.length > 0 &&
+              (await electricity?.reduce((acc, obj) => {
                 let key = Object.keys(obj)[0];
                 let value = Object.values(obj);
 
                 acc[key] = value;
 
                 return acc;
-              });
+              }));
 
             const othersObj = await others
               .map((item, i) => ({
@@ -140,7 +140,6 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
-
             return transformedObj;
           })
         );
