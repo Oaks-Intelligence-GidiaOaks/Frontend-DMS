@@ -19,7 +19,7 @@ import {
 } from "../data/enumeratorFormStructure";
 import { countEmptyStringFields, countValidFields } from "../lib";
 import { useAuth } from "./useAuth";
-import { base_url } from "../lib/paths";
+import { base_url, base_url_local } from "../lib/paths";
 import { useApp } from "./useApp";
 import { useNavigate } from "react-router-dom";
 
@@ -392,9 +392,11 @@ export function EnumeratorFormProvider({ children }) {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((response) => response.json())
+        .then((response) =>
+          response.json().then((data) => ({ status: response.status, ...data }))
+        )
         .then((data) => {
-          console.log(data);
+          console.log("data:", data);
           if (data.message.includes("successful")) {
             resetState();
             setState((prev) => ({
@@ -428,7 +430,6 @@ export function EnumeratorFormProvider({ children }) {
       }));
     }
   };
-  console.log(user);
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
       if (section === "accomodationSectionStructure") {
@@ -921,7 +922,7 @@ export function EnumeratorFormProvider({ children }) {
             let j = 0;
             while (state.foodSectionStructure[item][type][j]) {
               foodItems.push({
-                name: `${item} (${type})`,
+                name: `${item}_${type}`,
                 price: parseInt(
                   state.foodSectionStructure[item][type][j]["price"].replace(
                     /,/g,
@@ -971,7 +972,7 @@ export function EnumeratorFormProvider({ children }) {
           (type) =>
             type !== "type" &&
             foodItems.push({
-              name: `${item} (${type})`,
+              name: `${item}_${type}`,
               price: parseInt(
                 state.foodSectionStructure[item]["prices"][0][type].replace(
                   /,/g,
@@ -984,7 +985,7 @@ export function EnumeratorFormProvider({ children }) {
       } else {
         Object.keys(state.foodSectionStructure[item]).forEach((type) => {
           foodItems.push({
-            name: `${item} (${type})`,
+            name: `${item}_${type}`,
             price: parseInt(
               state.foodSectionStructure[item][type][0]["price"].replace(
                 /,/g,
@@ -1004,7 +1005,7 @@ export function EnumeratorFormProvider({ children }) {
           let j = 0;
           while (state.commoditySectionStructure[item][type][j]) {
             others.push({
-              name: `${item} (${type})`,
+              name: `${item}_${type}`,
               price: parseInt(
                 state.commoditySectionStructure[item][type][j]["price"].replace(
                   /,/g,
@@ -1035,7 +1036,7 @@ export function EnumeratorFormProvider({ children }) {
       } else {
         Object.keys(state.commoditySectionStructure[item]).forEach((type) => {
           others.push({
-            name: `${item} (${type})`,
+            name: `${item}_${type}`,
             price: parseInt(
               state.commoditySectionStructure[item][type][0]["price"].replace(
                 /,/g,
@@ -1077,6 +1078,9 @@ export function EnumeratorFormProvider({ children }) {
         comment_for_accidents:
           state.reportsSectionStructure.Accidents.answer ?? "",
         note: state.reportsSectionStructure.Notes.answer ?? "",
+        // ...(state.attachedImage.url && {
+        //   comment_image: state.attachedImage.url,
+        // }),
       },
     ];
 
@@ -1337,6 +1341,14 @@ export function EnumeratorFormProvider({ children }) {
 
     return () => clearTimeout(timeoutId);
   }, [state.showSavedNotification]);
+
+  // Always reset submit button on form page load.
+  useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: false,
+    }));
+  }, []);
 
   return (
     <EnumeratorFormContext.Provider
