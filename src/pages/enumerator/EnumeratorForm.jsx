@@ -38,6 +38,8 @@ function EnumeratorForm() {
       showDuplicateNotification,
       showErrorNotification,
     },
+    contextLgaRoutes,
+    setContextLgaRoutes,
     showProfile,
     hideProfile,
     saveFormChanges,
@@ -65,6 +67,7 @@ function EnumeratorForm() {
       });
   }, []);
   console.log(user);
+
   useEffect(() => {
     lgaRoutes
       ? updateTransportTab(
@@ -75,8 +78,7 @@ function EnumeratorForm() {
           .then((res) => {
             console.log(res.data.data);
             setLgaRoutes(res.data.data);
-            console.log(res.data.data);
-            console.log("cachedTp:", cachedTp);
+            setContextLgaRoutes(res.data.data);
             Object.keys(cachedTp).length
               ? cachedTp
               : updateTransportTab(
