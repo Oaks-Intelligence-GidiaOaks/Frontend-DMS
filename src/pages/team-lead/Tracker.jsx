@@ -71,7 +71,7 @@ const Tracker = () => {
   }, []);
 
   return (
-    <div className="border flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
       <div className="flex items-center flex-wrap gap-3">
         <div className="rounded bg-primary p-3 flex items-center justify-between  xs:flex-1 md:flex-initial gap-6 xs:gap-16 shrink-0 text-xs">
           <p className="text-white">Submitted</p>

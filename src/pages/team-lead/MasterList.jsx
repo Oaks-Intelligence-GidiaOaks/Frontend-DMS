@@ -40,12 +40,12 @@ const MasterList = () => {
             } = master;
 
             const foodObj = await foodItems
-              .map((food, i) => ({
+              ?.map((food, i) => ({
                 [`Price of ${food?.name}`]: food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
               }))
-              .reduce((acc, obj) => {
+              ?.reduce((acc, obj) => {
                 return {
                   ...acc,
                   ...obj,
@@ -67,39 +67,39 @@ const MasterList = () => {
               }, {});
 
             const accObj = await accomodations
-              .map((acc, i) => ({
+              ?.map((acc, i) => ({
                 [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
               }))
-              .reduce((acc, obj) => {
+              ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
               }, {});
 
             const transportObj = await transports
-              .map((transport, i) => ({
+              ?.map((transport, i) => ({
                 [`Route ${i + 1}`]: transport?.route,
                 [`Mode ${i + 1}`]: transport?.mode,
                 [`Route ${i + 1} cost`]: transport?.cost,
               }))
-              .reduce((acc, obj) => {
+              ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
-              });
+              }, {});
 
-            const electricityObj = await electricity.reduce((acc, obj) => {
+            const electricityObj = await electricity?.reduce((acc, obj) => {
               let key = Object.keys(obj)[0];
               let value = Object.values(obj);
 
               acc[key] = value;
 
               return acc;
-            });
+            }, {});
 
             const othersObj = await others
-              .map((item, i) => ({
+              ?.map((item, i) => ({
                 [`Price of ${item?.name}`]: item.price ?? "N/A",
                 [`Brand of ${item?.name}`]:
                   item?.brand?.length < 1 ? "N/A" : item?.brand,
               }))
-              .reduce((acc, obj) => {
+              ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
               });
 

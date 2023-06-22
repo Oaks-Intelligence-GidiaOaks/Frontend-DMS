@@ -101,21 +101,21 @@ const MasterList = () => {
               }, {});
 
             const electricityObj =
-              (await electricity.length) > 0 &&
-              electricity?.reduce((acc, obj) => {
+              electricity.length > 0 &&
+              (await electricity?.reduce((acc, obj) => {
                 let key = Object.keys(obj)[0];
                 let value = Object.values(obj);
 
                 acc[key] = value;
 
                 return acc;
-              });
+              }));
 
             const othersObj = await others
               .map((item, i) => ({
                 [`Price of ${item?.name}`]: item.price ?? "N/A",
                 [`Brand of ${item?.name}`]:
-                  item?.brand.length < 1 ? "N/A" : item?.brand,
+                  item?.brand?.length < 1 ? "N/A" : item?.brand,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -140,9 +140,6 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
-
-            console.log(transformedObj);
-
             return transformedObj;
           })
         );
@@ -156,7 +153,9 @@ const MasterList = () => {
   }, [masterList]);
 
   let paginationItems =
-    totalDataCount && masterList && totalDataCount / masterList.length;
+    totalDataCount &&
+    masterList &&
+    Math.floor(totalDataCount / masterList.length);
 
   let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
     let numArr = [];
@@ -193,7 +192,6 @@ const MasterList = () => {
     let formatDate = new Date(args.value).toISOString().split("T")[0];
 
     setEndDateValue(`${formatDate}`);
-    // console.log(formatDate);
   };
 
   const handlePageNumberChange = (no) => {

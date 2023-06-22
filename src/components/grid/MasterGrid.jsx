@@ -22,9 +22,27 @@ const MasterGrid = ({ data: masterRow }) => {
 
   let downloadData = masterRow;
 
+  console.log(masterRow);
+
+  function getTableColumnData(arr) {
+    let maxKeys = 0;
+    let objectWithMostKeys = null;
+
+    for (let obj of arr) {
+      const keysCount = Object.keys(obj).length;
+
+      if (keysCount > maxKeys) {
+        maxKeys = keysCount;
+        objectWithMostKeys = obj;
+      }
+    }
+
+    return objectWithMostKeys;
+  }
+
   let masterColumn =
     masterRow && masterRow.length > 0
-      ? Object.keys(masterRow[0]).map((item) => (
+      ? Object.keys(getTableColumnData(masterRow)).map((item) => (
           <ColumnDirective
             visible={item !== "_id"}
             key={item}

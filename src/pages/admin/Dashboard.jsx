@@ -28,14 +28,20 @@ const Dashboard = () => {
   let selectLGA = coveredLgas
     ? coveredLgas.map((item) => ({
         value: item,
-        label: item.charAt(0).toUpperCase() + item.slice(1),
+        label: item,
       }))
     : [];
 
   const getCoveredLgas = () => {
     axios
       .get(`lga_routes`)
-      .then((res) => setCoveredLgas(res.data.data.map((it) => it.lga)))
+      .then((res) =>
+        setCoveredLgas(
+          res.data.data.map(
+            (it) => it.lga.charAt(0).toUpperCase() + it.lga.slice(1)
+          )
+        )
+      )
       .catch((err) => console.error(err));
   };
 
@@ -64,7 +70,6 @@ const Dashboard = () => {
     axios
       .get("admin_dashboard/team_leads_count")
       .then((res) => {
-        // console.log(res.data);
         setTeamLeadsCount(res.data);
       })
       .catch((err) => console.error(err));
@@ -72,7 +77,6 @@ const Dashboard = () => {
     axios
       .get("admin_dashboard/enumerators_count")
       .then((res) => {
-        // console.log(res.data);
         setEnumeratorsCount(res.data);
       })
       .catch((err) => console.err);
@@ -82,7 +86,9 @@ const Dashboard = () => {
     try {
       setSubmissionCount(null);
       axios
-        .get(`admin_dashboard/submission_count?yearFilter=${yearDropdown}`)
+        .get(
+          `team_lead_dashboard/yearly_enumerators?yearFilter=${yearDropdown}`
+        )
         .then((res) => {
           setSubmissionCount(res.data.submissionsArray);
         })
@@ -112,7 +118,7 @@ const Dashboard = () => {
               data={teamLeadsCount}
               guide="Newly added"
               guideCount="2"
-              legendOne="Total enumerators"
+              legendOne="Total team leads"
               legendTwo="Newly added"
             />
           ) : (
@@ -124,11 +130,11 @@ const Dashboard = () => {
           {enumeratorsCount ? (
             <MetricsCard
               key={"2"}
-              lead="Enumerators"
-              guide="Newly added"
-              legendOne="Enumerators"
+              lead="Submissions"
+              guide="No response"
+              legendOne="Submission"
               data={enumeratorsCount ?? enumeratorsCount}
-              legendTwo="Newly added"
+              legendTwo="No response"
             />
           ) : (
             <div className="h-32 grid place-items-center w-1/3 p-2 drop-shadow-sm bg-white">
@@ -158,18 +164,17 @@ const Dashboard = () => {
         <div className="bg-white drop-shadow-sm p-3 mt-6 text-sm rounded-sm w-full lg:px-16">
           <div className="flex items-start">
             <div className="flex-1">
-              <p className="flex-1 text-[#00BCD4]">Submission Rate </p>
-              <p className="flex-1 text-xs">Submitted vs No response </p>
+              <p className="flex-1 text-[#00BCD4]">Enumerators </p>
+              <p className="flex-1 text-xs">Added vs Removed </p>
             </div>
 
             <div className="flex flex-col px-5">
               <div className="flex items-center">
                 <div className="h-2 w-2 bg-yellow-500 mr-1" />{" "}
-                <span>Submitted</span>
+                <span>Added</span>
               </div>
               <div className="flex items-center">
-                <div className="h-2 w-2 bg-red-500 mr-1" />{" "}
-                <span>No response</span>
+                <div className="h-2 w-2 bg-red-500 mr-1" /> <span>Removed</span>
               </div>
             </div>
 
@@ -182,13 +187,15 @@ const Dashboard = () => {
           </div>
 
           {/* charts */}
-          {submissionCount ? (
-            <SubmissionRateAdmin data={submissionCount ?? submissionCount} />
-          ) : (
+          {/* {submissionCount ? ( */}
+          <SubmissionRateAdmin data={submissionCount ?? submissionCount} />
+          {/* ) : (
             <div className="h-64">
               <Loading />
             </div>
-          )}
+          )} */}
+
+          {/* enumerators added vs removed */}
         </div>
       </div>
 
