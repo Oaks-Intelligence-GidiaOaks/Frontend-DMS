@@ -19,7 +19,7 @@ import {
 } from "../data/enumeratorFormStructure";
 import { countEmptyStringFields, countValidFields } from "../lib";
 import { useAuth } from "./useAuth";
-import { base_url } from "../lib/paths";
+import { base_url, base_url_local } from "../lib/paths";
 import { useApp } from "./useApp";
 import { useNavigate } from "react-router-dom";
 
@@ -392,9 +392,11 @@ export function EnumeratorFormProvider({ children }) {
           Authorization: `Bearer ${token}`,
         },
       })
-        .then((response) => response.json())
+        .then((response) =>
+          response.json().then((data) => ({ status: response.status, ...data }))
+        )
         .then((data) => {
-          console.log(data);
+          console.log("data:", data);
           if (data.message.includes("successful")) {
             resetState();
             setState((prev) => ({
@@ -428,7 +430,6 @@ export function EnumeratorFormProvider({ children }) {
       }));
     }
   };
-  console.log(user);
   const addItem = ({ item, type, section }) => {
     const duplicate = (section, item) => {
       if (section === "accomodationSectionStructure") {
@@ -1019,7 +1020,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (["Charcoal", "Building Block"].includes(item)) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
-            name: `${item}_${type[item === "Charcoal" ? "weight" : "size"]}`,
+            name: `${item} (${type[item === "Charcoal" ? "weight" : "size"]})`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -1027,7 +1028,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (item === "Firewood") {
         state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
           others.push({
-            name: `${item}_${type["size"]}`,
+            name: `${item} (${type["size"]})`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: "",
           })
@@ -1077,6 +1078,9 @@ export function EnumeratorFormProvider({ children }) {
         comment_for_accidents:
           state.reportsSectionStructure.Accidents.answer ?? "",
         note: state.reportsSectionStructure.Notes.answer ?? "",
+        // ...(state.attachedImage.url && {
+        //   comment_image: state.attachedImage.url,
+        // }),
       },
     ];
 
@@ -1337,6 +1341,14 @@ export function EnumeratorFormProvider({ children }) {
 
     return () => clearTimeout(timeoutId);
   }, [state.showSavedNotification]);
+
+  // Always reset submit button on form page load.
+  useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: false,
+    }));
+  }, []);
 
   return (
     <EnumeratorFormContext.Provider

@@ -68,19 +68,19 @@ function EnumeratorForm() {
   useEffect(() => {
     lgaRoutes
       ? updateTransportTab(
-          lgaRoutes.filter((t) => t.lga === formatLGA(currentLGA.toLowerCase()))
+          lgaRoutes.filter((t) => t.lga === formatLGA(currentLGA))
         )
       : axios
           .get(`lga_routes`)
           .then((res) => {
             console.log(res.data.data);
             setLgaRoutes(res.data.data);
+            console.log(res.data.data);
+            console.log("cachedTp:", cachedTp);
             Object.keys(cachedTp).length
               ? cachedTp
               : updateTransportTab(
-                  res.data.data.filter(
-                    (t) => t.lga === formatLGA(currentLGA.toLowerCase())
-                  )
+                  res.data.data.filter((t) => t.lga === formatLGA(currentLGA))
                 );
           })
           .catch((err) => console.error(err));
