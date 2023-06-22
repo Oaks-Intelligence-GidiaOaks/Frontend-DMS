@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
   const [submissionCount, setSubmissionCount] = useState(null);
+  const [submissionRate, setSubmissionRate] = useState(null);
   const [coveredLgas, setCoveredLgas] = useState(null);
 
   let selectLGA = coveredLgas
@@ -72,6 +73,11 @@ const Dashboard = () => {
       .then((res) => {
         setTeamLeadsCount(res.data);
       })
+      .catch((err) => console.error(err));
+
+    axios
+      .get(`team_lead_dashboard/submission_rate`)
+      .then((res) => setSubmissionRate(res.data))
       .catch((err) => console.error(err));
 
     axios
@@ -127,13 +133,13 @@ const Dashboard = () => {
             </div>
           )}
 
-          {enumeratorsCount ? (
+          {submissionRate ? (
             <MetricsCard
               key={"2"}
               lead="Submissions"
               guide="No response"
               legendOne="Submission"
-              data={enumeratorsCount ?? enumeratorsCount}
+              data={submissionRate ?? submissionRate}
               legendTwo="No response"
             />
           ) : (
