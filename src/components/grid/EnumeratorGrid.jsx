@@ -53,7 +53,7 @@ const EnumeratorGrid = ({ data }) => {
 
     if (user) {
       axios
-        .put(`admin/user/disable/${user._id}`)
+        .put(`admin/enumerator/disable/${user._id}`)
         .then((res) => {
           setIsMenuOpen(false);
           setTableModal(`Disabled user id ${user.id} successfully`);
@@ -65,6 +65,8 @@ const EnumeratorGrid = ({ data }) => {
   const handleResetPassword = (user) => {
     setIsMenuOpen(false);
     const { id } = user;
+
+    console.log(user);
 
     try {
       axios
@@ -149,7 +151,7 @@ const EnumeratorGrid = ({ data }) => {
         identityType,
         id,
         email,
-        LGA,
+        LGA: LGA.split(","),
       };
 
       axios
