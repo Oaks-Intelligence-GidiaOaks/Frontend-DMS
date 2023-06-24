@@ -61,7 +61,7 @@ const NotesGrid = ({ data }) => {
   ];
 
   const handleSave = async (args) => {
-    console.log(args);
+    // console.log(args);
     const modifiedData = args.rowData;
     if (args.commandColumn.type === "Save") {
       try {
@@ -69,7 +69,7 @@ const NotesGrid = ({ data }) => {
           .patch(`form_response/questions/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {

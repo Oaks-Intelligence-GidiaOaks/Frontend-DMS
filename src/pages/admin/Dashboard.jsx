@@ -83,6 +83,7 @@ const Dashboard = () => {
     axios
       .get("admin_dashboard/enumerators_count")
       .then((res) => {
+        console.log(res.data);
         setEnumeratorsCount(res.data);
       })
       .catch((err) => console.err);
@@ -194,7 +195,7 @@ const Dashboard = () => {
 
           {/* charts */}
           {/* {submissionCount ? ( */}
-          <SubmissionRateAdmin data={submissionCount ?? submissionCount} />
+          <SubmissionRateAdmin data={enumeratorsCount ?? enumeratorsCount} />
           {/* ) : (
             <div className="h-64">
               <Loading />

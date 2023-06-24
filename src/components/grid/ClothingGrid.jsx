@@ -48,7 +48,7 @@ const ClothingGrid = ({ data }) => {
   };
 
   const handleSave = async (args) => {
-    console.log(args);
+    // console.log(args);
     const modifiedData = args.rowData;
     if (args.commandColumn.type === "Save") {
       try {

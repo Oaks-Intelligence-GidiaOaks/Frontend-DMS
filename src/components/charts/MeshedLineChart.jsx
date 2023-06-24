@@ -46,10 +46,12 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
     MeshedLineD.map((item) => {
       let id = item.lga;
 
-      let data = item.weeklyValues.map((obj) => ({
-        x: `Week ${obj.weekNo}`,
-        y: formatTime(obj.submissionTime),
-      }));
+      let data = item.weeklyValues
+        .map((obj) => ({
+          x: `Week ${obj.weekNo}`,
+          y: formatTime(obj.submissionTime),
+        }))
+        .sort((a, b) => (a.x > b.x ? 1 : -1));
 
       return { id, data };
     });

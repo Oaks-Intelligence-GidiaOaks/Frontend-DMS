@@ -52,7 +52,7 @@ const FoodGrid = ({ data: foodRowss }) => {
   };
 
   const handleSave = async (args) => {
-    console.log(args);
+    // console.log(args);
     const modifiedData = args.rowData;
     if (args.commandColumn.type === "Save") {
       try {
@@ -60,7 +60,7 @@ const FoodGrid = ({ data: foodRowss }) => {
           .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {

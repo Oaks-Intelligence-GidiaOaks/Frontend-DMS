@@ -59,7 +59,7 @@ const OthersGrid = ({ data }) => {
   ];
 
   const handleSave = async (args) => {
-    console.log(args);
+    // console.log(args);
     const modifiedData = args.rowData;
     if (args.commandColumn.type === "Save") {
       try {
@@ -70,7 +70,7 @@ const OthersGrid = ({ data }) => {
           )
           .then((res) => {
             alert(res.data.message);
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
