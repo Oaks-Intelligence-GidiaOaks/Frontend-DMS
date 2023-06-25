@@ -6,62 +6,17 @@ import { SubmissionRateAdmin } from "../../components/charts";
 import CategoryRate from "../../components/charts/CategoryRate";
 import OaksSlider from "../../components/Slider";
 import axios from "axios";
-import { useAuth } from "../../context";
-import { FormInputDropDown } from "../../components/form";
-import { Loading, NoData, YearDropDown } from "../../components/reusable";
-import ChangePassword from "../../components/enumeratorFormTabs/ChangePassword";
+import { Loading, YearDropDown } from "../../components/reusable";
 import getCurrentYear from "../../lib/helpers";
+import { FluctuationRates } from "../../components/primitives";
 
 const Dashboard = () => {
-  const { user, token } = useAuth();
-  const [showDropdown, setShowDropdown] = useState(false);
   const [yearDropdown, setYearDropdown] = useState("");
-  const [priceFluctuation, setPriceFluctuation] = useState(null);
-  const [lga, setLga] = useState(user.LGA[0]);
+
   const [totalLgas, setTotalLgas] = useState(null);
-  const [yearlyEnum, setYearlyEnum] = useState(null);
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
-  const [submissionCount, setSubmissionCount] = useState(null);
   const [submissionRate, setSubmissionRate] = useState(null);
-  const [coveredLgas, setCoveredLgas] = useState(null);
-
-  let selectLGA = coveredLgas
-    ? coveredLgas.map((item) => ({
-        value: item,
-        label: item,
-      }))
-    : [];
-
-  const getCoveredLgas = () => {
-    axios
-      .get(`lga_routes`)
-      .then((res) =>
-        setCoveredLgas(
-          res.data.data.map(
-            (it) => it.lga.charAt(0).toUpperCase() + it.lga.slice(1)
-          )
-        )
-      )
-      .catch((err) => console.error(err));
-  };
-
-  useMemo(getCoveredLgas, []);
-
-  useEffect(() => {
-    setPriceFluctuation(null);
-
-    try {
-      axios
-        .get(`admin_dashboard/price_fluctuation?lgaFilter=${lga}`)
-        .then((res) => {
-          setPriceFluctuation(res.data);
-        })
-        .catch((err) => console.error(err));
-    } catch (err) {
-      console.error(err);
-    }
-  }, [lga]);
 
   useEffect(() => {
     axios.get("admin_dashboard/lga_count").then((res) => {
@@ -79,39 +34,19 @@ const Dashboard = () => {
       .get(`team_lead_dashboard/submission_rate`)
       .then((res) => setSubmissionRate(res.data))
       .catch((err) => console.error(err));
-
-    axios
-      .get("admin_dashboard/enumerators_count")
-      .then((res) => {
-        console.log(res.data);
-        setEnumeratorsCount(res.data);
-      })
-      .catch((err) => console.err);
   }, []);
 
   useEffect(() => {
-    try {
-      setSubmissionCount(null);
-      axios
-        .get(
-          `team_lead_dashboard/yearly_enumerators?yearFilter=${yearDropdown}`
-        )
-        .then((res) => {
-          setSubmissionCount(res.data.submissionsArray);
-        })
-        .catch((err) => console.err);
-    } catch (err) {
-      console.error(err);
-    }
+    axios
+      .get(`admin_dashboard/enumerators_count?yearFilter=${yearDropdown}`)
+      .then((res) => {
+        setEnumeratorsCount(res.data);
+      })
+      .catch((err) => console.err);
   }, [yearDropdown]);
-
-  const handleDropdownSelect = () => {
-    setShowDropdown((prev) => !prev);
-  };
 
   const handleSelectOption = (year) => {
     setYearDropdown(year);
-    setShowDropdown(false);
   };
 
   return (
@@ -194,44 +129,12 @@ const Dashboard = () => {
           </div>
 
           {/* charts */}
-          {/* {submissionCount ? ( */}
           <SubmissionRateAdmin data={enumeratorsCount ?? enumeratorsCount} />
-          {/* ) : (
-            <div className="h-64">
-              <Loading />
-            </div>
-          )} */}
-
-          {/* enumerators added vs removed */}
         </div>
       </div>
 
       {/* fluctuation rates */}
-      <div className=" rounded-md p-3 mt-4 lg:ml-[6rem] min-h-[18rem] max-h-auto">
-        <div className="flex flex-row justify-between items-center">
-          <p>Price Fluctuation Rate</p>
-
-          <div className="w-[200px]">
-            <FormInputDropDown
-              index="z-20"
-              data={selectLGA}
-              onChange={(selectedValue) => setLga(selectedValue)}
-            />
-          </div>
-        </div>
-
-        {!priceFluctuation ? (
-          <Loading />
-        ) : priceFluctuation?.length > 0 ? (
-          <OaksSlider slideDefault={4} break1={2} break2={2} break3={1}>
-            {priceFluctuation?.map((item, i) => (
-              <CategoryRate key={i} Product={item} />
-            ))}
-          </OaksSlider>
-        ) : (
-          <NoData text="No Data Available for this LGA" />
-        )}
-      </div>
+      <FluctuationRates admin />
     </div>
   );
 };
