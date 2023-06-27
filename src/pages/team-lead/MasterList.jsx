@@ -137,7 +137,9 @@ const MasterList = () => {
   }, [masterList]);
 
   let paginationItems =
-    totalDataCount && masterList && totalDataCount / masterList.length;
+    totalDataCount &&
+    masterList &&
+    Math.floor(totalDataCount / masterList.length);
 
   let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
     let numArr = [];
