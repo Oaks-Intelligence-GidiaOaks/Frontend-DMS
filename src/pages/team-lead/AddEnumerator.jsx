@@ -150,6 +150,8 @@ const AddEnumerator = () => {
     bodyFormData.append("identityImage", newUser.identityImage);
     newUser.LGA?.map((item) => bodyFormData.append("LGA", `${item}`));
 
+    // console.log("clicked submit");
+
     try {
       setIsLoading(true);
       axios
@@ -276,6 +278,19 @@ const AddEnumerator = () => {
             />
           )}
         </div>
+
+        {error && (
+          <p className="p-2 my-3 flex items-center justify-between rounded bg-gray-200">
+            <span className="text-red-500 text-xs">{error}</span>
+
+            <span
+              onClick={() => setError(false)}
+              className="rounded-full w-6 h-6 cursor-pointer text-center bg-white "
+            >
+              x
+            </span>
+          </p>
+        )}
 
         {userCreated && (
           <p className="p-2 my-3 flex items-center justify-between rounded bg-green-500">

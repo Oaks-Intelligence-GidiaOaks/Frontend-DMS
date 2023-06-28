@@ -58,15 +58,16 @@ const EnumeratorGrid = ({ data }) => {
           setIsMenuOpen(false);
           setTableModal(`Disabled user id ${user.id} successfully`);
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setTableModal(`Failed to disable user id ${user.id} `);
+          console.error(err);
+        });
     }
   };
 
   const handleResetPassword = (user) => {
     setIsMenuOpen(false);
     const { id } = user;
-
-    console.log(user);
 
     try {
       axios
