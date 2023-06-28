@@ -75,11 +75,11 @@ const FluctuationRates = memo(({ admin }) => {
       {!priceFluctuation ? (
         <Loading />
       ) : priceFluctuation?.length > 0 ? (
-        <OaksSlider slideDefault={4} break1={2} break2={2} break3={1}>
+        <div className="w-full flex flex-wrap gap-2 h-64 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-300">
           {priceFluctuation?.map((item, i) => (
             <CategoryRate key={i} Product={item} />
           ))}
-        </OaksSlider>
+        </div>
       ) : (
         <NoData text="No Data Available for this LGA" />
       )}

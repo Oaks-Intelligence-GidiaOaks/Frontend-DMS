@@ -59,7 +59,7 @@ const CategoryRate = ({ Product }) => {
   const transformedProd = {
     id: Product.name,
     data: Product.weeklyPrice.map((item) => ({
-      x: `Week ${item.x}`,
+      x: `Wk ${item.x}`,
       y: item.y,
     })),
   };
@@ -74,12 +74,12 @@ const CategoryRate = ({ Product }) => {
       </div>
 
       {/* main chart */}
-      <div className="h-36 w-full ">
+      <div className="h-36 w-full">
         <PriceFluctuationChart data={[transformedProd]} />
       </div>
 
       <div className="flex flex-col">
-        <p className="text-xs py-2">Percentage increase</p>
+        <p className="text-xs pb-2">Percentage increase</p>
         <PercentageBar value={Product.priceChange} />
       </div>
     </div>

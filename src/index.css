@@ -25,6 +25,15 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #ffad10;
+  border-radius: 5px;
+}
+
 .scrollbar-hidee::-webkit-scrollbar {
   display: none;
   width: 5px;

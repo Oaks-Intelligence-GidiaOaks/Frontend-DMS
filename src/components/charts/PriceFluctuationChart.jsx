@@ -5,7 +5,7 @@ const PriceFluctuationChart = ({ data }) => {
   return (
     <ResponsiveLine
       data={data}
-      margin={{ top: 10, right: 10, bottom: 30, left: 30 }}
+      margin={{ top: 15, right: 20, bottom: 30, left: 40 }}
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",

@@ -34,6 +34,7 @@ const EnumeratorGrid = ({ data }) => {
 
   const editOptions = {
     allowEditing: true,
+    allowEditOnDblClick: false,
     mode: "Dialog",
     allowDeleting: true,
   };

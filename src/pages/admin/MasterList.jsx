@@ -6,6 +6,7 @@ import axios from "axios";
 
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { BiDownload } from "react-icons/bi";
+import { arrangeTime } from "../../lib/helpers";
 
 const MasterList = () => {
   const [activeTab, setActiveTab] = useState("food");
@@ -53,7 +54,10 @@ const MasterList = () => {
               accomodations,
               created_by,
               _id,
+              updated_at,
             } = master;
+
+            // console.log(updated_at);
 
             const clothingsObj = await clothings
               ?.map((cloth, i) => ({
@@ -123,6 +127,7 @@ const MasterList = () => {
 
             const transformedObj = {
               S_N: i + 1,
+              Date: arrangeTime(updated_at),
               _id,
               ID: created_by.id,
               State,

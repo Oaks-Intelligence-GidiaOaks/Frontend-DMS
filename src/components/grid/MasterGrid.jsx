@@ -22,8 +22,6 @@ const MasterGrid = ({ data: masterRow }) => {
 
   let downloadData = masterRow;
 
-  console.log(masterRow);
-
   function getTableColumnData(arr) {
     let maxKeys = 0;
     let objectWithMostKeys = null;
