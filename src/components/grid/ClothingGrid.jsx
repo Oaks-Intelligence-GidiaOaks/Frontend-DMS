@@ -13,11 +13,12 @@ import {
 import axios from "axios";
 import { useAuth } from "../../context";
 import { NoData } from "../reusable";
+import { arrangeTime } from "../../lib/helpers";
+import * as XLSX from "xlsx";
+import { BiDownload } from "react-icons/bi";
 
 const ClothingGrid = ({ data }) => {
-  const {
-    user: { token },
-  } = useAuth();
+  const { user } = useAuth();
 
   let clothingData = data["data"];
 
@@ -26,7 +27,9 @@ const ClothingGrid = ({ data }) => {
     clothingData?.map((item, i) => ({
       S_N: i + 1,
       _id: item._id,
+      Date: arrangeTime(item.updated_at),
       id: item.created_by.id,
+      State: item.state,
       lga: item.lga,
       category: item.category,
       sub_category: item.sub_category,
@@ -102,34 +105,63 @@ const ClothingGrid = ({ data }) => {
       : field;
   };
 
-  return data["data"].length > 0 ? (
-    <GridComponent
-      dataSource={transformedData}
-      allowPaging={true}
-      allowSorting={true}
-      pageSettings={pageSettings}
-      allowEditing={true}
-      editSettings={editSettings}
-      allowGrouping={true}
-      height={350}
-      commandClick={(args) => handleSave(args)}
-    >
-      <ColumnsDirective>
-        {transformedColumns?.map(({ field, width }) => (
-          <ColumnDirective
-            key={field}
-            headerText={checkHeaderText(field)}
-            visible={field === "_id" ? false : true}
-            field={field}
-            allowEditing={field === "price"}
-            width={width}
-          />
-        ))}
+  const handleDownload = () => {
+    let downloadData = transformedData?.map(({ _id, ...item }) => item);
 
-        <ColumnDirective headerText="Action" width={100} commands={commands} />
-      </ColumnsDirective>
-      <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
-    </GridComponent>
+    var wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(downloadData);
+
+    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
+    XLSX.writeFile(wb, "Excel-sheet.xlsx");
+  };
+
+  return data["data"].length > 0 ? (
+    <>
+      {user?.role !== "team_lead" && (
+        <div className="my-3">
+          <button
+            onClick={handleDownload}
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
+          >
+            <div className="w-fit p-1 rounded text-black bg-gray-100">
+              <BiDownload />
+            </div>
+            <span className="pr-6 text-xs">Download</span>
+          </button>
+        </div>
+      )}
+      <GridComponent
+        dataSource={transformedData}
+        allowPaging={true}
+        allowSorting={true}
+        pageSettings={pageSettings}
+        allowEditing={true}
+        editSettings={editSettings}
+        allowGrouping={true}
+        height={350}
+        commandClick={(args) => handleSave(args)}
+      >
+        <ColumnsDirective>
+          {transformedColumns?.map(({ field, width }) => (
+            <ColumnDirective
+              key={field}
+              headerText={checkHeaderText(field)}
+              visible={field === "_id" ? false : true}
+              field={field}
+              allowEditing={field === "price"}
+              width={width}
+            />
+          ))}
+
+          <ColumnDirective
+            headerText="Action"
+            width={100}
+            commands={commands}
+          />
+        </ColumnsDirective>
+        <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
+      </GridComponent>
+    </>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

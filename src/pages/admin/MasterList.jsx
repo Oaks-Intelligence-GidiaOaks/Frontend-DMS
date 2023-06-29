@@ -57,8 +57,6 @@ const MasterList = () => {
               updated_at,
             } = master;
 
-            // console.log(updated_at);
-
             const clothingsObj = await clothings
               ?.map((cloth, i) => ({
                 [`Cloth category`]: cloth?.category,

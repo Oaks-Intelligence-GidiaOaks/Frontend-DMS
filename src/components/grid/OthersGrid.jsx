@@ -11,8 +11,13 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { NoData } from "../reusable";
+import { arrangeTime } from "../../lib/helpers";
+import * as XLSX from "xlsx";
+import { BiDownload } from "react-icons/bi";
+import { useAuth } from "../../context";
 
 const OthersGrid = ({ data }) => {
+  const { user } = useAuth();
   let dataCount = data?.totalCount;
 
   let othersData = data.data;
@@ -22,7 +27,9 @@ const OthersGrid = ({ data }) => {
     othersData.length > 0 &&
     data.data.map((item, i) => ({
       S_N: i + 1,
+      Date: arrangeTime(item.updated_at),
       id: item.created_by.id,
+      State: item.state,
       LGA: item.lga,
       name: item.name,
       price: item.price === 0 ? "N/A" : item.price,
@@ -79,6 +86,16 @@ const OthersGrid = ({ data }) => {
     }
   };
 
+  const handleDownload = () => {
+    let downloadData = transformedData?.map(({ _id, ...item }) => item);
+
+    var wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(downloadData);
+
+    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
+    XLSX.writeFile(wb, "Excel-sheet.xlsx");
+  };
+
   const checkHeaderText = (field) => {
     return field === "S_N"
       ? "S/N"
@@ -96,32 +113,51 @@ const OthersGrid = ({ data }) => {
   };
 
   return othersData.length > 0 ? (
-    <GridComponent
-      dataSource={transformedData}
-      allowPaging={true}
-      allowSorting={true}
-      pageSettings={pageSettings}
-      allowEditing={true}
-      editSettings={editSettings}
-      allowGrouping={true}
-      commandClick={(args) => handleSave(args)}
-    >
-      <ColumnsDirective>
-        {othersColumns.map(({ field, width }) => (
-          <ColumnDirective
-            key={field}
-            visible={field !== "_id"}
-            headerText={checkHeaderText(field)}
-            allowEditing={field === "price"}
-            field={field}
-            width={width}
-          />
-        ))}
+    <>
+      {user?.role !== "team_lead" && (
+        <div className="my-3">
+          <button
+            onClick={handleDownload}
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
+          >
+            <div className="w-fit p-1 rounded text-black bg-gray-100">
+              <BiDownload />
+            </div>
+            <span className="pr-6 text-xs">Download</span>
+          </button>
+        </div>
+      )}
+      <GridComponent
+        dataSource={transformedData}
+        allowPaging={true}
+        allowSorting={true}
+        pageSettings={pageSettings}
+        allowEditing={true}
+        editSettings={editSettings}
+        allowGrouping={true}
+        commandClick={(args) => handleSave(args)}
+      >
+        <ColumnsDirective>
+          {othersColumns.map(({ field, width }) => (
+            <ColumnDirective
+              key={field}
+              visible={field !== "_id"}
+              headerText={checkHeaderText(field)}
+              allowEditing={field === "price"}
+              field={field}
+              width={width}
+            />
+          ))}
 
-        <ColumnDirective headerText="Action" width={100} commands={commands} />
-      </ColumnsDirective>
-      <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
-    </GridComponent>
+          <ColumnDirective
+            headerText="Action"
+            width={100}
+            commands={commands}
+          />
+        </ColumnsDirective>
+        <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
+      </GridComponent>
+    </>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

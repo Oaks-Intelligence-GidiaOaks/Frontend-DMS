@@ -11,8 +11,14 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { NoData } from "../reusable";
+import { arrangeTime } from "../../lib/helpers";
+import * as XLSX from "xlsx";
+import { BiDownload } from "react-icons/bi";
+import { useAuth } from "../../context";
 
 const ElectricityGrid = ({ data }) => {
+  const { user } = useAuth();
+
   let dataCount = data.totalCount;
 
   let elecData = data.data;
@@ -22,7 +28,9 @@ const ElectricityGrid = ({ data }) => {
     elecData.length > 0 &&
     data.data.map((item, i) => ({
       S_N: i + 1,
+      Date: arrangeTime(item.updated_at),
       id: item.created_by.id,
+      State: item.state,
       LGA: item.lga,
       hours_per_week: item.hours_per_week,
       _id: item._id,
@@ -92,31 +100,60 @@ const ElectricityGrid = ({ data }) => {
       : field;
   };
 
-  return elecData.length > 0 ? (
-    <GridComponent
-      dataSource={transformedData}
-      allowPaging={true}
-      allowSorting={true}
-      pageSettings={pageSettings}
-      allowEditing={true}
-      editSettings={editSettings}
-      commandClick={(args) => handleSave(args)}
-    >
-      <ColumnsDirective>
-        {elecColumns.map(({ field, width }) => (
-          <ColumnDirective
-            key={field}
-            headerText={checkHeaderText(field)}
-            field={field}
-            width={width}
-            visible={field !== "_id"}
-          />
-        ))}
+  const handleDownload = () => {
+    let downloadData = transformedData?.map(({ _id, ...item }) => item);
 
-        <ColumnDirective headerText="Action" width={100} commands={commands} />
-      </ColumnsDirective>
-      <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
-    </GridComponent>
+    var wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(downloadData);
+
+    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
+    XLSX.writeFile(wb, "Excel-sheet.xlsx");
+  };
+
+  return elecData.length > 0 ? (
+    <>
+      {user?.role !== "team_lead" && (
+        <div className="my-3">
+          <button
+            onClick={handleDownload}
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
+          >
+            <div className="w-fit p-1 rounded text-black bg-gray-100">
+              <BiDownload />
+            </div>
+            <span className="pr-6 text-xs">Download</span>
+          </button>
+        </div>
+      )}
+      <GridComponent
+        dataSource={transformedData}
+        allowPaging={true}
+        allowSorting={true}
+        pageSettings={pageSettings}
+        allowEditing={true}
+        editSettings={editSettings}
+        commandClick={(args) => handleSave(args)}
+      >
+        <ColumnsDirective>
+          {elecColumns.map(({ field, width }) => (
+            <ColumnDirective
+              key={field}
+              headerText={checkHeaderText(field)}
+              field={field}
+              width={width}
+              visible={field !== "_id"}
+            />
+          ))}
+
+          <ColumnDirective
+            headerText="Action"
+            width={100}
+            commands={commands}
+          />
+        </ColumnsDirective>
+        <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
+      </GridComponent>
+    </>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />
