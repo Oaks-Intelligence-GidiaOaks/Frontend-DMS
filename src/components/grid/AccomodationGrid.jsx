@@ -32,7 +32,7 @@ const AccomodationGrid = ({ data }) => {
       S_N: i + 1,
       Date: arrangeTime(item.updated_at),
       id: item.created_by.id,
-      State: item.lga,
+      State: item.state,
       LGA: item.lga,
       type: item.type,
       rooms: item.rooms,

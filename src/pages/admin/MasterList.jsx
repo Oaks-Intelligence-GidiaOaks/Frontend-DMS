@@ -86,7 +86,8 @@ const MasterList = () => {
 
             const accObj = await accomodations
               ?.map((acc, i) => ({
-                [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
+                [`${acc?.rooms} room`]:
+                  acc?.price === "0" ? "N/A" : `${acc?.price} (${acc?.type})`,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -115,7 +116,12 @@ const MasterList = () => {
 
             const othersObj = await others
               .map((item, i) => ({
-                [`Price of ${item?.name}`]: item.price ?? "N/A",
+                [`Price of ${item?.name}`]:
+                  item?.price === "0"
+                    ? "N/A"
+                    : item?.price
+                    ? item?.price
+                    : "N/A",
                 [`Brand of ${item?.name}`]:
                   item?.brand?.length < 1 ? "N/A" : item?.brand,
               }))
@@ -143,6 +149,7 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
+
             return transformedObj;
           })
         );

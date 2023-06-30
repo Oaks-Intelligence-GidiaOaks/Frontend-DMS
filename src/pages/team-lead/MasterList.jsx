@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import MasterGrid from "../../components/grid/MasterGrid";
 import axios from "axios";
+import { arrangeTime } from "../../lib/helpers";
 
 const MasterList = () => {
   const [masterList, setMasterList] = useState(null);
@@ -36,6 +37,7 @@ const MasterList = () => {
               accomodations,
               clothings,
               created_by,
+              updated_at,
               _id,
             } = master;
 
@@ -68,7 +70,8 @@ const MasterList = () => {
 
             const accObj = await accomodations
               ?.map((acc, i) => ({
-                [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
+                [`${acc?.rooms} room ${acc?.type}`]:
+                  acc?.price === "0" ? "N/A" : acc?.price,
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -107,6 +110,7 @@ const MasterList = () => {
               S_N: i + 1,
               _id,
               ID: created_by?.id,
+              Date: arrangeTime(updated_at),
               State,
               LGA,
               Food: "food",
@@ -122,6 +126,8 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
+
+            // console.log(transformedObj);
 
             return transformedObj;
           })
