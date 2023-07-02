@@ -41,6 +41,16 @@ import Admin from "./components/layout/Admin";
 function App() {
   const { user, isLoggedIn } = useAuth();
 
+  const clearLocalStorage = () => {
+    localStorage.clear();
+    console.log("local storage cleared");
+  };
+
+  clearLocalStorage();
+
+  const interval = 3 * 24 * 60 * 60;
+  setInterval(clearLocalStorage, interval);
+
   // axios configs
   axios.defaults.baseURL = base_url;
   axios.defaults.headers.post["Content-Type"] = "application/json";
