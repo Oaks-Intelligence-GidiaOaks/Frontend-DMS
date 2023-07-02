@@ -59,7 +59,7 @@ const MasterList = () => {
                 [`Cloth category`]: cloth?.category,
                 [`Cloth subcategory`]: cloth?.sub_category,
                 [`Cloth size`]: cloth?.size,
-                [`Cloth Price`]: cloth?.price,
+                [`Cloth Price`]: cloth?.price === 0 ? "N/A" : cloth?.price,
               }))
               ?.reduce((acc, obj) => {
                 return {
@@ -70,8 +70,8 @@ const MasterList = () => {
 
             const accObj = await accomodations
               ?.map((acc, i) => ({
-                [`${acc?.rooms} room ${acc?.type}`]:
-                  acc?.price === "0" ? "N/A" : acc?.price,
+                [`${acc?.rooms} room`]:
+                  acc?.price === "0" ? "N/A" : `${acc?.price} (${acc?.type})`,
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -87,14 +87,11 @@ const MasterList = () => {
                 return { ...acc, ...obj };
               }, {});
 
-            const electricityObj = await electricity?.reduce((acc, obj) => {
-              let key = Object.keys(obj)[0];
-              let value = Object.values(obj);
-
-              acc[key] = value;
-
-              return acc;
-            }, {});
+            const electricityObj =
+              electricity.length > 0 &&
+              (await electricity?.reduce((acc, obj) => {
+                return { ...acc, ...obj };
+              }, {}));
 
             const othersObj = await others
               ?.map((item, i) => ({
@@ -104,13 +101,13 @@ const MasterList = () => {
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
-              });
+              }, {});
 
             const transformedObj = {
               S_N: i + 1,
               _id,
-              ID: created_by?.id,
               Date: arrangeTime(updated_at),
+              ID: created_by?.id,
               State,
               LGA,
               Food: "food",
@@ -126,8 +123,6 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
-
-            // console.log(transformedObj);
 
             return transformedObj;
           })

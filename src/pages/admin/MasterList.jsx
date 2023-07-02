@@ -62,7 +62,7 @@ const MasterList = () => {
                 [`Cloth category`]: cloth?.category,
                 [`Cloth subcategory`]: cloth?.sub_category,
                 [`Cloth size`]: cloth?.size,
-                [`Cloth Price`]: cloth?.price,
+                [`Cloth Price`]: cloth?.price === 0 ? "N/A" : cloth?.price,
               }))
               ?.reduce((acc, obj) => {
                 return {

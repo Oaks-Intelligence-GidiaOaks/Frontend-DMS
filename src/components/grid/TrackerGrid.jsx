@@ -12,8 +12,14 @@ import {
 
 const arrangeTime = (time) => {
   const passedDate = new Date(time);
-  const formattedDate = passedDate.toLocaleDateString();
-  const formattedTime = passedDate.toLocaleTimeString();
+  const formattedDate = passedDate.toLocaleDateString("en-US", {
+    timeZone: "Africa/Lagos",
+  });
+  const formattedTime = passedDate.toLocaleTimeString("en-US", {
+    timeZone: "Africa/Lagos",
+    hour: "numeric",
+    minute: "numeric",
+  });
 
   return `${formattedDate} ${formattedTime}`;
 };
