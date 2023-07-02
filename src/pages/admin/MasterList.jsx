@@ -73,7 +73,8 @@ const MasterList = () => {
 
             const foodObj = await foodItems
               ?.map((food, i) => ({
-                [`Price of ${food?.name}`]: food?.price,
+                [`Price of ${food?.name}`]:
+                  food?.price === "0" ? "N/A" : food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
               }))
