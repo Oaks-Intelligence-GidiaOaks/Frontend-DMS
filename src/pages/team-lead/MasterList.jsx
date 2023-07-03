@@ -105,7 +105,7 @@ const MasterList = () => {
               }, {});
 
             const transformedObj = {
-              S_N: i + 1,
+              // S_N: i + 1,
               _id,
               Date: arrangeTime(updated_at),
               ID: created_by?.id,

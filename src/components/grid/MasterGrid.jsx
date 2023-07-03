@@ -16,6 +16,7 @@ import * as XLSX from "xlsx";
 import { useAuth } from "../../context";
 import { Loading } from "../reusable";
 import { BiDownload } from "react-icons/bi";
+import { masterHeaderText } from "../../lib/helpers";
 
 const MasterGrid = ({ data: masterRow }) => {
   const { user } = useAuth();
@@ -43,9 +44,10 @@ const MasterGrid = ({ data: masterRow }) => {
       ? Object.keys(getTableColumnData(masterRow)).map((item) => (
           <ColumnDirective
             visible={item !== "_id"}
+            headerText={masterHeaderText(item)}
             key={item}
             field={item}
-            width={150 + item.length}
+            width={180 + item.length}
           />
         ))
       : [];
@@ -70,6 +72,10 @@ const MasterGrid = ({ data: masterRow }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
+  const serialNumberTemplate = (rowData) => {
+    return rowData ? Number(rowData.index) + 1 : "";
+  };
+
   return masterRow ? (
     <div className="">
       <div className="text-[7px]">
@@ -83,7 +89,15 @@ const MasterGrid = ({ data: masterRow }) => {
           allowGrouping={true}
           height={300}
         >
-          <ColumnsDirective>{masterColumn}</ColumnsDirective>
+          <ColumnsDirective>
+            <ColumnDirective
+              headerText="S/N"
+              width={80}
+              template={serialNumberTemplate}
+            />
+
+            {masterColumn}
+          </ColumnsDirective>
           <Inject services={[Sort, Filter, Group, Toolbar, Edit]} />
         </GridComponent>
       </div>
