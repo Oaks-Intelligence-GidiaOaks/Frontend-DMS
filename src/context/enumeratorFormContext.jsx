@@ -1037,17 +1037,17 @@ export function EnumeratorFormProvider({ children }) {
       } else if (["Charcoal", "Building Block"].includes(item)) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
-            name: `${item} (${type[item === "Charcoal" ? "weight" : "size"]})`,
+            name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
-            brand: "",
+            brand: `${type[item === "Charcoal" ? "weight" : "size"]}`,
           })
         );
       } else if (item === "Firewood") {
         state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
           others.push({
-            name: `${item} (${type["size"]})`,
+            name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
-            brand: "",
+            brand: `${type["size"]}`,
           })
         );
       } else {
