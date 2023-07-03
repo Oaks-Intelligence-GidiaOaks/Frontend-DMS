@@ -125,13 +125,13 @@ const Dashboard = () => {
           {lgaCount ? (
             <MetricsCard
               key={"3"}
-              lead="Total LGA"
+              lead="Total LGAs"
               leadCount="16"
               data={lgaCount ?? lgaCount}
-              guide="LGA Assigned"
+              guide="Unassigned LGAs"
               guideCount="4"
-              legendOne="Total LGA"
-              legendTwo="LGA Assigned"
+              legendOne="Total LGAs"
+              legendTwo="Unassigned LGAs"
             />
           ) : (
             <div className="h-32 grid place-items-center w-1/3 p-2 drop-shadow-sm bg-white">
