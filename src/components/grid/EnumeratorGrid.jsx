@@ -34,6 +34,7 @@ const EnumeratorGrid = ({ data }) => {
 
   const editOptions = {
     allowEditing: true,
+    allowEditOnDblClick: false,
     mode: "Dialog",
     allowDeleting: true,
   };
@@ -53,12 +54,15 @@ const EnumeratorGrid = ({ data }) => {
 
     if (user) {
       axios
-        .put(`admin/user/disable/${user._id}`)
+        .put(`admin/enumerator/disable/${user._id}`)
         .then((res) => {
           setIsMenuOpen(false);
           setTableModal(`Disabled user id ${user.id} successfully`);
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          setTableModal(`Failed to disable user id ${user.id} `);
+          console.error(err);
+        });
     }
   };
 
@@ -149,7 +153,7 @@ const EnumeratorGrid = ({ data }) => {
         identityType,
         id,
         email,
-        LGA,
+        LGA: LGA.split(","),
       };
 
       axios

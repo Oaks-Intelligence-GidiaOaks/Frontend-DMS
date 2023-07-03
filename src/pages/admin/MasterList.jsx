@@ -6,6 +6,7 @@ import axios from "axios";
 
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { BiDownload } from "react-icons/bi";
+import { arrangeTime } from "../../lib/helpers";
 
 const MasterList = () => {
   const [activeTab, setActiveTab] = useState("food");
@@ -53,6 +54,7 @@ const MasterList = () => {
               accomodations,
               created_by,
               _id,
+              updated_at,
             } = master;
 
             const clothingsObj = await clothings
@@ -60,7 +62,7 @@ const MasterList = () => {
                 [`Cloth category`]: cloth?.category,
                 [`Cloth subcategory`]: cloth?.sub_category,
                 [`Cloth size`]: cloth?.size,
-                [`Cloth Price`]: cloth?.price,
+                [`Cloth Price`]: cloth?.price === 0 ? "N/A" : cloth?.price,
               }))
               ?.reduce((acc, obj) => {
                 return {
@@ -71,7 +73,8 @@ const MasterList = () => {
 
             const foodObj = await foodItems
               ?.map((food, i) => ({
-                [`Price of ${food?.name}`]: food?.price,
+                [`Price of ${food?.name}`]:
+                  food?.price === "0" ? "N/A" : food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
               }))
@@ -84,7 +87,8 @@ const MasterList = () => {
 
             const accObj = await accomodations
               ?.map((acc, i) => ({
-                [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
+                [`${acc?.rooms} room`]:
+                  acc?.price === "0" ? "N/A" : `${acc?.price} (${acc?.type})`,
               }))
               .reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -113,7 +117,12 @@ const MasterList = () => {
 
             const othersObj = await others
               .map((item, i) => ({
-                [`Price of ${item?.name}`]: item.price ?? "N/A",
+                [`Price of ${item?.name}`]:
+                  item?.price === "0"
+                    ? "N/A"
+                    : item?.price
+                    ? item?.price
+                    : "N/A",
                 [`Brand of ${item?.name}`]:
                   item?.brand?.length < 1 ? "N/A" : item?.brand,
               }))
@@ -123,6 +132,7 @@ const MasterList = () => {
 
             const transformedObj = {
               S_N: i + 1,
+              Date: arrangeTime(updated_at),
               _id,
               ID: created_by.id,
               State,
@@ -140,6 +150,7 @@ const MasterList = () => {
               Others: "commodities",
               ...othersObj,
             };
+
             return transformedObj;
           })
         );

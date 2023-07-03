@@ -350,6 +350,7 @@ const oldAllLgasByState = {
   ],
   jigawa: [
     { value: "aki", label: "Aki" },
+    { value: "auyo", label: "Auyo" },
     { value: "babura", label: "Babura" },
     { value: "birnin kudu", label: "Birnin Kudu" },
     { value: "birniwa", label: "Birniwa" },

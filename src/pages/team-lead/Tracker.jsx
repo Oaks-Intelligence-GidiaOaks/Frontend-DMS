@@ -27,7 +27,11 @@ const Tracker = () => {
   }
 
   let firstChart = timeOfSub && timeOfSub.slice(0, 10);
-  let secondChart = timeOfSub && timeOfSub.length > 10 && timeOfSub.slice(10);
+  let secondChart =
+    timeOfSub && timeOfSub.length > 10 && timeOfSub.slice(10, 20);
+  let thirdChart =
+    timeOfSub && timeOfSub.length > 20 && timeOfSub.slice(20, 30);
+  let fourthChart = timeOfSub && timeOfSub.length > 30 && timeOfSub.slice(30);
 
   const handleSubmit = () => {
     let data = trackerData.results;
@@ -99,7 +103,7 @@ const Tracker = () => {
       </div>
 
       {/* chart */}
-      <div className="p-3 flex flex-col lg:flex-row gap-3 rounded-xl drop-shadow-lg ">
+      <div className="p-3 flex flex-col lg:flex-row lg:overflow-x-auto gap-3 rounded-xl drop-shadow-lg ">
         {firstChart && (
           <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
             <MeshedLineChart data={firstChart} />
@@ -109,6 +113,18 @@ const Tracker = () => {
         {secondChart && (
           <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
             <MeshedLineChart data={secondChart} />
+          </div>
+        )}
+
+        {thirdChart && (
+          <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
+            <MeshedLineChart data={thirdChart} />
+          </div>
+        )}
+
+        {fourthChart && (
+          <div className="h-72 lg:w-1/2 bg-white rounded drop-shadow-lg">
+            <MeshedLineChart data={fourthChart} />
           </div>
         )}
       </div>

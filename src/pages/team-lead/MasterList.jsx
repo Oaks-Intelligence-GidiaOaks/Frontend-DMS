@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import MasterGrid from "../../components/grid/MasterGrid";
 import axios from "axios";
+import { arrangeTime } from "../../lib/helpers";
 
 const MasterList = () => {
   const [masterList, setMasterList] = useState(null);
@@ -36,12 +37,14 @@ const MasterList = () => {
               accomodations,
               clothings,
               created_by,
+              updated_at,
               _id,
             } = master;
 
             const foodObj = await foodItems
               ?.map((food, i) => ({
-                [`Price of ${food?.name}`]: food?.price,
+                [`Price of ${food?.name}`]:
+                  food?.price === "0" ? "N/A" : food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
               }))
@@ -57,7 +60,7 @@ const MasterList = () => {
                 [`Cloth category`]: cloth?.category,
                 [`Cloth subcategory`]: cloth?.sub_category,
                 [`Cloth size`]: cloth?.size,
-                [`Cloth Price`]: cloth?.price,
+                [`Cloth Price`]: cloth?.price === 0 ? "N/A" : cloth?.price,
               }))
               ?.reduce((acc, obj) => {
                 return {
@@ -68,7 +71,8 @@ const MasterList = () => {
 
             const accObj = await accomodations
               ?.map((acc, i) => ({
-                [`${acc?.rooms} room ${acc?.type}`]: acc?.price,
+                [`${acc?.rooms} room`]:
+                  acc?.price === "0" ? "N/A" : `${acc?.price} (${acc?.type})`,
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -84,14 +88,11 @@ const MasterList = () => {
                 return { ...acc, ...obj };
               }, {});
 
-            const electricityObj = await electricity?.reduce((acc, obj) => {
-              let key = Object.keys(obj)[0];
-              let value = Object.values(obj);
-
-              acc[key] = value;
-
-              return acc;
-            }, {});
+            const electricityObj =
+              electricity.length > 0 &&
+              (await electricity?.reduce((acc, obj) => {
+                return { ...acc, ...obj };
+              }, {}));
 
             const othersObj = await others
               ?.map((item, i) => ({
@@ -101,11 +102,12 @@ const MasterList = () => {
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
-              });
+              }, {});
 
             const transformedObj = {
               S_N: i + 1,
               _id,
+              Date: arrangeTime(updated_at),
               ID: created_by?.id,
               State,
               LGA,
@@ -137,7 +139,9 @@ const MasterList = () => {
   }, [masterList]);
 
   let paginationItems =
-    totalDataCount && masterList && totalDataCount / masterList.length;
+    totalDataCount &&
+    masterList &&
+    Math.floor(totalDataCount / masterList.length);
 
   let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
     let numArr = [];
