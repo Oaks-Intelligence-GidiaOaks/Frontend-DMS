@@ -343,6 +343,8 @@ export function EnumeratorFormProvider({ children }) {
   // If user has saved changes use changes else use initial state
   const [state, setState] = useState(savedState ?? initialState);
 
+  const [contextLgaRoutes, setContextLgaRoutes] = useState(null);
+
   const setCurrentFormTab = (tab) => {
     setState((prev) => ({ ...prev, currentFormTab: tab }));
   };
@@ -396,9 +398,20 @@ export function EnumeratorFormProvider({ children }) {
           response.json().then((data) => ({ status: response.status, ...data }))
         )
         .then((data) => {
-          console.log("data:", data);
+          if (data.status === 500 || data.status === 503) {
+            setState((prev) => ({
+              ...prev,
+              showErrorNotification: true,
+              isSubmitting: false,
+            }));
+          }
           if (data.message.includes("successful")) {
             resetState();
+            updateTransportTab(
+              contextLgaRoutes.filter(
+                (t) => t.lga === formatLGA(state.currentLGA)
+              )
+            );
             setState((prev) => ({
               ...prev,
               showSubmissionNotification: true,
@@ -407,6 +420,11 @@ export function EnumeratorFormProvider({ children }) {
           }
           if (data.message.includes("Already submitted")) {
             resetState();
+            updateTransportTab(
+              contextLgaRoutes.filter(
+                (t) => t.lga === formatLGA(state.currentLGA)
+              )
+            );
             setState((prev) => ({
               ...prev,
               showDuplicateNotification: true,
@@ -415,7 +433,6 @@ export function EnumeratorFormProvider({ children }) {
           }
         })
         .catch((error) => {
-          console.log(error);
           setState((prev) => ({
             ...prev,
             showErrorNotification: true,
@@ -1020,17 +1037,17 @@ export function EnumeratorFormProvider({ children }) {
       } else if (["Charcoal", "Building Block"].includes(item)) {
         state.commoditySectionStructure[item]["prices"].forEach((type) =>
           others.push({
-            name: `${item} (${type[item === "Charcoal" ? "weight" : "size"]})`,
+            name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
-            brand: "",
+            brand: `${type[item === "Charcoal" ? "weight" : "size"]}`,
           })
         );
       } else if (item === "Firewood") {
         state.commoditySectionStructure[item]["1-bundle"].forEach((type) =>
           others.push({
-            name: `${item} (${type["size"]})`,
+            name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
-            brand: "",
+            brand: `${type["size"]}`,
           })
         );
       } else {
@@ -1355,6 +1372,8 @@ export function EnumeratorFormProvider({ children }) {
       value={{
         state,
         setState,
+        contextLgaRoutes,
+        setContextLgaRoutes,
         setCurrentFormTab,
         setCurrentLGA,
         setImageUrl,
