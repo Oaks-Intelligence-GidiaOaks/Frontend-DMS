@@ -42,7 +42,7 @@ function App() {
   const { user, isLoggedIn } = useAuth();
 
   const clearLocalStorage = () => {
-    localStorage.clear();
+    localStorage.removeItem("oius");
     // console.log("local storage cleared");
   };
 
