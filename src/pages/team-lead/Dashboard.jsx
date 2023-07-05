@@ -90,7 +90,7 @@ const Dashboard = () => {
   return (
     <div className="overflow-x-hidden">
       <div className="mx-auto  mt-8 pb-4 lg:w-5/6">
-        <div className="flex items-center justify-between gap-3 overflow-x-scroll lg:overflow-x-hidden">
+        <div className="flex items-center justify-between gap-3 overflow-x-scroll metrics-scrollbar">
           {enumeratorsCount ? (
             <MetricsCard
               key={"1"}

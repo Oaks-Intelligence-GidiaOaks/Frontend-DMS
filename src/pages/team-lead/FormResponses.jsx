@@ -203,10 +203,10 @@ const FormResponses = () => {
       </div>
 
       {/* categories */}
-      {/* <div className="flex items-center gap-3 overflow-x-scroll xs:scrollbar-hide md:scrollbar-default lg:scrollbar-hide "> */}
-      <OaksSlider slideDefault={5} break1={3} break2={2} break3={2}>
+      <div className="flex items-center gap-2 overflow-x-scroll metrics-scrollbar">
+        {/* <OaksSlider slideDefault={5} break1={3} break2={2} break3={2}> */}
         <div
-          className={`rounded w-fit mr-3 ${
+          className={`rounded w-fit ${
             activeTab === "food" ? "bg-oaksgreen text-white" : "bg-white"
           }`}
           onClick={() => getFood()}
@@ -275,8 +275,8 @@ const FormResponses = () => {
         >
           <CategoryTab text="Notes" Icon={Summarize} activeTab={activeTab} />
         </div>
-      </OaksSlider>
-      {/* </div> */}
+        {/* </OaksSlider> */}
+      </div>
 
       {/* table */}
 

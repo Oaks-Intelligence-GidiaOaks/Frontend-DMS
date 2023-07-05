@@ -25,6 +25,15 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.metrics-scrollbar::-webkit-scrollbar {
+  height: 5px;
+}
+
+.metrics-scrollbar::-webkit-scrollbar-thumb {
+  background-color: lightgray;
+  border-radius: 5px;
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 5px;
 }

@@ -51,33 +51,35 @@ const NotesGrid = ({ data }) => {
 
   const editSettings = {
     allowEditing: true,
+    allowEditOnDblClick: false,
+    mode: "Dialog",
+    allowDeleting: false,
   };
 
   const commands = [
     {
       type: "Edit",
-      buttonOption: { cssClass: "e-flat", iconCss: "e-edit e-icons" },
-    },
-    {
-      type: "Save",
-      buttonOption: { cssClass: "e-flat", iconCss: "e-update e-icons" },
-    },
-    {
-      type: "Cancel",
-      buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" },
+      buttonOption: {
+        iconCss: "e-icons e-edit",
+        cssClass: "e-flat",
+      },
     },
   ];
 
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+    const { data } = args;
+
+    if (args.requestType === "save") {
+      const modifiedData = {
+        note: data.notes,
+      };
+
       try {
+        console.log(modifiedData, data);
         await axios
-          .patch(`form_response/questions/${modifiedData._id}`, modifiedData)
+          .patch(`form_response/questions/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
@@ -119,7 +121,7 @@ const NotesGrid = ({ data }) => {
         allowEditing={true}
         allowGrouping={true}
         editSettings={editSettings}
-        commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {notesColumns.map(({ field, width }) => (

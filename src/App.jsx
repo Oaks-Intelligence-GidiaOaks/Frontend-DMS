@@ -43,12 +43,12 @@ function App() {
 
   const clearLocalStorage = () => {
     localStorage.clear();
-    console.log("local storage cleared");
+    // console.log("local storage cleared");
   };
 
-  clearLocalStorage();
+  // clearLocalStorage();
 
-  const interval = 3 * 24 * 60 * 60;
+  const interval = 3 * 24 * 60 * 60 * 1000;
   setInterval(clearLocalStorage, interval);
 
   // axios configs
