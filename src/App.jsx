@@ -37,16 +37,14 @@ import NewRoute from "./pages/team-lead/NewRoute";
 import { EnumeratorFormProvider, useApp, useAuth } from "./context";
 import { base_url, base_url_local, base_url_local_2 } from "./lib/paths";
 import Admin from "./components/layout/Admin";
+import secureLocalStorage from "react-secure-storage";
 
 function App() {
   const { user, isLoggedIn } = useAuth();
 
   const clearLocalStorage = () => {
     localStorage.removeItem("oius");
-    // console.log("local storage cleared");
   };
-
-  // clearLocalStorage();
 
   const interval = 3 * 24 * 60 * 60 * 1000;
   setInterval(clearLocalStorage, interval);
@@ -55,6 +53,19 @@ function App() {
   axios.defaults.baseURL = base_url;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
+
+  axios.interceptors.response.use(
+    (res) => {
+      return res;
+    },
+    (error) => {
+      if (error?.response?.status === 401) {
+        secureLocalStorage.removeItem("oius");
+        window.location.href = "/";
+      }
+      return Promise.reject(error);
+    }
+  );
 
   const identifyRoute = (user) => {
     if (user.role === "enumerator") {
