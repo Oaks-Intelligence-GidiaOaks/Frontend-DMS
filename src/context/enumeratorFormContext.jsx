@@ -422,7 +422,7 @@ export function EnumeratorFormProvider({ children }) {
               isSubmitting: false,
             }));
           }
-          if (response.data.message.includes("Already submitted")) {
+          if (response.response.data.message.includes("Already submitted")) {
             resetState();
             updateTransportTab(
               contextLgaRoutes.filter(
@@ -437,12 +437,25 @@ export function EnumeratorFormProvider({ children }) {
           }
         })
         .catch((error) => {
-          console.log(error);
-          setState((prev) => ({
-            ...prev,
-            showErrorNotification: true,
-            isSubmitting: false,
-          }));
+          if (error.response.data.message.includes("Already submitted")) {
+            resetState();
+            updateTransportTab(
+              contextLgaRoutes.filter(
+                (t) => t.lga === formatLGA(state.currentLGA)
+              )
+            );
+            setState((prev) => ({
+              ...prev,
+              showDuplicateNotification: true,
+              isSubmitting: false,
+            }));
+          } else {
+            setState((prev) => ({
+              ...prev,
+              showErrorNotification: true,
+              isSubmitting: false,
+            }));
+          }
         });
     } catch (error) {
       console.log(error);
@@ -1183,8 +1196,11 @@ export function EnumeratorFormProvider({ children }) {
       fetch(`${base_url}logout`)
         .then((res) => res.json())
         .then(({ success }) => {
+          setState((prev) => ({ ...prev, showEnumeratorProfile: false }));
           if (success) {
-            secureLocalStorage.clear();
+            secureLocalStorage.removeItem("tp");
+            secureLocalStorage.removeItem("user");
+            secureLocalStorage.removeItem("oius");
             setUser(null);
             setIsLoggedIn(false);
             return navigate("/");
