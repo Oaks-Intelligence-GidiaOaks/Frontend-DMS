@@ -1184,7 +1184,9 @@ export function EnumeratorFormProvider({ children }) {
         .then((res) => res.json())
         .then(({ success }) => {
           if (success) {
-            secureLocalStorage.clear();
+            secureLocalStorage.removeItem("tp");
+            secureLocalStorage.removeItem("user");
+            secureLocalStorage.removeItem("oius");
             setUser(null);
             setIsLoggedIn(false);
             return navigate("/");
