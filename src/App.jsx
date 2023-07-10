@@ -35,7 +35,7 @@ import AddEnumerator from "./pages/team-lead/AddEnumerator";
 import Login from "./pages/Login";
 import NewRoute from "./pages/team-lead/NewRoute";
 import { EnumeratorFormProvider, useApp, useAuth } from "./context";
-import { base_url, base_url_local } from "./lib/paths";
+import { base_url, base_url_local, base_url_local_2 } from "./lib/paths";
 import Admin from "./components/layout/Admin";
 
 function App() {

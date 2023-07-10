@@ -3,10 +3,11 @@ import { HiUserCircle } from "react-icons/hi";
 import oaksLogo from "../assets/oaks-logo.svg";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
-import { base_url, base_url_local } from "../lib/paths";
+import { base_url, base_url_local, base_url_local_2 } from "../lib/paths";
 import { Rings } from "react-loader-spinner";
 import secureLocalStorage from "react-secure-storage";
 import { useApp } from "../context";
+import axios from "axios";
 
 function EnumeratorLogin() {
   const navigate = useNavigate();
@@ -79,17 +80,17 @@ function EnumeratorLogin() {
       setIsLoading(true);
 
       try {
-        fetch(`${base_url}login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        })
-          .then((res) => res.json())
+        axios
+          .post("login", data, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .then((res) => res.data)
           .then(({ user, ...others }) => {
             if (!user) {
               setIsLoading(false);
+
               return setErrorResponse(
                 "Invalid ID or Password, please try again"
               );
@@ -147,11 +148,12 @@ function EnumeratorLogin() {
             }
           })
           .catch((error) => {
+            console.log("error:", error);
             setIsLoading(false);
             return setErrorResponse(
-              "Can't connect to the server at the moment please check your network and try again."
+              error.response.data.message ??
+                "Can't connect to the server at the moment please check your network and try again."
             );
-            console.log("error:", error);
           });
       } catch (err) {
         setIsLoading(false);

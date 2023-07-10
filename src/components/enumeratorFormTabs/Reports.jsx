@@ -380,13 +380,15 @@ function Reports() {
         {console.log(progressPercentage)}
       </p>
       <button
-        disabled={progressPercentage !== 100}
+        disabled={progressPercentage !== 100 || isSubmitting}
         onClick={() => {
           submitForm(token);
         }}
         className={`${
           progressPercentage === 100 ? "bg-primary-green" : "bg-gray-300"
-        } w-full rounded-lg flex justify-center items-center p-2 mt-2 text-white`}
+        } w-full rounded-lg flex justify-center items-center p-2 mt-2 text-white ${
+          isSubmitting ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
       >
         {isSubmitting ? (
           <Rings
