@@ -538,7 +538,7 @@ function Food() {
                                 "type"
                               ].toLowerCase() === "fresh tomatoes" ||
                               foodForm[item]["prices"][0]["type"] === ""
-                                ? Object.keys(foodForm[item][type][0])[2]
+                                ? Object.keys(foodForm[item][type][0])[3]
                                     .split("-")
                                     .join(" ")
                                 : "Big bag"}
