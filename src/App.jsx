@@ -65,7 +65,7 @@ function App() {
     }
 
     if (user.role === "admin" || user.role === "super_admin") {
-      return <Navigate reolace to={"/admin/home"} />;
+      return <Navigate replace to={"/admin/home"} />;
     }
   };
 
