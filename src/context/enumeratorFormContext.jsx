@@ -22,6 +22,7 @@ import { useAuth } from "./useAuth";
 import { base_url, base_url_local } from "../lib/paths";
 import { useApp } from "./useApp";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const EnumeratorFormContext = createContext();
 
@@ -51,6 +52,7 @@ export function EnumeratorFormProvider({ children }) {
             {
               price: "",
               brand: "",
+              size: "",
             },
           ],
           "50-kg": [
@@ -65,6 +67,7 @@ export function EnumeratorFormProvider({ children }) {
             {
               price: "",
               type: "",
+              size: "",
             },
           ],
           "50-kg": [
@@ -79,6 +82,7 @@ export function EnumeratorFormProvider({ children }) {
             {
               price: "",
               type: "",
+              size: "",
             },
           ],
           "50-kg": [
@@ -93,7 +97,9 @@ export function EnumeratorFormProvider({ children }) {
             {
               type: "",
               "4-seeds": "",
+              "seed-size": "",
               "big-basket": "",
+              size: "",
             },
           ],
         },
@@ -102,6 +108,7 @@ export function EnumeratorFormProvider({ children }) {
             {
               price: "",
               type: "",
+              size: "",
             },
           ],
         },
@@ -386,26 +393,23 @@ export function EnumeratorFormProvider({ children }) {
     }));
 
     try {
-      fetch(`${base_url}form/add_data`, {
-        method: "POST",
-        body: JSON.stringify(formSubmission),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) =>
-          response.json().then((data) => ({ status: response.status, ...data }))
-        )
-        .then((data) => {
-          if (data.status === 500 || data.status === 503) {
+      axios
+        .post("form/add_data", formSubmission, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          if (response.status === 500 || response.status === 503) {
             setState((prev) => ({
               ...prev,
               showErrorNotification: true,
               isSubmitting: false,
             }));
           }
-          if (data.message.includes("successful")) {
+          if (response.data.message.includes("successful")) {
             resetState();
             updateTransportTab(
               contextLgaRoutes.filter(
@@ -418,7 +422,7 @@ export function EnumeratorFormProvider({ children }) {
               isSubmitting: false,
             }));
           }
-          if (data.message.includes("Already submitted")) {
+          if (response.data.message.includes("Already submitted")) {
             resetState();
             updateTransportTab(
               contextLgaRoutes.filter(
@@ -433,6 +437,7 @@ export function EnumeratorFormProvider({ children }) {
           }
         })
         .catch((error) => {
+          console.log(error);
           setState((prev) => ({
             ...prev,
             showErrorNotification: true,
@@ -950,23 +955,35 @@ export function EnumeratorFormProvider({ children }) {
                   state.foodSectionStructure[item][type][j][
                     item === "Rice" ? "brand" : "type"
                   ],
+                size:
+                  type === "50-kg"
+                    ? "50 Kg"
+                    : state.foodSectionStructure[item][type][j]["size"],
               });
               j++;
             }
           });
         }
+      } else if (["Fish", "Beef", "Bread", "Egg", "Yam"].includes(item)) {
+        Object.keys(state.foodSectionStructure[item]).forEach((type) => {
+          let j = 0;
+          while (state.foodSectionStructure[item][type][j]) {
+            foodItems.push({
+              name: `${item}`,
+              price: parseInt(
+                state.foodSectionStructure[item][type][j]["price"].replace(
+                  /,/g,
+                  ""
+                )
+              ),
+              brand: state.foodSectionStructure[item][type][j]["type"],
+              size: state.foodSectionStructure[item][type][j]["type"],
+            });
+            j++;
+          }
+        });
       } else if (
-        [
-          "Fish",
-          "Chicken",
-          "Beef",
-          "Turkey",
-          "Bread",
-          "Egg",
-          "Yam",
-          "Palm oil",
-          "Groundnut oil",
-        ].includes(item)
+        ["Chicken", "Turkey", "Palm oil", "Groundnut oil"].includes(item)
       ) {
         Object.keys(state.foodSectionStructure[item]).forEach((type) => {
           let j = 0;
@@ -980,6 +997,7 @@ export function EnumeratorFormProvider({ children }) {
                 )
               ),
               brand: state.foodSectionStructure[item][type][j]["type"],
+              size: type.split("-").join(" "),
             });
             j++;
           }
@@ -987,7 +1005,7 @@ export function EnumeratorFormProvider({ children }) {
       } else if (item === "Tomatoes") {
         Object.keys(state.foodSectionStructure[item]["prices"][0]).forEach(
           (type) =>
-            type !== "type" &&
+            !["type", "seed-size", "size"].includes(type) &&
             foodItems.push({
               name: `${item}_${type}`,
               price: parseInt(
@@ -997,6 +1015,10 @@ export function EnumeratorFormProvider({ children }) {
                 )
               ),
               brand: state.foodSectionStructure[item]["prices"][0]["type"],
+              size:
+                type === "4-seeds"
+                  ? state.foodSectionStructure[item]["prices"][0]["seed-size"]
+                  : state.foodSectionStructure[item]["prices"][0]["size"],
             })
         );
       } else {
@@ -1030,6 +1052,7 @@ export function EnumeratorFormProvider({ children }) {
                 )
               ),
               brand: state.commoditySectionStructure[item][type][j]["weight"],
+              size: type.split("-").join(" "),
             });
             j++;
           }
@@ -1040,6 +1063,7 @@ export function EnumeratorFormProvider({ children }) {
             name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: `${type[item === "Charcoal" ? "weight" : "size"]}`,
+            size: `${type[item === "Charcoal" ? "weight" : "size"]}`,
           })
         );
       } else if (item === "Firewood") {
@@ -1048,6 +1072,7 @@ export function EnumeratorFormProvider({ children }) {
             name: `${item}`,
             price: parseInt(type["price"].replace(/,/g, "")),
             brand: `${type["size"]}`,
+            size: `${type["size"]}`,
           })
         );
       } else {
@@ -1061,7 +1086,8 @@ export function EnumeratorFormProvider({ children }) {
               )
             ),
             brand:
-              state.commoditySectionStructure[item][type][0]["brand"] ?? "",
+              state.commoditySectionStructure[item][type][0]["brand"] ?? type,
+            size: type,
           });
         });
       }

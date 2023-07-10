@@ -79,11 +79,11 @@ const fishList = [
 const beefList = ["Small Chunks", "Large Chunks"];
 const chickenList = ["Full Chicken", "Lap", "Chest", "Wings"];
 const turkeyList = ["Lap", "Wings"];
-const breadList = ["Family Size", "Medium"];
+const breadList = ["Family Size", "Medium", "Small"];
 const EggsList = ["Large", "Small"];
-const TomatoSeedList = ["Large", "Small"];
-const TomatoBasketList = ["Large", "Small"];
-const YamList = ["Large", "Small"];
+const TomatoSeedList = ["Small", "Medium", "Large"];
+const TomatoBasketList = ["Small", "Medium", "Large"];
+const YamList = ["Small", "Medium", "Large"];
 const GroundnutOilList = [
   "Bottle",
   "Golden Terra",
@@ -117,9 +117,23 @@ const singleFieldCommodityInputs = [
   "Petrol/PMS",
 ];
 
+const cupSizes = [
+  "Abia State Approved Cup",
+  "Gino Tin",
+  "Ceramic Cup",
+  "Peak Milk Tin",
+  "Kongo",
+  "Rabin Shakada",
+  "Small Bowl Plate",
+];
+
 const clothSizes = ["Small", "Medium", "Large"];
+const fishSizes = ["Small", "Medium", "Large"];
+const tomatoSeedSizes = ["Small", "Medium", "Large"];
 
 const tomatoTypes = ["Fresh Tomatoes", "Dry Tomatoes"];
+const tomatoBasketSizes = ["Small", "Large", "Crate"];
+const tomatoBagSizes = ["Small", "Medium", "Large"];
 
 const firewoodBundleSizes = ["Small", "Medium", "Large"];
 
@@ -160,12 +174,17 @@ export {
   beanTypes,
   garriTypes,
   fishList,
+  fishSizes,
+  cupSizes,
   beefList,
   chickenList,
   turkeyList,
   breadList,
   EggsList,
   TomatoBasketList,
+  tomatoSeedSizes,
+  tomatoBasketSizes,
+  tomatoBagSizes,
   TomatoSeedList,
   GroundnutOilList,
   PalmOilList,
