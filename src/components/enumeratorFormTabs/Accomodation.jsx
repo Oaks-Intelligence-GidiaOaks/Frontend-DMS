@@ -177,7 +177,7 @@ function Accomodation() {
       </div>
       <p className="text-[14px] w-full mb-10 text-gray-500">
         <span className="font-bold">NOTE</span>: Next button will only be active
-        if all fields in this form section have a value
+        if all fields in this form section have a value.
       </p>
       <button
         disabled={accomodationProgressPercentage !== 100}

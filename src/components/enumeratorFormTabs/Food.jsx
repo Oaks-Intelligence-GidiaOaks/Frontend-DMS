@@ -11,9 +11,14 @@ import {
   beefList,
   breadList,
   chickenList,
+  cupSizes,
   fishList,
+  fishSizes,
   garriTypes,
   riceBrands,
+  tomatoBagSizes,
+  tomatoBasketSizes,
+  tomatoSeedSizes,
   tomatoTypes,
   turkeyList,
 } from "../../data/enumeratorFormStructure";
@@ -115,6 +120,40 @@ function Food() {
                             />
                           </div>
                         </div>
+                        {type.toLowerCase() === "1-cup" && (
+                          <div className="flex flex-col gap-4">
+                            <p>Specify size of cup</p>
+                            <DropDownMenu
+                              list={cupSizes}
+                              handleChange={handleChange}
+                              item={item}
+                              type={type}
+                              valueTitle={"size"}
+                              value={foodForm[item][type][i]["size"]}
+                              i={i}
+                            />
+                            {/* <div className="flex gap-2 relative border-b border-solid border-mid-gray">
+                            <input
+                              type="text"
+                              value={
+                                foodSectionStructure[item][type][i]["brand"]
+                              }
+                              onChange={(e) =>
+                                
+                                  setFoodItemValue({
+                                    item,
+                                    type,
+                                    valueTitle: "brand",
+                                    value: e.target.value,
+                                  })
+                                
+                              }
+                              placeholder="Enter answer"
+                              className="flex-1 p-2 outline-primary-green"
+                            />
+                          </div> */}
+                          </div>
+                        )}
                         <div className="flex flex-col gap-4">
                           <p>
                             Specify Brand of {item}, for{" "}
@@ -206,6 +245,40 @@ function Food() {
                             />
                           </div>
                         </div>
+                        {type.toLowerCase() === "1-cup" && (
+                          <div className="flex flex-col gap-4">
+                            <p>Specify size of cup</p>
+                            <DropDownMenu
+                              list={cupSizes}
+                              handleChange={handleChange}
+                              item={item}
+                              type={type}
+                              valueTitle={"size"}
+                              value={foodForm[item][type][i]["size"]}
+                              i={i}
+                            />
+                            {/* <div className="flex gap-2 relative border-b border-solid border-mid-gray">
+                            <input
+                              type="text"
+                              value={
+                                foodSectionStructure[item][type][i]["brand"]
+                              }
+                              onChange={(e) =>
+                                
+                                  setFoodItemValue({
+                                    item,
+                                    type,
+                                    valueTitle: "brand",
+                                    value: e.target.value,
+                                  })
+                                
+                              }
+                              placeholder="Enter answer"
+                              className="flex-1 p-2 outline-primary-green"
+                            />
+                          </div> */}
+                          </div>
+                        )}
                         <div className="flex flex-col gap-4">
                           <p>
                             Specify type of {item} - {type.split("-").join(" ")}{" "}
@@ -309,6 +382,40 @@ function Food() {
                             />
                           </div>
                         </div>
+                        {type.toLowerCase() === "1-cup" && (
+                          <div className="flex flex-col gap-4">
+                            <p>Specify size of cup</p>
+                            <DropDownMenu
+                              list={cupSizes}
+                              handleChange={handleChange}
+                              item={item}
+                              type={type}
+                              valueTitle={"size"}
+                              value={foodForm[item][type][i]["size"]}
+                              i={i}
+                            />
+                            {/* <div className="flex gap-2 relative border-b border-solid border-mid-gray">
+                            <input
+                              type="text"
+                              value={
+                                foodSectionStructure[item][type][i]["brand"]
+                              }
+                              onChange={(e) =>
+                                
+                                  setFoodItemValue({
+                                    item,
+                                    type,
+                                    valueTitle: "brand",
+                                    value: e.target.value,
+                                  })
+                                
+                              }
+                              placeholder="Enter answer"
+                              className="flex-1 p-2 outline-primary-green"
+                            />
+                          </div> */}
+                          </div>
+                        )}
                         <div className="flex flex-col gap-4">
                           <p>
                             Specify type of {item} - {type.split("-").join(" ")}{" "}
@@ -410,6 +517,19 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
+                          <p>Specify size of seeds</p>
+                          <DropDownMenu
+                            list={tomatoSeedSizes}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"seed-size"}
+                            value={foodForm[item]["prices"][0]["seed-size"]}
+                            section={"foodSectionStructure"}
+                            i={0}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-4">
                           <p>
                             Price of {item}{" "}
                             <span className="capitalize">
@@ -418,7 +538,7 @@ function Food() {
                                 "type"
                               ].toLowerCase() === "fresh tomatoes" ||
                               foodForm[item]["prices"][0]["type"] === ""
-                                ? Object.keys(foodForm[item][type][0])[2]
+                                ? Object.keys(foodForm[item][type][0])[3]
                                     .split("-")
                                     .join(" ")
                                 : "Big bag"}
@@ -446,6 +566,34 @@ function Food() {
                               onWheel={(e) => e.target.blur()}
                             />
                           </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>
+                            Specify size of{" "}
+                            {foodForm[item]["prices"][0][
+                              "type"
+                            ].toLowerCase() === "fresh tomatoes" ||
+                            foodForm[item]["prices"][0]["type"] === ""
+                              ? "Basket"
+                              : "Bag"}
+                          </p>
+                          <DropDownMenu
+                            list={
+                              foodForm[item]["prices"][0][
+                                "type"
+                              ].toLowerCase() === "fresh tomatoes" ||
+                              foodForm[item]["prices"][0]["type"] === ""
+                                ? tomatoBasketSizes
+                                : tomatoBagSizes
+                            }
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"size"}
+                            value={foodForm[item]["prices"][0]["size"]}
+                            section={"foodSectionStructure"}
+                            i={0}
+                          />
                         </div>
                       </>
                     )}
@@ -509,6 +657,18 @@ function Food() {
                             type={type}
                             valueTitle={"type"}
                             value={foodForm[item][type][i]["type"]}
+                            i={i}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          <p>Specify size of Fish</p>
+                          <DropDownMenu
+                            list={fishSizes}
+                            handleChange={handleChange}
+                            item={item}
+                            type={type}
+                            valueTitle={"size"}
+                            value={foodForm[item][type][i]["size"]}
                             i={i}
                           />
                         </div>
