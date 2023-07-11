@@ -35,6 +35,7 @@ const FormResponses = () => {
 
   const [sub, setSub] = useState(null);
 
+  console.log(foodData, "FOOD DATA");
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";

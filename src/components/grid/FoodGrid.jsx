@@ -25,20 +25,30 @@ import { BiDownload } from "react-icons/bi";
 const FoodGrid = ({ data: foodRowss }) => {
   const { user } = useAuth();
 
-  let foodData = foodRowss["data"];
+  let foodData = foodRowss.data;
+
+  const formatProductName = (name) => {
+    if (name.includes("_")) {
+      name = name.replace("_", "(") + ")";
+    }
+    return name.replace(/-/g, "");
+  };
 
   const transformedData =
     foodData.length > 0 &&
     foodData?.map((item, i) => ({
-      S_N: i + 1,
+      // S_N: i + 1,
       _id: item._id,
       Date: arrangeTime(item.updated_at),
       id: item.created_by.id,
       State: item?.state,
       lga: item.lga,
-      name: item.name,
+      name: formatProductName(item.name),
       price: item.price,
+      size: item.size,
     }));
+
+  console.log(transformedData[0]?.size);
 
   const transformedColumns =
     foodData.length > 0 &&
@@ -102,6 +112,8 @@ const FoodGrid = ({ data: foodRowss }) => {
       ? "Name"
       : field === "price"
       ? "Price"
+      : field === "size"
+      ? "Size"
       : field;
   };
 

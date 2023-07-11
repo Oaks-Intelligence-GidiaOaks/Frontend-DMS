@@ -22,6 +22,13 @@ const OthersGrid = ({ data }) => {
 
   let othersData = data.data;
 
+  const formatProductName = (name) => {
+    if (name.includes("_")) {
+      name = name.replace("_", "(") + ")";
+    }
+    return name.replace(/-/g, "");
+  };
+
   const transformedData =
     othersData &&
     othersData.length > 0 &&
@@ -31,10 +38,12 @@ const OthersGrid = ({ data }) => {
       id: item.created_by.id,
       State: item.state,
       LGA: item.lga,
-      name: item.name,
+      // name: item.name,
+      name: formatProductName(item.name),
       price: item.price === 0 ? "N/A" : item.price,
       brand: item.brand.length > 1 ? item.brand : "N/A",
       _id: item._id,
+      size: item.size
     }));
 
   const othersColumns =
@@ -109,7 +118,9 @@ const OthersGrid = ({ data }) => {
       ? "Price"
       : field === "brand"
       ? "Brand"
-      : field;
+      : field === "size"
+      ? "Size"
+      : field
   };
 
   return othersData.length > 0 ? (
