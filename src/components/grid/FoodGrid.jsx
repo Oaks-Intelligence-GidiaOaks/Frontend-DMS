@@ -31,13 +31,15 @@ const FoodGrid = ({ data: foodRowss }) => {
     foodData.length > 0 &&
     foodData?.map((item, i) => ({
       S_N: i + 1,
-      _id: item._id,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by.id,
+      _id: item?._id,
+      Date: arrangeTime(item?.updated_at),
+      id: item.created_by?.id,
       State: item?.state,
-      lga: item.lga,
-      name: item.name,
-      price: item.price,
+      lga: item?.lga,
+      name: item?.name,
+      brand: item?.brand,
+      size: item?.size,
+      price: item?.price,
     }));
 
   const transformedColumns =

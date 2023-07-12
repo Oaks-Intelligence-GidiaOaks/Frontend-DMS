@@ -31,7 +31,7 @@ const TransportGrid = ({ data }) => {
     transportData.map((item, i) => ({
       S_N: i + 1,
       Date: arrangeTime(item.updated_at),
-      id: item.created_by.id,
+      id: item.created_by?.id,
       State: item.state,
       LGA: item.lga,
       route: item.route,
