@@ -38,6 +38,7 @@ import { EnumeratorFormProvider, useApp, useAuth } from "./context";
 import { base_url, base_url_local, base_url_local_2 } from "./lib/paths";
 import Admin from "./components/layout/Admin";
 import secureLocalStorage from "react-secure-storage";
+import { LoginTest } from "./pages";
 
 function App() {
   const { user, isLoggedIn } = useAuth();
@@ -91,6 +92,10 @@ function App() {
         <Route
           path="/"
           element={isLoggedIn && user ? identifyRoute(user) : <Login />}
+        />
+        <Route
+          path="/login_test"
+          element={isLoggedIn && user ? identifyRoute(user) : <LoginTest />}
         />
         {/* enumerator routes */}
         <Route
@@ -194,7 +199,7 @@ function App() {
 
         {/* admin routes */}
         <Route
-          path="admin/home"
+          path="/admin/home"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -206,7 +211,7 @@ function App() {
           }
         />
         <Route
-          path="admin/team_leads"
+          path="/admin/team_leads"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -218,7 +223,7 @@ function App() {
           }
         />
         <Route
-          path="admin/team_leads/:id"
+          path="/admin/team_leads/:id"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -230,7 +235,7 @@ function App() {
           }
         />
         <Route
-          path="admin/responses"
+          path="/admin/responses"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -255,7 +260,7 @@ function App() {
           }
         />
         <Route
-          path="admin/add"
+          path="/admin/add"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -267,7 +272,7 @@ function App() {
           }
         />
         <Route
-          path="admin/profile"
+          path="/admin/profile"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -280,7 +285,7 @@ function App() {
         />
 
         <Route
-          path="admin/profile/:id"
+          path="/admin/profile/:id"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -293,7 +298,7 @@ function App() {
         />
 
         <Route
-          path="admin/master"
+          path="/admin/master"
           element={
             adminRoleCheck ? (
               <Admin>
@@ -305,7 +310,7 @@ function App() {
           }
         />
         <Route
-          path="admin/new-lga"
+          path="/admin/new-lga"
           element={
             adminRoleCheck ? (
               <Admin>
