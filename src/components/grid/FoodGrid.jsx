@@ -25,7 +25,14 @@ import { BiDownload } from "react-icons/bi";
 const FoodGrid = ({ data: foodRowss }) => {
   const { user } = useAuth();
 
-  let foodData = foodRowss["data"];
+  let foodData = foodRowss.data;
+
+  const formatProductName = (name) => {
+    if (name.includes("_")) {
+      name = name.replace("_", "(") + ")";
+    }
+    return name.replace(/-/g, "");
+  };
 
   const transformedData =
     foodData.length > 0 &&
@@ -42,6 +49,8 @@ const FoodGrid = ({ data: foodRowss }) => {
       price: item?.price,
     }));
 
+  console.log(transformedData[0]?.size);
+
   const transformedColumns =
     foodData.length > 0 &&
     Object.keys(transformedData?.[0]).map((item) => ({
@@ -55,14 +64,19 @@ const FoodGrid = ({ data: foodRowss }) => {
   const editSettings = {
     allowEditing: true,
   };
-
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+    const { data } = args;
+  
+    if (args.requestType === "save") {
+      const modifiedData = {
+        size: data.size,
+        brand: data.brand,
+        price: data.price,
+      };
+  
       try {
         await axios
-          .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
+          .patch(`form_response/food_product/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
@@ -73,7 +87,7 @@ const FoodGrid = ({ data: foodRowss }) => {
       }
     }
   };
-
+  
   const commands = [
     {
       type: "Edit",
@@ -104,6 +118,8 @@ const FoodGrid = ({ data: foodRowss }) => {
       ? "Name"
       : field === "price"
       ? "Price"
+      : field === "size"
+      ? "Size"
       : field;
   };
 
@@ -142,16 +158,20 @@ const FoodGrid = ({ data: foodRowss }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
-        commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {transformedColumns?.map(({ field, width }) => (
             <ColumnDirective
               key={field}
               headerText={checkHeaderText(field)}
-              visible={field === "_id" ? false : true}
+              // visible={field === "_id" ? false : true}
+              visible={field !== "_id"}
               field={field}
-              allowEditing={field === "price"}
+              allowEditing={
+                field === "price" || field === "brand" || field === "size"
+              }
               width={width}
             />
           ))}

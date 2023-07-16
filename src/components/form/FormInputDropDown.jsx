@@ -24,7 +24,7 @@ const FormInputDropDown = ({ label, data, index, onChange }) => {
       <div
         className={`w-full ${index} bg-white text-xs rounded drop-shadow-sm`}
       >
-        <Select options={data} value={value} onChange={handleChange} />
+        <Select options={data} value={value} setValue={setValue} onChange={handleChange} />
       </div>
     </div>
   );
