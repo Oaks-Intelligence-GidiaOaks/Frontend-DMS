@@ -28,7 +28,7 @@ const ClothingGrid = ({ data }) => {
       S_N: i + 1,
       _id: item._id,
       Date: arrangeTime(item.updated_at),
-      id: item.created_by.id,
+      id: item.created_by?.id,
       State: item.state,
       lga: item.lga,
       category: item.category,

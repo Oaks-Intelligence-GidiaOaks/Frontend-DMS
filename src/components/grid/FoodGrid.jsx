@@ -37,15 +37,16 @@ const FoodGrid = ({ data: foodRowss }) => {
   const transformedData =
     foodData.length > 0 &&
     foodData?.map((item, i) => ({
-      // S_N: i + 1,
-      _id: item._id,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by.id,
+      S_N: i + 1,
+      _id: item?._id,
+      Date: arrangeTime(item?.updated_at),
+      id: item.created_by?.id,
       State: item?.state,
-      lga: item.lga,
-      name: formatProductName(item.name),
-      price: item.price,
-      size: item.size,
+      lga: item?.lga,
+      name: item?.name,
+      brand: item?.brand,
+      size: item?.size,
+      price: item?.price,
     }));
 
   console.log(transformedData[0]?.size);
@@ -63,14 +64,19 @@ const FoodGrid = ({ data: foodRowss }) => {
   const editSettings = {
     allowEditing: true,
   };
-
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+    const { data } = args;
+  
+    if (args.requestType === "save") {
+      const modifiedData = {
+        size: data.size,
+        brand: data.brand,
+        price: data.price,
+      };
+  
       try {
         await axios
-          .patch(`form_response/food_product/${modifiedData._id}`, modifiedData)
+          .patch(`form_response/food_product/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
@@ -81,7 +87,7 @@ const FoodGrid = ({ data: foodRowss }) => {
       }
     }
   };
-
+  
   const commands = [
     {
       type: "Edit",
@@ -152,16 +158,20 @@ const FoodGrid = ({ data: foodRowss }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
-        commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {transformedColumns?.map(({ field, width }) => (
             <ColumnDirective
               key={field}
               headerText={checkHeaderText(field)}
-              visible={field === "_id" ? false : true}
+              // visible={field === "_id" ? false : true}
+              visible={field !== "_id"}
               field={field}
-              allowEditing={field === "price"}
+              allowEditing={
+                field === "price" || field === "brand" || field === "size"
+              }
               width={width}
             />
           ))}

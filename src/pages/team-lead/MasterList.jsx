@@ -54,7 +54,7 @@ const MasterList = () => {
                   food?.price === "0" ? "N/A" : food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
-                  [`Size of ${food?.name}`]: food?.size ?? "N/A"
+                [`Size of ${food?.name}`]: food?.size,
               }))
               ?.reduce((acc, obj) => {
                 return {

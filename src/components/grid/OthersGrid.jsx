@@ -15,6 +15,7 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
+import axios from "axios";
 
 const OthersGrid = ({ data }) => {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ const OthersGrid = ({ data }) => {
     data.data.map((item, i) => ({
       S_N: i + 1,
       Date: arrangeTime(item.updated_at),
-      id: item.created_by.id,
+      id: item.created_by?.id,
       State: item.state,
       LGA: item.lga,
       // name: item.name,
@@ -43,7 +44,7 @@ const OthersGrid = ({ data }) => {
       price: item.price === 0 ? "N/A" : item.price,
       brand: item.brand.length > 1 ? item.brand : "N/A",
       _id: item._id,
-      size: item.size
+      size: item.size,
     }));
 
   const othersColumns =
@@ -75,18 +76,20 @@ const OthersGrid = ({ data }) => {
   ];
 
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+    const { data } = args;
+
+    if (args.requestType === "save") {
+      const modifiedData = {
+        size: data.size,
+        brand: data.brand,
+        price: data.price,
+      };
+
       try {
         await axios
-          .patch(
-            `form_response/other_products/${modifiedData._id}`,
-            modifiedData
-          )
+          .patch(`form_response/other_products/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
@@ -120,7 +123,7 @@ const OthersGrid = ({ data }) => {
       ? "Brand"
       : field === "size"
       ? "Size"
-      : field
+      : field;
   };
 
   return othersData.length > 0 ? (
@@ -146,7 +149,8 @@ const OthersGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         allowGrouping={true}
-        commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {othersColumns.map(({ field, width }) => (
@@ -154,7 +158,9 @@ const OthersGrid = ({ data }) => {
               key={field}
               visible={field !== "_id"}
               headerText={checkHeaderText(field)}
-              allowEditing={field === "price"}
+              allowEditing={
+                field === "price" || field === "brand" || field === "size"
+              }
               field={field}
               width={width}
             />

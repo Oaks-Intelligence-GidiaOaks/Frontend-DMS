@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   FormInput,
   FormInputDropDown,
@@ -15,6 +15,7 @@ const AddEnumerator = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const ref = useRef(null);
 
   let totalEnumerators = location.state?.totalEnumerators;
   let recentlyAdded = location.state?.newlyAdded;
@@ -41,6 +42,7 @@ const AddEnumerator = () => {
   const [userCreated, setUserCreated] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+ 
 
   useEffect(() => {
     let fileReader,
@@ -72,11 +74,11 @@ const AddEnumerator = () => {
     });
 
     setState(null);
-    setLga(null);
+    setLga([]);
     setImage(null);
     setFileDataUrl(null);
-    setUserCreated(true);
     setIsLoading(false);
+    ref.current.value = ""
     navigate("/add");
   };
 
@@ -86,6 +88,7 @@ const AddEnumerator = () => {
   };
 
   const handleLgaChange = (selectedValue) => {
+
     setLga(selectedValue.map((item) => item.value));
   };
 
@@ -152,25 +155,24 @@ const AddEnumerator = () => {
 
     // console.log("clicked submit");
 
-    try {
-      setIsLoading(true);
-      axios
-        .post(`enumerator/new`, bodyFormData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((res) => {
-          resetForm();
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          setError(err);
-          console.log(err);
-        });
-    } catch (err) {
-      console.error(err);
-    }
+    setIsLoading(true);
+    axios
+      .post(`enumerator/new`, bodyFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setUserCreated(true);
+        resetForm();
+      })
+      .catch((err) => {
+        const error = err.response?.data?.message  || err.message;
+        setIsLoading(false);
+        setUserCreated(false);
+        setError(error);
+        
+      });
   };
 
   return (
@@ -265,6 +267,7 @@ const AddEnumerator = () => {
           type="file"
           name=""
           id=""
+          ref={ref}
           onChange={handleImageSelect}
           accept="image/*"
         />
