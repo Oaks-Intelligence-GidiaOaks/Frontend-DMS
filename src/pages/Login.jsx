@@ -148,7 +148,7 @@ function EnumeratorLogin() {
             }
           })
           .catch((error) => {
-            console.log("error:", error);
+            // console.log("error:", error);
             setIsLoading(false);
             return setErrorResponse(
               error.response.data.message ??
@@ -160,7 +160,7 @@ function EnumeratorLogin() {
         setErrorResponse(
           "Can't connect to the server at the moment please check your network and try again."
         );
-        console.log("error:", err);
+        // console.log("error:", err);
       }
     }
   };

@@ -39,6 +39,7 @@ function EnumeratorForm() {
       showErrorNotification,
     },
     contextLgaRoutes,
+    setCurrentLGA,
     setContextLgaRoutes,
     showProfile,
     hideProfile,
@@ -54,6 +55,8 @@ function EnumeratorForm() {
   const { setUser, user } = useAuth();
   const [lgaRoutes, setLgaRoutes] = useState(null);
 
+  // console.log(Object.keys(user));
+
   useEffect(() => {
     window.addEventListener("beforeunload", function (e) {
       e.preventDefault();
@@ -66,7 +69,7 @@ function EnumeratorForm() {
         e.returnValue = "";
       });
   }, []);
-  console.log(user);
+  // console.log(user);
 
   useEffect(() => {
     lgaRoutes
@@ -76,13 +79,14 @@ function EnumeratorForm() {
       : axios
           .get(`lga_routes`)
           .then((res) => {
-            console.log(res.data.data);
             setLgaRoutes(res.data.data);
             setContextLgaRoutes(res.data.data);
-            Object.keys(cachedTp).length
+            Object.keys(cachedTp).length && user.LGA.includes(currentLGA)
               ? cachedTp
               : updateTransportTab(
-                  res.data.data.filter((t) => t.lga === formatLGA(currentLGA))
+                  res.data.data.filter(
+                    (t) => t.lga.trim() === formatLGA(currentLGA.trim())
+                  )
                 );
           })
           .catch((err) => console.error(err));

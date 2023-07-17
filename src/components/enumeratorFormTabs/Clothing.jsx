@@ -76,7 +76,6 @@ function Clothing() {
                   key={ind}
                   className="relative flex flex-col gap-10 px-[5%] pb-[2%] sm:pb-[2%] xs:pb-[5%] mt-4"
                 >
-                  {console.log(clothingForm)}
                   <div className="flex flex-col gap-4">
                     <p>Price of {cloth}</p>
                     <div className="flex gap-2 relative border-b border-solid border-mid-gray">

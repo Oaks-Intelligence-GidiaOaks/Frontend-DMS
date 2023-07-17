@@ -348,7 +348,9 @@ export function EnumeratorFormProvider({ children }) {
   const savedState = JSON.parse(secureLocalStorage.getItem("oaks-enum-form"));
 
   // If user has saved changes use changes else use initial state
-  const [state, setState] = useState(savedState ?? initialState);
+  const [state, setState] = useState(
+    user.LGA.includes(savedState.currentLGA) ? savedState : initialState
+  );
 
   const [contextLgaRoutes, setContextLgaRoutes] = useState(null);
 
@@ -386,7 +388,7 @@ export function EnumeratorFormProvider({ children }) {
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
-    console.log(formSubmission);
+    // console.log(formSubmission);
     setState((prev) => ({
       ...prev,
       isSubmitting: true,
@@ -401,7 +403,7 @@ export function EnumeratorFormProvider({ children }) {
           },
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response.status === 500 || response.status === 503) {
             setState((prev) => ({
               ...prev,
@@ -458,7 +460,7 @@ export function EnumeratorFormProvider({ children }) {
           }
         });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setState((prev) => ({
         ...prev,
         isSubmitting: false,
@@ -814,7 +816,7 @@ export function EnumeratorFormProvider({ children }) {
     const { accomodationSectionStructure } = state;
     const { item, value, valueTitle, i } = action;
 
-    console.log(action);
+    // console.log(action);
 
     setState((prev) => {
       const updatedArray = [...accomodationSectionStructure[item]];
@@ -937,7 +939,7 @@ export function EnumeratorFormProvider({ children }) {
     if (isNaN(formattedNumber) || formattedNumber.length < 1 || value === "") {
       return "";
     } else {
-      console.log(formattedNumber.toLocaleString());
+      // console.log(formattedNumber.toLocaleString());
       return formattedNumber.toLocaleString();
     }
   };
@@ -1207,14 +1209,14 @@ export function EnumeratorFormProvider({ children }) {
           }
         })
         .catch((error) => {
-          console.log("error:", error);
+          // console.log("error:", error);
           secureLocalStorage.clear();
           setUser(null);
           setIsLoggedIn(false);
           return navigate("/");
         });
     } catch (err) {
-      console.log("error:", err);
+      // console.log("error:", err);
       secureLocalStorage.clear();
       setUser(null);
       setIsLoggedIn(false);
@@ -1223,7 +1225,7 @@ export function EnumeratorFormProvider({ children }) {
   };
   const updateTransportTab = useCallback(
     (data) => {
-      console.log(data);
+      // console.log(data);
       let routes = {};
       data[0].routes.map((route) => {
         routes[`${route.start} to ${route.end}`] = {
@@ -1384,7 +1386,7 @@ export function EnumeratorFormProvider({ children }) {
 
   // Save form if any change is made
   useEffect(() => {
-    console.log(state);
+    // console.log(state);
     backgroundSave();
     secureLocalStorage.setItem("tp", state.transportSectionStructure);
   }, [state]);
