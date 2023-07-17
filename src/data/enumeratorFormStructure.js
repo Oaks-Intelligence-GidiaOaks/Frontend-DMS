@@ -62,19 +62,14 @@ const beanTypes = ["White beans", "Brown beans"];
 const garriTypes = ["White Garri", "Yellow Garri"];
 
 const fishList = [
+  "Titus",
+  "Mackerel",
+  "Kote",
+  "Scrumbia",
+  "Tilapia",
+  "Smoked fish",
   "Catfish",
   "Croaker",
-  "Titus/Mackerel",
-  "Kote/Horse Mackerel",
-  "Shawa/ Herring",
-  "Panla/ Hake Fish",
-  "Tilapia",
-  "Sardine",
-  "Shinney",
-  "Scumbia",
-  "Takwaso",
-  "Smoked",
-  "Other",
 ];
 const beefList = ["Small Chunks", "Large Chunks"];
 const chickenList = ["Full Chicken", "Lap", "Chest", "Wings"];
@@ -118,6 +113,15 @@ const singleFieldCommodityInputs = [
 ];
 
 const cupSizes = [
+  "Abia State Approved Cup",
+  "Gino Tin",
+  "Ceramic Cup",
+  "Peak Milk Tin",
+  "Kongo",
+  "Small Bowl Plate",
+];
+
+const riceCupSizes = [
   "Abia State Approved Cup",
   "Gino Tin",
   "Ceramic Cup",
@@ -176,6 +180,7 @@ export {
   fishList,
   fishSizes,
   cupSizes,
+  riceCupSizes,
   beefList,
   chickenList,
   turkeyList,

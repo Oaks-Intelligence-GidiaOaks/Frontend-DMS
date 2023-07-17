@@ -377,7 +377,6 @@ function Reports() {
       <p className="text-[14px] w-full mb-10 text-gray-500">
         <span className="font-bold">NOTE</span>: Submit button will only be
         active once the progress bar at the top of this page is complete.
-        {console.log(progressPercentage)}
       </p>
       <button
         disabled={progressPercentage !== 100 || isSubmitting}

@@ -21,7 +21,6 @@ const FormMultipleSelect = ({
 
   const handleChange = (selectedOption) => {
     setValue(selectedOption);
-    // console.log(selectedOption);
     onChange(selectedOption);
   };
 

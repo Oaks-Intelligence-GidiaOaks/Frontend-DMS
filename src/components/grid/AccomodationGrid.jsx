@@ -81,7 +81,7 @@ const AccomodationGrid = ({ data }) => {
           })
           .catch((err) => console.error(err));
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
   };

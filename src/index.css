@@ -187,11 +187,11 @@ input[type="radio"]:checked {
   border-bottom-right-radius: 6px;
 }
 .profile-bg {
-  background-image: url("public/profile-bg.svg");
+  background-image: url("/profile-bg.svg");
   background-size: cover;
 }
 .profile-btn-bg {
-  background-image: url("public/profile-bg.svg");
+  background-image: url("/profile-bg.svg");
   background-position: 100% right;
   background-size: cover;
 }

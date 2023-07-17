@@ -16,6 +16,7 @@ import {
   fishSizes,
   garriTypes,
   riceBrands,
+  riceCupSizes,
   tomatoBagSizes,
   tomatoBasketSizes,
   tomatoSeedSizes,
@@ -95,7 +96,10 @@ function Food() {
                         )} */}
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {item} - {type.split("-").join(" ")}
+                            Price of {item} - {type === "50-kg" && "1 Bag"}{" "}
+                            {type === "50-kg"
+                              ? `(${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -124,7 +128,7 @@ function Food() {
                           <div className="flex flex-col gap-4">
                             <p>Specify size of cup</p>
                             <DropDownMenu
-                              list={cupSizes}
+                              list={riceCupSizes}
                               handleChange={handleChange}
                               item={item}
                               type={type}
@@ -157,7 +161,9 @@ function Food() {
                         <div className="flex flex-col gap-4">
                           <p>
                             Specify Brand of {item}, for{" "}
-                            {type.split("-").join(" ")} above
+                            {type === "50-kg"
+                              ? `1 Bag (${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}
                           </p>
                           <DropDownMenu
                             list={riceBrands.filter(
@@ -220,7 +226,10 @@ function Food() {
                         )} */}
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {item} - {type.split("-").join(" ")}
+                            Price of {item} - {type === "50-kg" && "1 Bag"}{" "}
+                            {type === "50-kg"
+                              ? `(${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}{" "}
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -281,7 +290,10 @@ function Food() {
                         )}
                         <div className="flex flex-col gap-4">
                           <p>
-                            Specify type of {item} - {type.split("-").join(" ")}{" "}
+                            Specify type of {item}, for{" "}
+                            {type === "50-kg"
+                              ? `1 Bag (${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}
                           </p>
                           <DropDownMenu
                             list={beanTypes.filter(
@@ -357,7 +369,10 @@ function Food() {
                         )} */}
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {item} - {type.split("-").join(" ")}
+                            Price of {item} - {type === "50-kg" && "1 Bag"}{" "}
+                            {type === "50-kg"
+                              ? `(${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}{" "}
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -418,7 +433,10 @@ function Food() {
                         )}
                         <div className="flex flex-col gap-4">
                           <p>
-                            Specify type of {item} - {type.split("-").join(" ")}{" "}
+                            Specify type of {item}, for{" "}
+                            {type === "50-kg"
+                              ? `1 Bag (${type.split("-").join(" ")})`
+                              : type.split("-").join(" ")}
                           </p>
                           <DropDownMenu
                             list={garriTypes.filter(
@@ -484,7 +502,6 @@ function Food() {
                             section={"foodSectionStructure"}
                             i={0}
                           />
-                          {console.log(foodForm[item]["prices"][0]["type"])}
                         </div>
                         <div className="flex flex-col gap-4">
                           <p>

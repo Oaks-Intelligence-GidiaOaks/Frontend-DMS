@@ -91,7 +91,6 @@ const ChangePassword = () => {
             }
           })
           .catch((err) => {
-            console.log(err);
             if (err.response.data.message === "old password do not match") {
               setError("Old password is not correct.");
             } else {
@@ -102,7 +101,6 @@ const ChangePassword = () => {
           })
           .finally(() => setIsLoading(false));
       } catch (error) {
-        console.log(err);
         setIsLoading(false);
         setError(
           "Error changing your password, please check your network and try again."
