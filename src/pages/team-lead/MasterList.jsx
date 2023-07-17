@@ -17,16 +17,22 @@ const MasterList = () => {
   const maxDate = new Date(new Date().getFullYear(), new Date().getMonth(), 27);
 
   useEffect(() => {
-    axios
-      .get(
-        `form_response/master_list_data?startDateFilter=${startDateValue}&endDateFilter=${endDateValue}&page=${pageNo}`
-      )
-      .then((res) => {
-        setMasterList(res.data.forms);
-        setTotalDataCount(res.data.total);
-      })
-      .catch((err) => console.log(err));
-  }, [pageNo, endDateValue]);
+    try {
+      setMasterList(null);
+      setNewMaster(null);
+      axios
+        .get(
+          `form_response/master_list_data?startDateFilter=${startDateValue}&endDateFilter=${endDateValue}&page=${pageNo}`
+        )
+        .then((res) => {
+          setMasterList(res.data.forms);
+          setTotalDataCount(res.data.total);
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.error(err);
+    }
+  }, [endDateValue, pageNo]);
 
   useEffect(() => {
     async function transformData() {
@@ -45,7 +51,6 @@ const MasterList = () => {
               created_by,
               updated_at,
               _id,
-              
             } = master;
 
             const foodObj = await foodItems
@@ -107,7 +112,7 @@ const MasterList = () => {
                 [`Price of ${item?.name}`]: item.price ?? "N/A",
                 [`Brand of ${item?.name}`]:
                   item?.brand?.length < 1 ? "N/A" : item?.brand,
-                  [`Size of ${item.name}`]: item?.size ?? "N/A"
+                [`Size of ${item.name}`]: item?.size ?? "N/A",
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -176,7 +181,6 @@ const MasterList = () => {
       </div>
     );
   };
-
 
   const handleStartDateChange = (args) => {
     let formatDate = new Date(args.value).toISOString().split("T")[0];

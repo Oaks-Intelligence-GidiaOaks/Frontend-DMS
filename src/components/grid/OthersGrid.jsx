@@ -39,7 +39,6 @@ const OthersGrid = ({ data }) => {
       id: item.created_by?.id,
       State: item.state,
       LGA: item.lga,
-      // name: item.name,
       name: formatProductName(item.name),
       price: item.price === 0 ? "N/A" : item.price,
       brand: item.brand.length > 1 ? item.brand : "N/A",
