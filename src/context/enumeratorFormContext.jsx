@@ -349,7 +349,7 @@ export function EnumeratorFormProvider({ children }) {
 
   // If user has saved changes use changes else use initial state
   const [state, setState] = useState(
-    user.LGA.includes(savedState.currentLGA) ? savedState : initialState
+    user.LGA.includes(savedState?.currentLGA) ? savedState : initialState
   );
 
   const [contextLgaRoutes, setContextLgaRoutes] = useState(null);
