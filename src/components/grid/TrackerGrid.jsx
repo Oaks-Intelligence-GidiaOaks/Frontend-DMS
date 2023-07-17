@@ -47,6 +47,8 @@ const TrackerGrid = ({ data }) => {
     return rowData ? Number(rowData.index) + 1 : "";
   };
 
+  console.log(tableData, {tableData});
+
   return data ? (
     <GridComponent
       dataSource={tableData}

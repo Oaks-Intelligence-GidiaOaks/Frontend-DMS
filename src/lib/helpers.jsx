@@ -21,12 +21,20 @@ export const masterHeaderText = (header) => {
     headerText = "Brand of Rice (1 Cup)";
   }
 
+  if (header === "Size of Rice_1-cup") {
+    headerText = "Size of Rice (1 Cup)";
+  }
+
   if (header === "Price of Rice_50-kg") {
     headerText = "Price of Rice (50kg)";
   }
 
   if (header === "Brand of Rice_50-kg") {
     headerText = "Brand of Rice(50kg)";
+  }
+
+  if (header === "Size of Rice_50-kg") {
+    headerText = "Size of Rice(50kg)";
   }
 
   if (header === "Price of Beans_1-cup") {
@@ -37,12 +45,20 @@ export const masterHeaderText = (header) => {
     headerText = "Brand of Beans (1 Cup)";
   }
 
+  if (header === "Size of Beans_1-cup") {
+    headerText = "Size of Beans (1 Cup)";
+  }
+
   if (header === "Price of Beans_50-kg") {
     headerText = "Price of Beans (50kg)";
   }
 
   if (header === "Brand of Beans_50-kg") {
     headerText = "Brand of Beans (50 kg)";
+  }
+
+  if (header === "Size of Beans_50-kg") {
+    headerText = "Size of Beans (50 kg)";
   }
 
   if (header === "Price of Garri_1-cup") {
@@ -53,12 +69,20 @@ export const masterHeaderText = (header) => {
     headerText = "Brand of Garri (1 Cup)";
   }
 
+  if (header === "Size of Garri_1-cup") {
+    headerText = "Size of Garri (1 Cup)";
+  }
+
   if (header === "Price of Garri_50-kg") {
     headerText = "Price of Garri (1 Cup)";
   }
 
   if (header === "Brand of Garri_50-kg") {
     headerText = "Brand of Garri (50 kg)";
+  }
+
+  if (header === "Size of Garri_50-kg") {
+    headerText = "Size of Garri (50 kg)";
   }
 
   if (header === "Price of Tomatoes_4-seeds") {
@@ -69,6 +93,10 @@ export const masterHeaderText = (header) => {
     headerText = "Brand of Tomatoes (4 seeds)";
   }
 
+  if (header === "Size of Tomatoes_4-seeds") {
+    headerText = "Size of Tomatoes (4 seeds)";
+  }
+
   if (header === "Price of Tomatoes_big-basket") {
     headerText = "Price of Tomatoes (big basket)";
   }
@@ -77,13 +105,10 @@ export const masterHeaderText = (header) => {
     headerText = "Brand of Tomatoes (big basket)";
   }
 
-  if (header === "Price of Rice_1-cup") {
-    headerText = "Price of Rice (1 Cup)";
+  if (header === "Size of Tomatoes_big-basket") {
+    headerText = "Size of Tomatoes (big basket)";
   }
 
-  if (header === "Price of Rice_1-cup") {
-    headerText = "Price of Rice (1 Cup)";
-  }
   if (header === "hours_per_week") {
     headerText = "Hours Per Week";
   }

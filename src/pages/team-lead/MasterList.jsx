@@ -3,24 +3,30 @@ import React, { useEffect, useState } from "react";
 import MasterGrid from "../../components/grid/MasterGrid";
 import axios from "axios";
 import { arrangeTime } from "../../lib/helpers";
+import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 
 const MasterList = () => {
   const [masterList, setMasterList] = useState(null);
   const [newMaster, setNewMaster] = useState(null);
+  const [startDateValue, setStartDateValue] = useState("");
+  const [endDateValue, setEndDateValue] = useState("");
   let [totalDataCount, setTotalDataCount] = useState(null);
   let [pageNo, setPageNo] = useState(1);
+
+  const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 7);
+  const maxDate = new Date(new Date().getFullYear(), new Date().getMonth(), 27);
 
   useEffect(() => {
     axios
       .get(
-        `form_response/master_list_data?startDateFilter=${``}&endDateFilter=${``}&page=${pageNo}`
+        `form_response/master_list_data?startDateFilter=${startDateValue}&endDateFilter=${endDateValue}&page=${pageNo}`
       )
       .then((res) => {
         setMasterList(res.data.forms);
         setTotalDataCount(res.data.total);
       })
       .catch((err) => console.log(err));
-  }, [pageNo]);
+  }, [pageNo, endDateValue]);
 
   useEffect(() => {
     async function transformData() {
@@ -39,6 +45,7 @@ const MasterList = () => {
               created_by,
               updated_at,
               _id,
+              
             } = master;
 
             const foodObj = await foodItems
@@ -47,6 +54,7 @@ const MasterList = () => {
                   food?.price === "0" ? "N/A" : food?.price,
                 [`Brand of ${food?.name}`]:
                   food?.brand < 1 ? "N/A" : food?.brand,
+                [`Size of ${food?.name}`]: food?.size,
               }))
               ?.reduce((acc, obj) => {
                 return {
@@ -99,6 +107,7 @@ const MasterList = () => {
                 [`Price of ${item?.name}`]: item.price ?? "N/A",
                 [`Brand of ${item?.name}`]:
                   item?.brand?.length < 1 ? "N/A" : item?.brand,
+                  [`Size of ${item.name}`]: item?.size ?? "N/A"
               }))
               ?.reduce((acc, obj) => {
                 return { ...acc, ...obj };
@@ -168,6 +177,22 @@ const MasterList = () => {
     );
   };
 
+
+  const handleStartDateChange = (args) => {
+    let formatDate = new Date(args.value).toISOString().split("T")[0];
+
+    setStartDateValue(`${formatDate}`);
+  };
+
+  const handleEndDateChange = (args) => {
+    let formatDate = new Date(args.value).toISOString().split("T")[0];
+
+    setEndDateValue(`${formatDate}`);
+  };
+
+  const handlePageNumberChange = (no) => {
+    setPageNo(no);
+  };
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
@@ -177,23 +202,34 @@ const MasterList = () => {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="rounded justify-between bg-oaksyellow p-3 flex xs:flex-1 md:flex-initial items-center gap-4 text-xs">
           <p className="text-white whitespace-nowrap">Master List</p>
-          {/* <p className="rounded p-1  bg-white">585</p> */}
         </div>
-
-        {/* <div className="flex p-3 lg:ml-8 items-center gap-6 w-fit rounded bg-white border border-oaksyellow">
-          <p className="">Submissions</p>
-          <p className="p-1 bg-gray-100 rounded text-sm">667</p>
-        </div>
-
-        <div className="rounded bg-white border border-oaksyellow  flex items-center p-3 gap-10 xs:gap-6 lg:ml-auto cursor-pointer">
-          <p>No response</p>
-          <p className="bg-gray-100 p-1 rounded text-sm px-2">18</p>
-        </div> */}
       </div>
 
-      {/* <div>
-        <CategoryTab text="Submit" Icon={Download} />
-      </div> */}
+      <div className="flex  items-center justify-end mr-auto ">
+        <div className="md:w-32 xs:w-full">
+          <p className="mb-2 text-center">From</p>
+          <div className="border px-2 rounded">
+            <DatePickerComponent
+              cssClass="custom-datepicker"
+              id="datepicker"
+              change={handleStartDateChange}
+            />
+          </div>
+        </div>
+
+        <div className="border border-gray-900 mx-3 w-6 my-auto" />
+
+        <div className="md:w-32 xs:w-full">
+          <p className="mb-2 text-center">To</p>
+          <div className="border px-2 rounded">
+            <DatePickerComponent
+              change={handleEndDateChange}
+              id="datepicker"
+              // value={endDateValue}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* table */}
       <div className="bg-white h-80 w-full text-[6px]">

@@ -35,7 +35,7 @@ function EnumeratorLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorResponse("");
-    setFieldErrors({ email: "", password: "" });
+    setFieldErrors({ email: "" });
 
     // let pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     let errorFound = false;
@@ -51,27 +51,27 @@ function EnumeratorLogin() {
 
     // Check password value
 
-    if (!loginForm.password.length) {
-      errorFound = true;
-      setFieldErrors((prev) => ({
-        ...prev,
-        password: "Password is empty.",
-      }));
-    }
-    if (loginForm.password.length > 0 && loginForm.password.length < 6) {
-      errorFound = true;
-      setFieldErrors((prev) => ({
-        ...prev,
-        password: "Please enter valid password.",
-      }));
-    }
+    // if (!loginForm.password.length) {
+    //   errorFound = true;
+    //   setFieldErrors((prev) => ({
+    //     ...prev,
+    //     password: "Password is empty.",
+    //   }));
+    // }
+    // if (loginForm.password.length > 0 && loginForm.password.length < 6) {
+    //   errorFound = true;
+    //   setFieldErrors((prev) => ({
+    //     ...prev,
+    //     password: "Please enter valid password.",
+    //   }));
+    // }
 
     // Check error messages
     if (errorFound) return;
 
     const data = {
       id: loginForm.userId,
-      password: loginForm.password,
+      //   password: loginForm.password,
     };
 
     // Validate entered email
@@ -79,80 +79,89 @@ function EnumeratorLogin() {
       setFieldErrors({ userId: "", password: "" });
       setIsLoading(true);
 
-      axios
-        .post("login", data, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((res) => res.data)
-        .then(({ user, ...others }) => {
-          // if (!user) {
-          //   setIsLoading(false);
+      try {
+        axios
+          .post("test_login", data, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .then((res) => res.data)
+          .then(({ user, ...others }) => {
+            if (!user) {
+              setIsLoading(false);
 
-          //   return setErrorResponse(
-          //     "Invalid ID or Password, please try again"
-          //   );
-          // }
+              return setErrorResponse(
+                "Invalid ID or Password, please try again"
+              );
+            }
 
-          // setIsLoading(false);
-          // if (others.message === "Invalid Id or password, please try again") {
-          //   return setErrorResponse(
-          //     "Invalid ID or Password, please try again"
-          //   );
-          // }
-          // if (others.message === "Invalid password, please try again") {
-          //   return setErrorResponse(
-          //     "Invalid password, please input correct password."
-          //   );
-          // }
-          // console.log(others);
-          // console.log(others.status);
-          // if (
-          //   others &&
-          //   others.message &&
-          //   others.message.includes("disabled")
-          // ) {
-          //   return setErrorResponse(others.message);
-          // }
+            setIsLoading(false);
+            if (others.message === "Invalid Id or password, please try again") {
+              return setErrorResponse(
+                "Invalid ID or Password, please try again"
+              );
+            }
+            if (others.message === "Invalid password, please try again") {
+              return setErrorResponse(
+                "Invalid password, please input correct password."
+              );
+            }
+            // console.log(others);
+            // console.log(others.status);
+            if (
+              others &&
+              others.message &&
+              others.message.includes("disabled")
+            ) {
+              return setErrorResponse(others.message);
+            }
 
-          setUser({ ...user, ...others });
-          setIsLoggedIn(true);
-          setIsLoading(false);
+            setUser({ ...user, ...others });
+            setIsLoggedIn(true);
 
-          if (user.role === "enumerator") {
-            secureLocalStorage.setItem("oius", "true");
-            secureLocalStorage.setItem(
-              "user",
-              JSON.stringify({ ...user, ...others })
+            if (user.role === "enumerator") {
+              secureLocalStorage.setItem("oius", "true");
+              secureLocalStorage.setItem(
+                "user",
+                JSON.stringify({ ...user, ...others })
+              );
+              navigate("/form");
+            }
+
+            if (user.role === "team_lead") {
+              secureLocalStorage.setItem("oius", "true");
+              secureLocalStorage.setItem(
+                "user",
+                JSON.stringify({ ...user, ...others })
+              );
+              navigate("/home");
+            }
+
+            if (user.role === "admin" || user.role === "super_admin") {
+              secureLocalStorage.setItem("oius", "true");
+              secureLocalStorage.setItem(
+                "user",
+                JSON.stringify({ ...user, ...others })
+              );
+              navigate("/admin/home");
+            }
+          })
+          .catch((error) => {
+            console.log("error:", error);
+            setIsLoading(false);
+            return setErrorResponse(
+              error.response.data.message ??
+                "Can't connect to the server at the moment please check your network and try again."
             );
-            navigate("/form");
-          }
-
-          if (user.role === "team_lead") {
-            secureLocalStorage.setItem("oius", "true");
-            secureLocalStorage.setItem(
-              "user",
-              JSON.stringify({ ...user, ...others })
-            );
-            navigate("/home");
-          }
-
-          if (user.role === "admin" || user.role === "super_admin") {
-            secureLocalStorage.setItem("oius", "true");
-            secureLocalStorage.setItem(
-              "user",
-              JSON.stringify({ ...user, ...others })
-            );
-            navigate("admin/home");
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setIsLoading(false);
-          const errorMessage = error.response.data.message || error.message;
-          setErrorResponse(errorMessage);
-        });
+          });
+      } catch (err) {
+        setIsLoading(false);
+        setErrorResponse(
+          "Can't connect to the server at the moment please check your network and try again."
+        );
+        console.log("error:", err);
+      }
     }
   };
 
@@ -194,7 +203,7 @@ function EnumeratorLogin() {
             />
             <p className="text-red-500 text-xs mt-1">{fieldErrors.userId}</p>
           </div>
-          <div className="flex flex-col mt-4">
+          {/* <div className="flex flex-col mt-4">
             <label htmlFor="password" className="text-[14px]">
               Password
             </label>
@@ -223,7 +232,7 @@ function EnumeratorLogin() {
               </button>
             </div>
             <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
-          </div>
+          </div> */}
           <p className="text-red-500 text-xs mt-7">{errorResponse}</p>
 
           <button
