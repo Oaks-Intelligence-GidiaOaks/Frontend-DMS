@@ -1,5 +1,6 @@
 import React from "react";
 import { ResponsiveLine } from "@nivo/line";
+import { format } from "date-fns";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 andtrac
@@ -7,38 +8,38 @@ import { ResponsiveLine } from "@nivo/line";
 // website examples showcase many properties,
 // you'll often use just a few of them.
 
-const formatTime = (time) => {
-  // const dateOject = new Date(time);
+// const formatTime = (time) => {
+//   // const dateOject = new Date(time);
 
-  const getReferenceTime = () => {
-    const currentDate = new Date();
+//   const getReferenceTime = () => {
+//     const currentDate = new Date();
 
-    const currentDay = currentDate.getDay();
+//     const currentDay = currentDate.getDay();
 
-    const daysToAdd = currentDay <= 3 ? 3 - currentDay : 10 - currentDay;
+//     const daysToAdd = currentDay <= 3 ? 3 - currentDay : 10 - currentDay;
 
-    currentDate.setDate(currentDate.getDate() + daysToAdd);
+//     currentDate.setDate(currentDate.getDate() + daysToAdd);
 
-    currentDate.setHours(0, 0, 0, 0);
+//     currentDate.setHours(0, 0, 0, 0);
 
-    return currentDate.toISOString();
-  };
+//     return currentDate.toISOString();
+//   };
 
-  const referenceTime = new Date(getReferenceTime()).getTime();
-  const submissionTime = new Date(time).getTime();
+//   const referenceTime = new Date(getReferenceTime()).getTime();
+//   const submissionTime = new Date(time).getTime();
 
-  const submissionDelta = submissionTime - referenceTime;
+//   const submissionDelta = submissionTime - referenceTime;
 
-  return `${submissionDelta}`;
-};
+//   return `${submissionDelta}`;
+// };
 
-const arrangeTime = (time) => {
-  const passedDate = new Date(time);
-  const formattedDate = passedDate.toLocaleDateString();
-  const formattedTime = passedDate.toLocaleDateString();
+// const arrangeTime = (time) => {
+//   const passedDate = new Date(time);
+//   const formattedDate = passedDate.toLocaleDateString();
+//   const formattedTime = passedDate.toLocaleDateString();
 
-  return `${formattedDate} ${formattedTime}`;
-};
+//   return `${formattedDate} ${formattedTime}`;
+// };
 
 const MeshedLineChart = ({ data: MeshedLineD }) => {
   const transformedData =
@@ -46,10 +47,14 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
     MeshedLineD.map((item) => {
       let id = item.lga;
 
+      console.log(item, "ITEM");
       let data = item.weeklyValues
+
         .map((obj) => ({
           x: `Week ${obj.weekNo}`,
-          y: formatTime(obj.submissionTime),
+
+          y: new Date(obj.submissionTime).getTime(),
+          
         }))
         .sort((a, b) => (a.x > b.x ? 1 : -1));
 
@@ -60,7 +65,7 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
     <ResponsiveLine
       className="responsive-line-chart"
       data={transformedData}
-      margin={{ top: 50, right: 110, bottom: 50, left: 70 }}
+      margin={{ top: 50, right: 110, bottom: 50, left: 120 }}
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
@@ -85,6 +90,13 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
         tickSize: 2,
         tickPadding: 2,
         tickRotation: 0,
+        format: (value) => format(new Date(value), "MM/dd/yyyy hh:mm a"), 
+        // format: (value) => format(new Date(value), "HH:mm"),
+        // format: (value) => {
+        //   const date = format(new Date(value), "MM/dd/yyyy"); 
+        //   const time = format(new Date(value), "HH:mm"); 
+        //   return `${date} ${time}`;
+        // },
         // legend: "Submission time",
         legendOffset: -40,
         legendPosition: "middle",
@@ -134,3 +146,4 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
 };
 
 export default MeshedLineChart;
+

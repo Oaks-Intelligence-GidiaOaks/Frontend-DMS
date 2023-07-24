@@ -43,7 +43,7 @@ const FoodGrid = ({ data: foodRowss }) => {
       id: item.created_by?.id,
       State: item?.state,
       lga: item?.lga,
-      name: item?.name,
+      name:formatProductName(item?.name),
       brand: item?.brand,
       size: item?.size,
       price: item?.price,
