@@ -332,7 +332,7 @@ function Reports() {
                         }}
                       />
                     </div>
-                    {!attachedImage.url && (
+                    {/* {!attachedImage.url && (
                       <label
                         htmlFor="image-picker"
                         className="w-fit bg-oaksgreen rounded py-1 cursor-pointer"
@@ -366,7 +366,7 @@ function Reports() {
                       className="hidden"
                       id="image-picker"
                       onChange={handleFile}
-                    />
+                    /> */}
                   </div>
                 )}
               </>
