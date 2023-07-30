@@ -742,7 +742,8 @@ function Food() {
                       <>
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {type.split("-").join(" ")} of {item}
+                            {/* Price of {type.split("-").join(" ")} of {item} */}
+                            Price of {item}
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -767,7 +768,7 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
-                          <p>Specify type of Chicken</p>
+                          <p>Specify size of Chicken</p>
                           <DropDownMenu
                             list={chickenList.filter(
                               (el) =>
@@ -789,7 +790,8 @@ function Food() {
                       <>
                         <div className="flex flex-col gap-4">
                           <p>
-                            Price of {type.split("-").join(" ")} of {item}
+                            {/* Price of {type.split("-").join(" ")} of {item} */}
+                            Price of {item}
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
@@ -814,7 +816,7 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
-                          <p>Specify type of Turkey</p>
+                          <p>Specify size of Turkey</p>
                           <DropDownMenu
                             list={turkeyList.filter(
                               (el) =>
