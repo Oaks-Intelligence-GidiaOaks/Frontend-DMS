@@ -47,7 +47,7 @@ const MasterGrid = ({ data: masterRow }) => {
             headerText={masterHeaderText(item)}
             key={item}
             field={item}
-            width={180 + item.length}
+            width={item === "Note" ? 300 + item.length : 180 + item.length}
           />
         ))
       : [];
@@ -87,6 +87,8 @@ const MasterGrid = ({ data: masterRow }) => {
           // allowEditing={true}
           // editSettings={editSettings}
           allowGrouping={true}
+          allowTextWrap={true}
+          textWrapSettings={{ wrapMode: "Content" }}
           height={300}
         >
           <ColumnsDirective>

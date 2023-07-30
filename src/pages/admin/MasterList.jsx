@@ -55,6 +55,7 @@ const MasterList = () => {
               created_by,
               _id,
               updated_at,
+              questions,
             } = master;
 
             const clothingsObj = await clothings
@@ -131,6 +132,9 @@ const MasterList = () => {
                 return { ...acc, ...obj };
               }, {});
 
+            const question = questions?.[0];
+            const note = question?.note || "N/A";
+
             const transformedObj = {
               // S_N: i + 1,
               Date: arrangeTime(updated_at),
@@ -150,6 +154,7 @@ const MasterList = () => {
               ...electricityObj,
               Others: "commodities",
               ...othersObj,
+              Note: note,
             };
 
             return transformedObj;

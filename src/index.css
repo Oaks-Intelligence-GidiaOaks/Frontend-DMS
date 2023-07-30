@@ -256,3 +256,6 @@ input.e-input:focus {
   border: none !important;
   outline: none !important;
 }
+td[aria-colindex="96"] {
+  font-size: 10px !important;
+}
