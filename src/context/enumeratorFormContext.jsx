@@ -356,8 +356,9 @@ export function EnumeratorFormProvider({ children }) {
 
   // check if commodity fields to fill are complete
   if (
-    Object.keys(savedState.commoditySectionStructure).length <
-    Object.keys(initialState.commoditySectionStructure).length
+    savedState &&
+    Object.keys(savedState?.commoditySectionStructure).length <
+      Object.keys(initialState?.commoditySectionStructure).length
   ) {
     savedState.commoditySectionStructure = {
       ...initialState.commoditySectionStructure,
