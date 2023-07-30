@@ -757,6 +757,36 @@ const Commodity = () => {
                         </div>
                       </>
                     )}
+                    {item === "Diesel/AGO" && (
+                      <>
+                        <div className="flex flex-col gap-4">
+                          <p>
+                            Price of {item} ({type.split("-").join(" ")})
+                          </p>
+                          <div className="flex gap-2 relative border-b border-solid border-mid-gray">
+                            <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
+                              ₦
+                            </span>
+                            <input
+                              type="text"
+                              placeholder="Enter answer"
+                              value={commodityForm[item][type][0]["price"]}
+                              onChange={(e) =>
+                                setCommodityItemValue({
+                                  item,
+                                  type,
+                                  valueTitle: "price",
+                                  value: handleValue(e.target.value),
+                                  i: 0,
+                                })
+                              }
+                              onWheel={(e) => e.target.blur()}
+                              className="flex-1 pl-8 py-2 outline-primary-green"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
                 {/* Add item button */}

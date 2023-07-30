@@ -62,22 +62,29 @@ const beanTypes = ["White beans", "Brown beans"];
 const garriTypes = ["White Garri", "Yellow Garri"];
 
 const fishList = [
-  "Titus",
-  "Mackerel",
-  "Kote",
-  "Scrumbia",
-  "Tilapia",
-  "Smoked fish",
-  "Catfish",
-  "Croaker",
+  // "Titus",
+  // "Mackerel",
+  // "Kote",
+  // "Scrumbia",
+  // "Tilapia",
+  // "Smoked fish",
+  // "Catfish",
+  // "Croaker",
+  "1 Kilo",
 ];
 const beefList = ["Small Chunks", "Large Chunks"];
-const chickenList = ["Full Chicken", "Lap", "Chest", "Wings"];
-const turkeyList = ["Lap", "Wings"];
+const chickenList = [
+  // "Full Chicken", "Lap", "Chest", "Wings",
+  "1 Kilo(Kg)",
+];
+const turkeyList = [
+  // "Lap", "Wings"
+  "1 Kilo(Kg)",
+];
 const breadList = ["Family Size", "Medium", "Small"];
 const EggsList = ["Large", "Small"];
-const TomatoSeedList = ["Small", "Medium", "Large"];
-const TomatoBasketList = ["Small", "Medium", "Large"];
+const TomatoSeedList = ["Small", "Large"];
+const TomatoBasketList = ["Small", "Large"];
 const YamList = ["Small", "Medium", "Large"];
 const GroundnutOilList = [
   "Bottle",
@@ -110,34 +117,35 @@ const singleFieldCommodityInputs = [
   "Cooking Gas",
   "Firewood",
   "Petrol/PMS",
+  "Diesel/AGO",
 ];
 
 const cupSizes = [
   "Abia State Approved Cup",
   "Gino Tin",
-  "Ceramic Cup",
   "Peak Milk Tin",
-  "Kongo",
-  "Small Bowl Plate",
+  // "Ceramic Cup",
+  // "Kongo",
+  // "Small Bowl Plate",
 ];
 
 const riceCupSizes = [
   "Abia State Approved Cup",
   "Gino Tin",
-  "Ceramic Cup",
   "Peak Milk Tin",
-  "Kongo",
-  "Rabin Shakada",
-  "Small Bowl Plate",
+  // "Ceramic Cup",
+  // "Kongo",
+  // "Rabin Shakada",
+  // "Small Bowl Plate",
 ];
 
 const clothSizes = ["Small", "Medium", "Large"];
 const fishSizes = ["Small", "Medium", "Large"];
-const tomatoSeedSizes = ["Small", "Medium", "Large"];
+const tomatoSeedSizes = ["Small", "Large"];
 
 const tomatoTypes = ["Fresh Tomatoes", "Dry Tomatoes"];
 const tomatoBasketSizes = ["Small", "Large", "Crate"];
-const tomatoBagSizes = ["Small", "Medium", "Large"];
+const tomatoBagSizes = ["Small", "Large"];
 
 const firewoodBundleSizes = ["Small", "Medium", "Large"];
 

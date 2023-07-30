@@ -231,6 +231,13 @@ export function EnumeratorFormProvider({ children }) {
             },
           ],
         },
+        "Diesel/AGO": {
+          "1-Litre": [
+            {
+              price: "",
+            },
+          ],
+        },
       },
       clothingSectionStructure: {
         Male: {
@@ -346,6 +353,17 @@ export function EnumeratorFormProvider({ children }) {
   );
 
   const savedState = JSON.parse(secureLocalStorage.getItem("oaks-enum-form"));
+
+  // check if commodity fields to fill are complete
+  if (
+    savedState &&
+    Object.keys(savedState?.commoditySectionStructure).length <
+      Object.keys(initialState?.commoditySectionStructure).length
+  ) {
+    savedState.commoditySectionStructure = {
+      ...initialState.commoditySectionStructure,
+    };
+  }
 
   // If user has saved changes use changes else use initial state
   const [state, setState] = useState(
