@@ -89,7 +89,7 @@ const MasterGrid = ({ data: masterRow }) => {
           allowGrouping={true}
           allowTextWrap={true}
           textWrapSettings={{ wrapMode: "Content" }}
-          height={300}
+          height={380}
         >
           <ColumnsDirective>
             <ColumnDirective
