@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../context";
 import { Rings } from "react-loader-spinner";
 import { Info, InfoOutlined } from "@mui/icons-material";
+import { BiErrorCircle } from "react-icons/bi";
 
 function Reports() {
   const {
@@ -274,14 +275,15 @@ function Reports() {
               </>
             )}
             {item === "Notes" && (
-              <>
+              <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-4">
                   <p>
-                    Do you want to leave any{" "}
-                    <span className="font-medium">comments</span>?
+                    Enter your <span className="font-medium">comments</span>{" "}
+                    below.
                   </p>
 
-                  <div className="flex flex-col gap-2">
+                  {/* Radio buttons for comments */}
+                  {/* <div className="flex flex-col gap-2">
                     {binaryQuestionValues.map((variant, i) => (
                       <div key={i} className="flex items-center">
                         <label
@@ -310,29 +312,35 @@ function Reports() {
                         </label>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
-                {reportsForm[item]["boolean"] && (
-                  <div className="flex flex-col gap-4">
-                    <p>Enter your comments below</p>
-                    <div className="flex gap-2 relative">
-                      <textarea
-                        type="text"
-                        placeholder="Enter notes here..."
-                        rows={7}
-                        className="flex-1 min-h-[100px] max-h-[240px] pl-2 py-2 outline-primary-green border border-solid border-mid-gray rounded-[10px]"
-                        value={reportsForm[item]["answer"]}
-                        onChange={(e) => {
-                          setReportsItemValue({
-                            item,
-                            value: true,
-                            valueTitle: "boolean",
-                            answer: e.target.value,
-                          });
-                        }}
-                      />
-                    </div>
-                    {/* {!attachedImage.url && (
+                {/* {reportsForm[item]["boolean"] && ( */}
+                <div className="flex flex-col gap-4">
+                  {/* <p>Enter your comments below</p> */}
+                  <div className="flex gap-2 relative flex-col">
+                    <textarea
+                      type="text"
+                      placeholder="Enter notes here..."
+                      rows={7}
+                      className="flex-1 min-h-[100px] max-h-[240px] pl-2 py-2 outline-primary-green border border-solid border-mid-gray rounded-[10px]"
+                      value={reportsForm[item]["answer"]}
+                      onChange={(e) => {
+                        setReportsItemValue({
+                          item,
+                          value: true,
+                          valueTitle: "boolean",
+                          answer: e.target.value,
+                        });
+                      }}
+                    />
+                    <p className="flex items-start gap-1 text-[14px] w-full text-gray-500">
+                      <BiErrorCircle size={18} />
+                      <span className="align-top">
+                        This field is required and must be filled.
+                      </span>
+                    </p>
+                  </div>
+                  {/* {!attachedImage.url && (
                       <label
                         htmlFor="image-picker"
                         className="w-fit bg-oaksgreen rounded py-1 cursor-pointer"
@@ -367,9 +375,9 @@ function Reports() {
                       id="image-picker"
                       onChange={handleFile}
                     /> */}
-                  </div>
-                )}
-              </>
+                </div>
+                {/* )} */}
+              </div>
             )}
           </div>
         ))}

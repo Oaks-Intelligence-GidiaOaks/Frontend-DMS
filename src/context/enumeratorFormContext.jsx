@@ -342,7 +342,8 @@ export function EnumeratorFormProvider({ children }) {
           hours: "",
         },
         Notes: {
-          boolean: "",
+          // boolean: "",
+          answer: "",
         },
       },
       attachedImage: {
@@ -406,7 +407,7 @@ export function EnumeratorFormProvider({ children }) {
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
-    // console.log(formSubmission);
+    console.log(formSubmission);
     setState((prev) => ({
       ...prev,
       isSubmitting: true,
