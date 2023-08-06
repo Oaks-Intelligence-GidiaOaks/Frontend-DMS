@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../context";
 import { Rings } from "react-loader-spinner";
 import { Info, InfoOutlined } from "@mui/icons-material";
+import { BiErrorCircle } from "react-icons/bi";
 
 function Reports() {
   const {
@@ -316,7 +317,7 @@ function Reports() {
                 {/* {reportsForm[item]["boolean"] && ( */}
                 <div className="flex flex-col gap-4">
                   {/* <p>Enter your comments below</p> */}
-                  <div className="flex gap-2 relative">
+                  <div className="flex gap-2 relative flex-col">
                     <textarea
                       type="text"
                       placeholder="Enter notes here..."
@@ -332,6 +333,12 @@ function Reports() {
                         });
                       }}
                     />
+                    <p className="flex items-start gap-1 text-[14px] w-full text-gray-500">
+                      <BiErrorCircle size={18} />
+                      <span className="align-top">
+                        This field is required and must be filled.
+                      </span>
+                    </p>
                   </div>
                   {/* {!attachedImage.url && (
                       <label
