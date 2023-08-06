@@ -47,15 +47,15 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
     MeshedLineD.map((item) => {
       let id = item.lga;
 
-      console.log(item, "ITEM");
+      // console.log(item, "ITEM");
       let data = item.weeklyValues
+        .map((obj) => {
+          return {
+            x: `Week ${obj.weekNo}`,
 
-        .map((obj) => ({
-          x: `Week ${obj.weekNo}`,
-
-          y: new Date(obj.submissionTime).getTime(),
-          
-        }))
+            y: new Date(obj.submissionTime),
+          };
+        })
         .sort((a, b) => (a.x > b.x ? 1 : -1));
 
       return { id, data };
@@ -67,14 +67,21 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
       data={transformedData}
       margin={{ top: 50, right: 110, bottom: 50, left: 120 }}
       xScale={{ type: "point" }}
+      // yScale={{
+      //   type: "linear",
+      //   min: "auto",
+      //   max: "auto",
+      //   stacked: false,
+      //   reverse: false,
+      // }}
       yScale={{
-        type: "linear",
-        min: "auto",
-        max: "auto",
-        stacked: false,
-        reverse: false,
+        type: "time",
+        // format: "%Y-%m-%dT%H:%M:%SZ",
+        // precision: "day",
       }}
-      yFormat=" >-.2f"
+      // yFormat=" >-.2f"
+      // yFormat="time:%Y-%m-%dT%H:%M:%S%Z"
+      yFormat={(d) => formatDate(d)}
       curve="natural"
       axisTop={null}
       axisRight={null}
@@ -90,11 +97,12 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
         tickSize: 2,
         tickPadding: 2,
         tickRotation: 0,
-        format: (value) => format(new Date(value), "MM/dd/yyyy hh:mm a"), 
+        format: (d) => formatDate(d),
+        // format: (value) => format(new Date(value), "MM/dd/yyyy hh:mm a"),
         // format: (value) => format(new Date(value), "HH:mm"),
         // format: (value) => {
-        //   const date = format(new Date(value), "MM/dd/yyyy"); 
-        //   const time = format(new Date(value), "HH:mm"); 
+        //   const date = format(new Date(value), "MM/dd/yyyy");
+        //   const time = format(new Date(value), "HH:mm");
         //   return `${date} ${time}`;
         // },
         // legend: "Submission time",
@@ -139,11 +147,29 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
           },
         },
       ]}
+      tooltip={tooltipConfig}
     />
   ) : (
     <div className="h-32 grid place-items-center">No chart data..</div>
   );
 };
 
-export default MeshedLineChart;
+const formatDate = (date) => {
+  const options = {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    year: "numeric",
+    timeZone: "Africa/Lagos",
+    hour12: true,
+  };
 
+  return date.toLocaleDateString("en-US", options);
+};
+
+const tooltipConfig = {
+  format: (value) => formatDate(value),
+};
+
+export default MeshedLineChart;
