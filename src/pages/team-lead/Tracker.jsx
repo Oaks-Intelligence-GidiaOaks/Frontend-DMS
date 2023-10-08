@@ -4,9 +4,10 @@ import MeshedLineChart from "../../components/charts/MeshedLineChart";
 import CategoryTab from "../../components/CategoryTab";
 import { MeshedLineChartData } from "../../data/charts";
 import axios from "axios";
-import { Download } from "@mui/icons-material";
+import { Download, ClearOutlined } from "@mui/icons-material";
 import { useAuth } from "../../context";
 import { Loading } from "../../components/reusable";
+import { ClipLoader } from "react-spinners";
 
 const Tracker = () => {
   const {
@@ -14,7 +15,8 @@ const Tracker = () => {
   } = useAuth();
   const [trackerData, setTrackerData] = useState(null);
   const [timeOfSub, setTimeOfSub] = useState(null);
-
+  const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // console.log(trackerData);
 
@@ -41,6 +43,7 @@ const Tracker = () => {
     console.log("formattedData:", formattedData);
 
     try {
+      setIsLoading(true);
       axios
         .post(
           "form_response/approve_response",
@@ -57,9 +60,18 @@ const Tracker = () => {
           const message = data.data.message;
           alert(message);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          if (error.response.status === 500) {
+            alert(
+              "An Error Occured Submmitting Your Weekly Data! Please try again."
+            );
+          }
+        });
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+      setShowModal(false);
     }
   };
 
@@ -76,7 +88,7 @@ const Tracker = () => {
   }, []);
 
   return (
-    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6">
+    <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-6 relative">
       <div className="flex items-center flex-wrap gap-3">
         <div className="rounded bg-primary p-3 flex items-center justify-between  xs:flex-1 md:flex-initial gap-6 xs:gap-16 shrink-0 text-xs">
           <p className="text-white">Submitted</p>
@@ -90,9 +102,44 @@ const Tracker = () => {
           </p>
         </div>
       </div>
-      <div onClick={() => handleSubmit()}>
+
+      <div
+        className="w-fit text-white font-semibold bg-oaksgreen rounded shadow-md"
+        onClick={() => setShowModal(true)}
+      >
         <CategoryTab text="Submit" Icon={Download} />
       </div>
+
+      {/* submit modal */}
+      {showModal && (
+        <div className="absolute h-screen w-full  backdrop-blur-sm bg-[rgba(0,0,0,0.15)] grid place-items-center z-40">
+          {isLoading ? (
+            <div>
+              <ClipLoader color="#00BCD4" />
+            </div>
+          ) : (
+            <div className="lg:w-1/3 bg-white mx-auto p-4 px-6 space-y-8 text-base rounded">
+              <p>Are you sure you want to submit your weekly data?</p>
+
+              <div className="flex gap-3 items-center justify-between  text-white">
+                <div
+                  onClick={handleSubmit}
+                  className="rounded p-2 cursor-pointer text-center bg-blue-500 flex items-center px-5"
+                >
+                  <span>Submit</span>
+                </div>
+
+                <div
+                  onClick={() => setShowModal(false)}
+                  className="rounded cursor-pointer p-2 text-center flex items-center bg-green-500 px-5"
+                >
+                  <span>Cancel</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* table */}
       <div className="bg-white  w-full">
