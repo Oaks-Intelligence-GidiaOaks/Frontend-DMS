@@ -17,6 +17,7 @@ const MasterList = () => {
   let [totalDataCount, setTotalDataCount] = useState(null);
   let [pageNo, setPageNo] = useState(1);
 
+
   const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 7);
   const maxDate = new Date(new Date().getFullYear(), new Date().getMonth(), 27);
 
