@@ -19,6 +19,7 @@ const Tracker = () => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+
   // console.log(trackerData);
 
   let submitted = trackerData && trackerData.totalSubmision;
@@ -27,7 +28,7 @@ const Tracker = () => {
     trackerData && trackerData.totalEnumerators - trackerData.totalSubmision;
 
   if (timeOfSub) {
-    // console.log("time of submission", timeOfSub);
+    
   }
 
   let firstChart = timeOfSub && timeOfSub.slice(0, 10);

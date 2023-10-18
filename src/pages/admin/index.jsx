@@ -8,3 +8,4 @@ export { default as AdminNewRoute } from "./AdminNewRoute";
 export { default as TeamLeads } from "./TeamLeads";
 export { default as AddTeamLead } from "./AddTeamLead";
 export { default as TeamLeadProfile } from "./TeamLeadProfile";
+export { default as History } from "./History";

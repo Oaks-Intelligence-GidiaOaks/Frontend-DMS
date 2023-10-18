@@ -13,6 +13,7 @@ const MasterList = () => {
   let [totalDataCount, setTotalDataCount] = useState(null);
   let [pageNo, setPageNo] = useState(1);
 
+
   const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 7);
   const maxDate = new Date(new Date().getFullYear(), new Date().getMonth(), 27);
 
@@ -169,9 +170,8 @@ const MasterList = () => {
         {numArr.length > 0 &&
           numArr.map((singleNo) => (
             <button
-              className={`grid place-items-center my-1 text-xs text-gray-800 h-5 w-5  rounded-full ${
-                singleNo === pageNo ? "bg-oaksgreen text-white" : "bg-gray-200"
-              } `}
+              className={`grid place-items-center my-1 text-xs text-gray-800 h-5 w-5  rounded-full ${singleNo === pageNo ? "bg-oaksgreen text-white" : "bg-gray-200"
+                } `}
               key={singleNo}
               onClick={() => setPageNo(singleNo)}
             >
@@ -229,7 +229,7 @@ const MasterList = () => {
             <DatePickerComponent
               change={handleEndDateChange}
               id="datepicker"
-              // value={endDateValue}
+            // value={endDateValue}
             />
           </div>
         </div>
@@ -238,7 +238,6 @@ const MasterList = () => {
       {/* table */}
       <div className="bg-white h-80 w-full text-[6px]">
         <MasterGrid data={newMaster ?? newMaster} />
-
         <div className="p-2 border ">
           <div className="ml-auto flex items-center">{<PageNumbers />}</div>
         </div>
