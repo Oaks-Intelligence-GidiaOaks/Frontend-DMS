@@ -18,6 +18,7 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
+import axios from "axios";
 
 const TransportGrid = ({ data }) => {
   const { user } = useAuth();
@@ -44,7 +45,9 @@ const TransportGrid = ({ data }) => {
     Object.keys(transformedData[0]).map((item) => ({
       field: item,
       width: item === "route" ? item.length + 200 : 130,
+      allowEditing: item === "cost",
     }));
+
 
   const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
@@ -68,14 +71,19 @@ const TransportGrid = ({ data }) => {
     },
   ];
 
-  const handleSave = async (args) => {
-    // console.log(args);
 
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+  const handleSave = async (args) => {
+
+    const { data } = args;
+    if (args.requestType === "save") {
+      const modifiedData = {
+        cost: data.cost,
+
+      };
+
       try {
         await axios
-          .patch(`form_response/transport/${modifiedData._id}`, modifiedData)
+        .patch(`form_response/transport/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
@@ -91,16 +99,16 @@ const TransportGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-      ? "ID"
-      : field === "lga"
-      ? "LGA"
-      : field === "route"
-      ? "Route"
-      : field === "cost"
-      ? "Cost"
-      : field === "mode"
-      ? "Mode"
-      : field;
+        ? "ID"
+        : field === "lga"
+          ? "LGA"
+          : field === "route"
+            ? "Route"
+            : field === "cost"
+              ? "Cost"
+              : field === "mode"
+                ? "Mode"
+                : field;
   };
 
   const handleDownload = () => {
@@ -137,7 +145,8 @@ const TransportGrid = ({ data }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
-        commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
+      // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {transportColumns.map(({ field, width }) => (

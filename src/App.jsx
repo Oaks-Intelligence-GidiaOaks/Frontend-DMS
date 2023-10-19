@@ -53,7 +53,7 @@ function App() {
   setInterval(clearLocalStorage, interval);
 
   // axios configs
-  axios.defaults.baseURL = base_url;
+  axios.defaults.baseURL = base_url_local;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
 

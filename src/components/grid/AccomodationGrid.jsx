@@ -17,6 +17,7 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
+import axios from "axios";
 
 const AccomodationGrid = ({ data }) => {
   const { user } = useAuth();
@@ -68,20 +69,24 @@ const AccomodationGrid = ({ data }) => {
     },
   ];
 
+
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+    const { data } = args;
+    if (args.requestType === "save") {
+      const modifiedData = {
+        price: data.price,
+
+      };
       try {
         await axios
-          .patch(`form_response/accomodation/${modifiedData._id}`, modifiedData)
+        .patch(`form_response/accomodation/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
-        // console.log(error);
+        console.log(error);
       }
     }
   };
@@ -136,7 +141,8 @@ const AccomodationGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         allowGrouping={true}
-        commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
+        // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {accColumns.map(({ field, width }) => (
