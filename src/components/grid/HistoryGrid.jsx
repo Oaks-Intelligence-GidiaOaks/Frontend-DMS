@@ -37,12 +37,19 @@ const HistoryGrid = ({ data }) => {
         status: item.description,
     }));
 
+    // Modify the data by trimming "::ffff:" from ip_address
+    const modifiedTableData = tableData.map((item) => {
+        if (item.ip_address && item.ip_address.startsWith("::ffff:")) {
+            item.ip_address = item.ip_address.replace("::ffff:", "").trim();
+        }
+        return item;
+    });
+
     const pageSettings = { pageSize: 35 };
 
     const editSettings = {
         allowEditing: false,
     };
-
     const serialNumberTemplate = (rowData) => {
         return rowData ? Number(rowData.index) + 1 : "";
     };
