@@ -25,6 +25,8 @@ const arrangeTime = (time) => {
 };
 
 const TrackerGrid = ({ data }) => {
+
+  console.log(data, "Data");
   let tableData = data.map((item) => ({
     ...item,
     created_at: item.created_at

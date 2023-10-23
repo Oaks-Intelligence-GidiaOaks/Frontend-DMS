@@ -7,6 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 
+
 import { EnumeratorForm } from "./pages/enumerator";
 
 import {
@@ -28,6 +29,7 @@ import {
   AddTeamLead,
   AdminNewRoute,
   TeamLeadProfile,
+  History
 } from "./pages/admin";
 
 import TeamLead from "./components/layout/TeamLead";
@@ -51,7 +53,7 @@ function App() {
   setInterval(clearLocalStorage, interval);
 
   // axios configs
-  axios.defaults.baseURL = base_url;
+  axios.defaults.baseURL = base_url_local;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
 
@@ -253,6 +255,18 @@ function App() {
             adminRoleCheck ? (
               <Admin>
                 <AdminTracker />
+              </Admin>
+            ) : (
+              <Navigate replace to={"/"} />
+            )
+          }
+        />
+        <Route
+          path="admin/history"
+          element={
+            adminRoleCheck ? (
+              <Admin>
+                <History />
               </Admin>
             ) : (
               <Navigate replace to={"/"} />

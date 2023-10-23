@@ -8,6 +8,7 @@ import { Download, ClearOutlined } from "@mui/icons-material";
 import { useAuth } from "../../context";
 import { Loading } from "../../components/reusable";
 import { ClipLoader } from "react-spinners";
+import { toast } from 'react-toastify';
 
 const Tracker = () => {
   const {
@@ -18,6 +19,7 @@ const Tracker = () => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+
   // console.log(trackerData);
 
   let submitted = trackerData && trackerData.totalSubmision;
@@ -26,7 +28,7 @@ const Tracker = () => {
     trackerData && trackerData.totalEnumerators - trackerData.totalSubmision;
 
   if (timeOfSub) {
-    // console.log("time of submission", timeOfSub);
+    
   }
 
   let firstChart = timeOfSub && timeOfSub.slice(0, 10);
@@ -58,13 +60,14 @@ const Tracker = () => {
         .then((data) => {
           console.log(data);
           const message = data.data.message;
-          alert(message);
+          console.log('Success:', message);
+          toast.success("Data submitted successfully");
         })
         .catch((error) => {
           if (error.response.status === 500) {
-            alert(
-              "An Error Occured Submmitting Your Weekly Data! Please try again."
-            );
+            toast.error("You have already submitted your data.");
+          } else {
+            toast.error(error.response.data || error.response.statusText);
           }
         });
     } catch (error) {

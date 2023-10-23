@@ -15,6 +15,7 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
+import axios from "axios";
 
 const ElectricityGrid = ({ data }) => {
   const { user } = useAuth();
@@ -71,15 +72,19 @@ const ElectricityGrid = ({ data }) => {
   ];
 
   const handleSave = async (args) => {
-    console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
+
+    const { data } = args;
+    if (args.requestType === "save") {
+      const modifiedData = {
+        hours_per_week
+          : data.hours_per_week,
+      };
       try {
         await axios
-          .patch(`form_response/electricity/${modifiedData._id}`, modifiedData)
+          .patch(`form_response/electricity/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            console.log(res.data);
+            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {
@@ -92,12 +97,12 @@ const ElectricityGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-      ? "ID"
-      : field === "lga"
-      ? "LGA"
-      : field === "hours_per_week"
-      ? "Hours per week"
-      : field;
+        ? "ID"
+        : field === "lga"
+          ? "LGA"
+          : field === "hours_per_week"
+            ? "Hours per week"
+            : field;
   };
 
   const handleDownload = () => {
@@ -132,7 +137,8 @@ const ElectricityGrid = ({ data }) => {
         pageSettings={pageSettings}
         allowEditing={true}
         editSettings={editSettings}
-        commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
+      // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {elecColumns.map(({ field, width }) => (

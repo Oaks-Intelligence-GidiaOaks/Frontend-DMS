@@ -33,9 +33,8 @@ const AdminSidebar = () => {
 
   return (
     <div
-      className={`w-72 xs:absolute md:static top-0 left-0 ${
-        sidebarShown ? "xs:initial" : "xs:hidden"
-      } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
+      className={`w-72 xs:absolute md:static top-0 left-0 ${sidebarShown ? "xs:initial" : "xs:hidden"
+        } sm:block left-0 z-30 lg:shrink-0 h-full text-sm bg-white`}
     >
       <div className="ml-10 flex flex-col h-full">
         <p className="mt-2 capitalize p-1 px-2 text-white bg-oaksgreen w-fit flex items-center gap-2 rounded">
@@ -109,6 +108,14 @@ const AdminSidebar = () => {
             link="admin/master"
           />
 
+
+          <SidebarItem
+            key="6"
+            text="History"
+            Icon={FilterNone}
+            link="admin/history"
+
+          />
           <LogoutButton />
         </div>
 

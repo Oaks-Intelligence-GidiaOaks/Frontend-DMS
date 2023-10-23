@@ -69,7 +69,6 @@ const Profile = () => {
     formData.append("phoneNumber", phoneNumber);
     formData.append("id", user.id);
     formData.append("avatar", imageUrl);
-    // formData.append("role", user.role);
 
     user.states.forEach((state) => formData.append("states", state));
     user.LGA.forEach((lga) => formData.append("LGA", lga));
