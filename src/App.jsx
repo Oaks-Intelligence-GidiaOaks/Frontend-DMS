@@ -7,7 +7,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-
 import { EnumeratorForm } from "./pages/enumerator";
 
 import {
@@ -29,7 +28,7 @@ import {
   AddTeamLead,
   AdminNewRoute,
   TeamLeadProfile,
-  History
+  History,
 } from "./pages/admin";
 
 import TeamLead from "./components/layout/TeamLead";
@@ -53,7 +52,7 @@ function App() {
   setInterval(clearLocalStorage, interval);
 
   // axios configs
-  axios.defaults.baseURL = base_url_local;
+  axios.defaults.baseURL = base_url;
   axios.defaults.headers.post["Content-Type"] = "application/json";
   axios.defaults.headers.common["Authorization"] = `Bearer ${user?.token}`;
 
