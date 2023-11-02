@@ -13,6 +13,7 @@ const History = () => {
   const [endDateValue, setEndDateValue] = useState("");
   let [totalDataCount, setTotalDataCount] = useState(null);
   let [pageNo, setPageNo] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
 
   const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 7);
@@ -24,6 +25,7 @@ const History = () => {
       axios.get(`/audit_log?start=${startDateValue}&end=${endDateValue}&page=${pageNo}`).then((res) => {
         setHistoryData(res.data)
         setTotalDataCount(res.data.totalRecords);
+        setTotalPages(res.data.totalPages);
       })
         .catch((err) => console.log(err));
 
@@ -34,14 +36,11 @@ const History = () => {
   }, [endDateValue, pageNo])
 
 
-  let paginationItems = Math.ceil(totalDataCount / 10);
+  const itemsPerPage = 10;
 
-  let PageNumbers = ({ totalPages, currentPage, onPageChange }) => {
-    let numArr = [];
-
-    for (let i = 0; i < paginationItems; i++) {
-      numArr.push(i + 1);
-    }
+  const paginationItems = totalPages;
+  const PageNumbers = ({ currentPage, onPageChange }) => {
+    const numArr = Array.from({ length: paginationItems }, (_, i) => i + 1);
 
     return (
       <div className="flex flex-wrap space-x-2">
