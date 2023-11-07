@@ -7,7 +7,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-
 import { EnumeratorForm } from "./pages/enumerator";
 
 import {
@@ -29,7 +28,7 @@ import {
   AddTeamLead,
   AdminNewRoute,
   TeamLeadProfile,
-  History
+  History,
 } from "./pages/admin";
 
 import TeamLead from "./components/layout/TeamLead";
