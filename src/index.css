@@ -259,3 +259,8 @@ input.e-input:focus {
 td[aria-colindex="96"] {
   font-size: 10px !important;
 }
+
+.red-text {
+  border: 1px solid red !important;
+}
+

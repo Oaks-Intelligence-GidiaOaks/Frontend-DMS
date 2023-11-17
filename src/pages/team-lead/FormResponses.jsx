@@ -32,11 +32,12 @@ const FormResponses = () => {
   const [notesData, setNotesData] = useState(null);
   const [clothingData, setClothingData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const [sub, setSub] = useState(null);
 
-  console.log(foodData, "FOOD DATA");
-  // styles
+
+  const [prevFoodData, setPrevFoodData] = useState(null)
+  // console.log(foodData, "FOOD DATA");
+
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
 
@@ -57,6 +58,8 @@ const FormResponses = () => {
       .catch((err) => console.error(err));
   }, []);
 
+
+
   const getFood = async () => {
     try {
       setIsLoading(true);
@@ -74,6 +77,20 @@ const FormResponses = () => {
     }
   };
 
+
+  useEffect(() => {
+    const getPrevFood = async () => {
+      try {
+        const response = await axios.get("form_response/prev_food_product");
+        console.log("Response:", response.data); 
+        setPrevFoodData(response.data);
+      } catch (err) {
+        console.error("Error:", err); 
+      }
+    };
+    getPrevFood();
+  }, []);
+  
   const getTransport = async () => {
     try {
       setIsLoading(true);
@@ -207,18 +224,16 @@ const FormResponses = () => {
       <div className="flex items-center gap-2 overflow-x-scroll metrics-scrollbar">
         {/* <OaksSlider slideDefault={5} break1={3} break2={2} break3={2}> */}
         <div
-          className={`rounded w-fit ${
-            activeTab === "food" ? "bg-oaksgreen text-white" : "bg-white"
-          }`}
+          className={`rounded w-fit ${activeTab === "food" ? "bg-oaksgreen text-white" : "bg-white"
+            }`}
           onClick={() => getFood()}
         >
           <CategoryTab text="Food" Icon={Restaurant} activeTab={activeTab} />
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "transport" ? "bg-oaksgreen text-white" : "bg-white"
-          }`}
+          className={`rounded ${activeTab === "transport" ? "bg-oaksgreen text-white" : "bg-white"
+            }`}
           onClick={() => getTransport()}
         >
           <CategoryTab
@@ -229,27 +244,24 @@ const FormResponses = () => {
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "accomodation" ? activeStyle : nonActiveStyle
-          }`}
+          className={`rounded ${activeTab === "accomodation" ? activeStyle : nonActiveStyle
+            }`}
           onClick={() => getAccomodation()}
         >
           <CategoryTab text="Accomodation" Icon={Home} activeTab={activeTab} />
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "clothing" ? activeStyle : nonActiveStyle
-          }`}
+          className={`rounded ${activeTab === "clothing" ? activeStyle : nonActiveStyle
+            }`}
           onClick={() => getClothing()}
         >
           <CategoryTab text="Clothing" Icon={Home} activeTab={activeTab} />
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "electricity" ? activeStyle : nonActiveStyle
-          }`}
+          className={`rounded ${activeTab === "electricity" ? activeStyle : nonActiveStyle
+            }`}
           onClick={() => getElectricity()}
         >
           <CategoryTab
@@ -260,18 +272,16 @@ const FormResponses = () => {
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "others" ? activeStyle : nonActiveStyle
-          }`}
+          className={`rounded ${activeTab === "others" ? activeStyle : nonActiveStyle
+            }`}
           onClick={() => getOthers()}
         >
           <CategoryTab text="Others" Icon={Shuffle} activeTab={activeTab} />
         </div>
 
         <div
-          className={`rounded ${
-            activeTab === "notes" ? activeStyle : nonActiveStyle
-          }`}
+          className={`rounded ${activeTab === "notes" ? activeStyle : nonActiveStyle
+            }`}
           onClick={() => getNotes()}
         >
           <CategoryTab text="Notes" Icon={Summarize} activeTab={activeTab} />

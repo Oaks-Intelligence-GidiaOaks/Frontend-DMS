@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -19,9 +19,42 @@ import axios from "axios";
 
 const OthersGrid = ({ data }) => {
   const { user } = useAuth();
+  const [prevOthersData, setPrevOthersData] = useState([])
+  console.log(prevOthersData, "PREVIOUS OTHER");
   let dataCount = data?.totalCount;
 
   let othersData = data.data;
+
+
+  useEffect(() => {
+    const getPrevOthersData = async () => {
+      try {
+        const response = await axios.get("form_response/prev_other_products");
+        const avgPrices = {};
+        response.data.data.forEach((prev) => {
+          if (avgPrices[prev.name]) {
+            avgPrices[prev.name].totalPrice += parseFloat(prev.price);
+            avgPrices[prev.name].count += 1;
+          } else {
+            avgPrices[prev.name] = {
+              totalPrice: parseFloat(prev.price),
+              count: 1,
+            };
+          }
+        })
+
+        const avgPriceArray = Object.entries(avgPrices).map(([name, data]) => ({
+          name,
+          avgPrice: data.totalPrice / data.count,
+        }));
+        setPrevOthersData(avgPriceArray)
+      } catch (err) {
+        console.error("Error fetching previous food data:", err);
+      }
+    }
+    getPrevOthersData()
+  }, [])
+
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -33,25 +66,54 @@ const OthersGrid = ({ data }) => {
   const transformedData =
     othersData &&
     othersData.length > 0 &&
-    data.data.map((item, i) => ({
-      S_N: i + 1,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by?.id,
-      State: item.state,
-      LGA: item.lga,
-      name: formatProductName(item?.name),
-      price: item.price === 0 ? "N/A" : item.price,
-      brand: item.brand.length > 1 ? item.brand : "N/A",
-      _id: item._id,
-      size: item.size,
-    }));
+    data.data.map((item, i) => {
+      const prevItem = prevOthersData?.find((prev) => prev.name === item.name);
+      const itemPrice = parseFloat(item.price);
+      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+      const priceDifference = prevItem
+        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+        : 0;
+      return {
+        S_N: i + 1,
+        Date: arrangeTime(item.updated_at),
+        id: item.created_by?.id,
+        State: item.state,
+        LGA: item.lga,
+        name: formatProductName(item?.name),
+        price: item.price === 0 ? "N/A" : item.price,
+        brand: item.brand.length > 1 ? item.brand : "N/A",
+        _id: item._id,
+        size: item.size,
+        priceDifference
+      }
+    });
+
+
+    const isCellRed = (field, priceDifference) => {
+      const threshold = 0.25;
+      return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+    };
+  
 
   const othersColumns =
     othersData.length > 0 &&
-    Object.keys(transformedData[0]).map((item) => ({
+    Object.keys(transformedData[0])
+    .filter((field) => field !== "priceDifference")
+    .map((item) => ({
       field: item,
-      width: item.length ? item.length + 130 : 130,
+      // width: item.length ? item.length + 130 : 130,
+      width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
+      cssClass: (props) =>
+        isCellRed(props.column.field, props.data.priceDifference)
+          ? "red-border"
+          : "",
     }));
+
+    const handleQueryCellInfo = (args) => {
+      if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+        args.cell.classList.add("red-text");
+      }
+    };
 
   const pageSettings = { pageSize: 50 };
 
@@ -111,18 +173,18 @@ const OthersGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-      ? "ID"
-      : field === "lga"
-      ? "LGA"
-      : field === "name"
-      ? "Name"
-      : field === "price"
-      ? "Price"
-      : field === "brand"
-      ? "Brand"
-      : field === "size"
-      ? "Size"
-      : field;
+        ? "ID"
+        : field === "lga"
+          ? "LGA"
+          : field === "name"
+            ? "Name"
+            : field === "price"
+              ? "Price"
+              : field === "brand"
+                ? "Brand"
+                : field === "size"
+                  ? "Size"
+                  : field;
   };
 
   return othersData.length > 0 ? (
@@ -148,6 +210,7 @@ const OthersGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         allowGrouping={true}
+        queryCellInfo={handleQueryCellInfo}
         // commandClick={(args) => handleSave(args)}
         actionComplete={handleSave}
       >

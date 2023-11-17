@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -22,32 +22,93 @@ import axios from "axios";
 
 const TransportGrid = ({ data }) => {
   const { user } = useAuth();
-
+  const [prevTransportData, setPrevTransportData] = useState([]);
+  
+  
   let dataCount = data.totalCount;
-
+  
   let transportData = data.data;
+
+  useEffect(() => {
+    const getPrevTransportData = async () => {
+      try {
+        const response = await axios.get("form_response/prev_transport");
+        const avgCost = {};
+        response.data.data.forEach((prev) => {
+          if (avgCost[prev.mode]) {
+            avgCost[prev.mode].totalCost += parseFloat(prev.cost);
+            avgCost[prev.mode].count += 1;
+
+          } else {
+            avgCost[prev.mode] = {
+              totalCost: parseFloat(prev.cost),
+              count: 1
+            }
+          }
+        })
+
+        const avgCostArray = Object.entries(avgCost).map(([mode, data]) => ({
+          mode,
+          avgCost: data.totalCost / data.count,
+        }));
+        setPrevTransportData(avgCostArray)
+
+      } catch (err) {
+        console.error("Error fetching previous food data:", err)
+      }
+    }
+    getPrevTransportData();
+  }, [])
+
 
   const transformedData =
     transportData.length > 0 &&
-    transportData.map((item, i) => ({
-      S_N: i + 1,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by?.id,
-      State: item.state,
-      LGA: item.lga,
-      route: item.route,
-      mode: item.mode,
-      _id: item._id,
-      cost: item.cost,
-    }));
+    transportData.map((item, i) => {
+      const prevItem = prevTransportData.find((prev) => prev.mode === item.mode);
+      const itemCost = parseFloat(item.cost);
+      const prevAvgCost = prevItem ? prevItem.itemCost : 0;
+      const priceDifference = prevItem
+      ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
+      return {
+        S_N: i + 1,
+        Date: arrangeTime(item.updated_at),
+        id: item.created_by?.id,
+        State: item.state,
+        LGA: item.lga,
+        route: item.route,
+        mode: item.mode,
+        _id: item._id,
+        cost: item.cost,
+        priceDifference
+      }
+    });
+
+  const isCellRed = (field, priceDifference) => {
+    const threshold = 0.25;
+    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+  };
+
+  
+
   const transportColumns =
     transportData.length > 0 &&
-    Object.keys(transformedData[0]).map((item) => ({
-      field: item,
-      width: item === "route" ? item.length + 200 : 130,
-      allowEditing: item === "cost",
-    }));
+    Object.keys(transformedData[0])
+      .filter((field) => field !== "priceDifference")
+      .map((item) => ({
+        field: item,
+        width: item === "route" ? item.length + 200 : 130,
+        allowEditing: item === "cost",
+        cssClass: (props) =>
+          isCellRed(props.column.field, props.data.priceDifference)
+            ? "red-border"
+            : "",
+      }));
 
+  const handleQueryCellInfo = (args) => {
+    if (args.column.field === "cost" && args.data.priceDifference >= 0.25) {
+      args.cell.classList.add("red-text");
+    }
+  };
 
   const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
@@ -83,7 +144,7 @@ const TransportGrid = ({ data }) => {
 
       try {
         await axios
-        .patch(`form_response/transport/${data._id}`, modifiedData)
+          .patch(`form_response/transport/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
@@ -145,6 +206,7 @@ const TransportGrid = ({ data }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
+        queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
       // commandClick={(args) => handleSave(args)}
       >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -20,29 +20,93 @@ import axios from "axios";
 const ElectricityGrid = ({ data }) => {
   const { user } = useAuth();
 
+  const [prevElectricData, setPrevElectricData] = useState([]);
+ 
+
   let dataCount = data.totalCount;
 
   let elecData = data.data;
 
+
+  useEffect(() => {
+    const getPrevElectricData = async () => {
+      try {
+        const response = await axios.get("form_response/prev_electricity");
+        const avgHours = {};
+        response.data.data.forEach((prev) => {
+          if (avgHours[prev.state]) {
+            avgHours[prev.state].totalHour += parseFloat(prev.hours_per_week);
+            avgHours[prev.state].count += 1
+          } else {
+            avgHours[prev.state] = {
+              totalHour: parseFloat(prev.hours_per_week),
+              count: 1
+            }
+          }
+        })
+        const avgHourArray = Object.entries(avgHours).map(([state, data]) => ({
+          state,
+          avgHour: data.totalHour / data.count,
+        }));
+        setPrevElectricData(avgHourArray)
+
+      } catch (err) {
+        console.error("Error fetching previous food data:", err);
+      }
+    }
+    getPrevElectricData()
+  }, [])
+
+
+
   const transformedData =
     elecData &&
     elecData.length > 0 &&
-    data.data.map((item, i) => ({
-      S_N: i + 1,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by?.id,
-      State: item.state,
-      LGA: item.lga,
-      hours_per_week: item.hours_per_week,
-      _id: item._id,
-    }));
+    data.data.map((item, i) => {
+      const prevItem = prevElectricData?.find((prev) => prev.state === item.state);
+      const itemHour = parseFloat(item.hours_per_week);
+      const prevAvgHour = prevItem ? prevItem.avgHour : 0;
+      const priceDifference = prevItem
+        ? Math.abs(itemHour - prevAvgHour) / prevAvgHour
+        : 0;
+      return {
+        S_N: i + 1,
+        Date: arrangeTime(item.updated_at),
+        id: item.created_by?.id,
+        State: item.state,
+        LGA: item.lga,
+        hours_per_week: item.hours_per_week,
+        _id: item._id,
+        priceDifference
+      }
+    });
+
+    const isCellRed = (field, priceDifference) => {
+      const threshold = 0.25;
+      return field === "hours_per_week" && (priceDifference >= threshold || priceDifference <= -threshold);
+    };
+
 
   const elecColumns =
     elecData.length > 0 &&
-    Object.keys(transformedData[0]).map((item) => ({
+    Object.keys(transformedData[0])
+    .filter((field) => field !== "priceDifference")
+    .map((item) => ({
       field: item,
-      width: item.length ? item.length + 150 : 100,
+      // width: item.length ? item.length + 150 : 100,
+      width: item === "hours_per_week" ? 100 : item.length < 4 ? 120 : item.length + 130,
+      cssClass: (props) =>
+      isCellRed(props.column.field, props.data.priceDifference)
+        ? "red-border"
+        : "",
     }));
+
+
+    const handleQueryCellInfo = (args) => {
+      if (args.column.field === "hours_per_week" && args.data.priceDifference >= 0.25) {
+        args.cell.classList.add("red-text");
+      }
+    };
 
   const toolbarOptions = ["Edit", "Delete", "Update", "Cancel"];
   const pageSettings = { pageSize: 50 };
@@ -138,6 +202,7 @@ const ElectricityGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         actionComplete={handleSave}
+        queryCellInfo={handleQueryCellInfo}
       // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>

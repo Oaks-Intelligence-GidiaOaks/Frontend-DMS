@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -21,6 +21,42 @@ import axios from "axios";
 
 const AccomodationGrid = ({ data }) => {
   const { user } = useAuth();
+  const [accomodataData, setAccomodationData] = useState([]);
+
+
+  useEffect(() => {
+    const getPrevAccData = async () => {
+      try {
+        const response = await axios.get("form_response/prev_accomodation");
+
+        const avgPrices = {};
+        response.data.data.forEach((prev) => {
+          if (avgPrices[prev.type]) {
+            avgPrices[prev.type].totalPrice += parseFloat(prev.price);
+            avgPrices[prev.type].count += 1;
+          } else {
+            avgPrices[prev.type] = {
+              totalPrice: parseFloat(prev.price),
+              count: 1,
+            };
+          }
+
+        });
+
+        const avgPriceArray = Object.entries(avgPrices).map(([type, data]) => ({
+          type,
+          avgPrice: data.totalPrice / data.count,
+        }));
+
+        setAccomodationData(avgPriceArray);
+      } catch (err) {
+        console.error("Error fetching previous food data:", err);
+      }
+    };
+
+    getPrevAccData();
+  }, []);
+
 
   let dataCount = data.totalCount;
 
@@ -29,24 +65,52 @@ const AccomodationGrid = ({ data }) => {
   const transformedData =
     accData &&
     accData.length > 0 &&
-    data.data.map((item, i) => ({
-      S_N: i + 1,
-      Date: arrangeTime(item.updated_at),
-      id: item.created_by?.id,
-      State: item.state,
-      LGA: item.lga,
-      type: item.type,
-      rooms: item.rooms,
-      price: item.price,
-      _id: item._id,
-    }));
+    data.data.map((item, i) => {
+      const prevItem = accomodataData.find((prev) => prev.type === item.type);
+      const itemPrice = parseFloat(item.price);
+      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+      const priceDifference = prevItem
+        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+        : 0;
+      return {
+        S_N: i + 1,
+        Date: arrangeTime(item.updated_at),
+        id: item.created_by?.id,
+        State: item.state,
+        LGA: item.lga,
+        type: item.type,
+        rooms: item.rooms,
+        price: item.price,
+        _id: item._id,
+        priceDifference
+      }
+
+    })
+
+  const isCellRed = (field, priceDifference) => {
+    const threshold = 0.25;
+    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+  };
 
   const accColumns =
     accData.length > 0 &&
-    Object.keys(transformedData[0]).map((item) => ({
+    Object.keys(transformedData[0])
+    .filter((field) => field !== "priceDifference")
+    .map((item) => ({
       field: item,
-      width: item.length === "type" ? item.length + 120 : 120,
+      // width: item.length === "type" ? item.length + 120 : 120,
+      width: item === "price" ? 100 : item.length < 4 ? 120 : item.length + 130,
+      cssClass: (props) =>
+        isCellRed(props.column.field, props.data.priceDifference)
+          ? "red-border"
+          : "",
     }));
+
+  const handleQueryCellInfo = (args) => {
+    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+      args.cell.classList.add("red-text");
+    }
+  };
 
   const pageSettings = { pageSize: 50 };
 
@@ -79,7 +143,7 @@ const AccomodationGrid = ({ data }) => {
       };
       try {
         await axios
-        .patch(`form_response/accomodation/${data._id}`, modifiedData)
+          .patch(`form_response/accomodation/${data._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
             // console.log(res.data);
@@ -95,16 +159,16 @@ const AccomodationGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-      ? "ID"
-      : field === "lga"
-      ? "LGA"
-      : field === "type"
-      ? "Type"
-      : field === "rooms"
-      ? "Rooms"
-      : field === "price"
-      ? "Price"
-      : field;
+        ? "ID"
+        : field === "lga"
+          ? "LGA"
+          : field === "type"
+            ? "Type"
+            : field === "rooms"
+              ? "Rooms"
+              : field === "price"
+                ? "Price"
+                : field;
   };
 
   const handleDownload = () => {
@@ -141,8 +205,9 @@ const AccomodationGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         allowGrouping={true}
+        queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
-        // commandClick={(args) => handleSave(args)}
+      // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {accColumns.map(({ field, width }) => (

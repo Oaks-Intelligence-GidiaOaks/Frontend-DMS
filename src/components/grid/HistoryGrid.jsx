@@ -25,8 +25,6 @@ const arrangeTime = (time) => {
 };
 
 const HistoryGrid = ({ data }) => {
-
-
     let tableData = data.map((item) => ({
         ...item,
         created_at: item.created_at
