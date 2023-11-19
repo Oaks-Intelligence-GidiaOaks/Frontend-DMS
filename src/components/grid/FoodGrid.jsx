@@ -85,8 +85,6 @@ const FoodGrid = ({ data: foodRowss }) => {
         size: item?.size,
         price: item?.price,
         priceDifference,
-        price: itemPrice,
-        priceDifference,
       };
     });
 
