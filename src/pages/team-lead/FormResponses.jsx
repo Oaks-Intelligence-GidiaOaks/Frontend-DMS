@@ -77,19 +77,6 @@ const FormResponses = () => {
     }
   };
 
-
-  useEffect(() => {
-    const getPrevFood = async () => {
-      try {
-        const response = await axios.get("form_response/prev_food_product");
-        console.log("Response:", response.data); 
-        setPrevFoodData(response.data);
-      } catch (err) {
-        console.error("Error:", err); 
-      }
-    };
-    getPrevFood();
-  }, []);
   
   const getTransport = async () => {
     try {

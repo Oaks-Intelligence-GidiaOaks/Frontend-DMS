@@ -16,6 +16,7 @@ import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const OthersGrid = ({ data }) => {
   const { user } = useAuth();
@@ -55,6 +56,20 @@ const OthersGrid = ({ data }) => {
     getPrevOthersData()
   }, [])
 
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/flag_other_products/${rowData._id}`, { flagged: true });
+        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to flag item.');
+    }
+  }
+
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -89,31 +104,31 @@ const OthersGrid = ({ data }) => {
     });
 
 
-    const isCellRed = (field, priceDifference) => {
-      const threshold = 0.25;
-      return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
-    };
-  
+  const isCellRed = (field, priceDifference) => {
+    const threshold = 0.25;
+    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+  };
+
 
   const othersColumns =
     othersData.length > 0 &&
     Object.keys(transformedData[0])
-    .filter((field) => field !== "priceDifference")
-    .map((item) => ({
-      field: item,
-      // width: item.length ? item.length + 130 : 130,
-      width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
-      cssClass: (props) =>
-        isCellRed(props.column.field, props.data.priceDifference)
-          ? "red-border"
-          : "",
-    }));
+      .filter((field) => field !== "priceDifference")
+      .map((item) => ({
+        field: item,
+        // width: item.length ? item.length + 130 : 130,
+        width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
+        cssClass: (props) =>
+          isCellRed(props.column.field, props.data.priceDifference)
+            ? "red-border"
+            : "",
+      }));
 
-    const handleQueryCellInfo = (args) => {
-      if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
-        args.cell.classList.add("red-text");
-      }
-    };
+  const handleQueryCellInfo = (args) => {
+    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+      args.cell.classList.add("red-text");
+    }
+  };
 
   const pageSettings = { pageSize: 50 };
 
@@ -227,6 +242,22 @@ const OthersGrid = ({ data }) => {
               width={width}
             />
           ))}
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={(rowData) => (
+              <button
+                onClick={() => handleFlagButtonClick(rowData)}
+                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
+                  }`}
+                disabled={!isCellRed("price", rowData.priceDifference)}
+              >
+                Flag
+              </button>
+            )}
+            visible={user?.role === 'admin'}
+          />
 
           <ColumnDirective
             headerText="Action"

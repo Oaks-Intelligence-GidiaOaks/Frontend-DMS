@@ -264,3 +264,7 @@ td[aria-colindex="96"] {
   border: 1px solid red !important;
 }
 
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5; 
+}

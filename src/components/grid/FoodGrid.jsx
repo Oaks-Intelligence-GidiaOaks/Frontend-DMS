@@ -16,13 +16,14 @@ import { NoData } from "../reusable";
 import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
+import { toast } from 'react-toastify';
 
 const FoodGrid = ({ data: foodRowss }) => {
   const { user } = useAuth();
   const [prevFoodData, setPrevFoodData] = useState([]);
 
-
   let foodData = foodRowss.data;
+
 
   useEffect(() => {
     const getPrevFoodData = async () => {
@@ -55,6 +56,22 @@ const FoodGrid = ({ data: foodRowss }) => {
 
     getPrevFoodData();
   }, []);
+
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/flag_food_product/${rowData._id}`, { flagged: true });
+        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to flag item.');
+    }
+  }
+
+
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -96,19 +113,16 @@ const FoodGrid = ({ data: foodRowss }) => {
 
   const transformedColumns =
     foodData.length > 0 &&
-    Object.keys(transformedData?.[0])
+    [...Object.keys(transformedData?.[0])]
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
-        // width: item.length < 4 ? 120 : item.length + 130,
         width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
         cssClass: (props) =>
           isCellRed(props.column.field, props.data.priceDifference)
             ? "red-border"
             : "",
       }));
-
-
   const handleQueryCellInfo = (args) => {
     if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
       args.cell.classList.add("red-text");
@@ -196,7 +210,9 @@ const FoodGrid = ({ data: foodRowss }) => {
         allowGrouping={true}
         height={350}
         queryCellInfo={handleQueryCellInfo}
-        actionComplete={handleSave}
+        actionComplete={handleSave }
+        
+
       >
         <ColumnsDirective>
           {transformedColumns?.map(({ field, width }) => (
@@ -209,6 +225,22 @@ const FoodGrid = ({ data: foodRowss }) => {
               width={width}
             />
           ))}
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={(rowData) => (
+              <button
+                onClick={() => handleFlagButtonClick(rowData)}
+                className={`bg-danger text-white px-2 rounded text-xs ${
+                  !isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
+                }`}
+                disabled={!isCellRed("price", rowData.priceDifference)}
+              >
+                Flag
+              </button>
+            )}
+            visible={user?.role === 'admin'}
+          />
           <ColumnDirective headerText="Action" width={100} commands={commands} />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />

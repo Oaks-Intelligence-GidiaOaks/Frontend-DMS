@@ -16,6 +16,7 @@ import { NoData } from "../reusable";
 import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
+import { toast } from 'react-toastify';
 
 const ClothingGrid = ({ data }) => {
   const { user } = useAuth();
@@ -51,6 +52,21 @@ const ClothingGrid = ({ data }) => {
     }
     getPrevClothingData()
   }, [])
+
+
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/flag_clothings/${rowData._id}`, { flagged: true });
+        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to flag item.');
+    }
+  }
 
 
   const transformedData =
@@ -213,6 +229,22 @@ const ClothingGrid = ({ data }) => {
               width={width}
             />
           ))}
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={(rowData) => (
+              <button
+                onClick={() => handleFlagButtonClick(rowData)}
+                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
+                  }`}
+                disabled={!isCellRed("price", rowData.priceDifference)}
+              >
+                Flag
+              </button>
+            )}
+            visible={user?.role === 'admin'}
+          />
 
           <ColumnDirective
             headerText="Action"

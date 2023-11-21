@@ -18,6 +18,7 @@ export default {
         "light-primary-green": "rgba(130, 178, 46, 15%)",
         "light-gray": "#EDF2F6",
         "mid-gray": "#D3D4D8",
+        danger: "#FA0D0D",
       },
       borderColor: {
         "primary-green": "#72a247",

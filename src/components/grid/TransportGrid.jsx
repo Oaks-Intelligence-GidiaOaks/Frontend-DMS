@@ -19,14 +19,15 @@ import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const TransportGrid = ({ data }) => {
   const { user } = useAuth();
   const [prevTransportData, setPrevTransportData] = useState([]);
-  
-  
+
+
   let dataCount = data.totalCount;
-  
+
   let transportData = data.data;
 
   useEffect(() => {
@@ -60,6 +61,20 @@ const TransportGrid = ({ data }) => {
     getPrevTransportData();
   }, [])
 
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/flag_transport/${rowData._id}`, { flagged: true });
+        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to flag item.');
+    }
+  }
+
 
   const transformedData =
     transportData.length > 0 &&
@@ -68,7 +83,7 @@ const TransportGrid = ({ data }) => {
       const itemCost = parseFloat(item.cost);
       const prevAvgCost = prevItem ? prevItem.itemCost : 0;
       const priceDifference = prevItem
-      ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
+        ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
       return {
         S_N: i + 1,
         Date: arrangeTime(item.updated_at),
@@ -88,7 +103,7 @@ const TransportGrid = ({ data }) => {
     return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
   };
 
-  
+
 
   const transportColumns =
     transportData.length > 0 &&
@@ -221,6 +236,22 @@ const TransportGrid = ({ data }) => {
               allowEditing={field === "cost"}
             />
           ))}
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={(rowData) => (
+              <button
+                onClick={() => handleFlagButtonClick(rowData)}
+                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
+                  }`}
+                disabled={!isCellRed("price", rowData.priceDifference)}
+              >
+                Flag
+              </button>
+            )}
+            visible={user?.role === 'admin'}
+          />
 
           <ColumnDirective
             headerText="Action"

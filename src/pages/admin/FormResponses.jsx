@@ -41,6 +41,7 @@ const FormResponses = () => {
   const nonActiveStyle = "bg-white";
 
   let expectedSubmission = submissionData ? submissionData.totalTeamLeads : 0;
+
   let submissions = submissionData
     ? submissionData.results.filter((res) => res.status).length
     : 0;

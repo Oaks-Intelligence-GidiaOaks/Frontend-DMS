@@ -18,6 +18,7 @@ import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const AccomodationGrid = ({ data }) => {
   const { user } = useAuth();
@@ -58,6 +59,22 @@ const AccomodationGrid = ({ data }) => {
   }, []);
 
 
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/flag_accomodation/${rowData._id}`, { flagged: true });
+        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to flag item.');
+    }
+  }
+
+
+
   let dataCount = data.totalCount;
 
   let accData = data.data;
@@ -95,16 +112,16 @@ const AccomodationGrid = ({ data }) => {
   const accColumns =
     accData.length > 0 &&
     Object.keys(transformedData[0])
-    .filter((field) => field !== "priceDifference")
-    .map((item) => ({
-      field: item,
-      // width: item.length === "type" ? item.length + 120 : 120,
-      width: item === "price" ? 100 : item.length < 4 ? 120 : item.length + 130,
-      cssClass: (props) =>
-        isCellRed(props.column.field, props.data.priceDifference)
-          ? "red-border"
-          : "",
-    }));
+      .filter((field) => field !== "priceDifference")
+      .map((item) => ({
+        field: item,
+        // width: item.length === "type" ? item.length + 120 : 120,
+        width: item === "price" ? 100 : item.length < 4 ? 120 : item.length + 130,
+        cssClass: (props) =>
+          isCellRed(props.column.field, props.data.priceDifference)
+            ? "red-border"
+            : "",
+      }));
 
   const handleQueryCellInfo = (args) => {
     if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
@@ -220,6 +237,23 @@ const AccomodationGrid = ({ data }) => {
               visible={field !== "_id"}
             />
           ))}
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={(rowData) => (
+              <button
+                onClick={() => handleFlagButtonClick(rowData)}
+                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
+                  }`}
+                disabled={!isCellRed("price", rowData.priceDifference)}
+              >
+                Flag
+              </button>
+            )}
+            visible={user?.role === 'admin'}
+          />
+
           <ColumnDirective
             headerText="Action"
             width={100}
