@@ -17,11 +17,14 @@ import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const OthersGrid = ({ data }) => {
   const { user } = useAuth();
   const [prevOthersData, setPrevOthersData] = useState([])
-  console.log(prevOthersData, "PREVIOUS OTHER");
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   let dataCount = data?.totalCount;
 
   let othersData = data.data;
@@ -30,6 +33,7 @@ const OthersGrid = ({ data }) => {
   useEffect(() => {
     const getPrevOthersData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_other_products");
         const avgPrices = {};
         response.data.data.forEach((prev) => {
@@ -49,8 +53,36 @@ const OthersGrid = ({ data }) => {
           avgPrice: data.totalPrice / data.count,
         }));
         setPrevOthersData(avgPriceArray)
+
+
+        setTransformedData(
+          othersData &&
+          othersData.length > 0 &&
+          data.data.map((item, i) => {
+            const prevItem = prevOthersData?.find((prev) => prev.name === item.name);
+            const itemPrice = parseFloat(item.price);
+            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+              : 0;
+            return {
+              S_N: i + 1,
+              Date: arrangeTime(item.updated_at),
+              id: item.created_by?.id,
+              State: item.state,
+              LGA: item.lga,
+              name: formatProductName(item?.name),
+              price: item.price === 0 ? "N/A" : item.price,
+              brand: item.brand.length > 1 ? item.brand : "N/A",
+              _id: item._id,
+              size: item.size,
+              priceDifference
+            }
+          }));
       } catch (err) {
         console.error("Error fetching previous food data:", err);
+      } finally {
+        setLoading(false);
       }
     }
     getPrevOthersData()
@@ -78,30 +110,6 @@ const OthersGrid = ({ data }) => {
     return name.replace(/-/g, "");
   };
 
-  const transformedData =
-    othersData &&
-    othersData.length > 0 &&
-    data.data.map((item, i) => {
-      const prevItem = prevOthersData?.find((prev) => prev.name === item.name);
-      const itemPrice = parseFloat(item.price);
-      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-        : 0;
-      return {
-        S_N: i + 1,
-        Date: arrangeTime(item.updated_at),
-        id: item.created_by?.id,
-        State: item.state,
-        LGA: item.lga,
-        name: formatProductName(item?.name),
-        price: item.price === 0 ? "N/A" : item.price,
-        brand: item.brand.length > 1 ? item.brand : "N/A",
-        _id: item._id,
-        size: item.size,
-        priceDifference
-      }
-    });
 
 
   const isCellRed = (field, priceDifference) => {
@@ -112,7 +120,7 @@ const OthersGrid = ({ data }) => {
 
   const othersColumns =
     othersData.length > 0 &&
-    Object.keys(transformedData[0])
+    Object.keys(transformedData[0] || {})
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -150,6 +158,23 @@ const OthersGrid = ({ data }) => {
       buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" },
     },
   ];
+
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+
 
   const handleSave = async (args) => {
     const { data } = args;
@@ -202,8 +227,12 @@ const OthersGrid = ({ data }) => {
                   : field;
   };
 
-  return othersData.length > 0 ? (
-    <>
+  return loading ? (
+    <div className="h-32">
+      <Loading />
+    </div>
+  ) : othersData.length > 0 ? (
+    <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -242,32 +271,22 @@ const OthersGrid = ({ data }) => {
               width={width}
             />
           ))}
-
-          <ColumnDirective
-            headerText="Flag"
-            width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                  }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
-            visible={user?.role === 'admin'}
-          />
-
           <ColumnDirective
             headerText="Action"
             width={100}
             commands={commands}
           />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === 'admin'}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

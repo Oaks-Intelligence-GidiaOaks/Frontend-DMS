@@ -41,8 +41,9 @@ const Tracker = () => {
   const handleSubmit = () => {
     let data = trackerData.results;
 
-    const formattedData = data.map((value) => value.form_id);
-    console.log("formattedData:", formattedData);
+
+    const formattedData = data.filter((value) => value.form_id).map((val) => val.form_id );
+  
 
     try {
       setIsLoading(true);

@@ -284,7 +284,7 @@ const FormResponses = () => {
             <Loading />
           </div>
         ) : (
-          <>
+          <div>
             {activeTab === "food" && <FoodGrid data={foodData} />}
             {activeTab === "transport" && (
               <TransportGrid data={transportData ?? transportData} />
@@ -304,7 +304,7 @@ const FormResponses = () => {
             {activeTab === "notes" && (
               <NotesGrid data={notesData ?? notesData} />
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

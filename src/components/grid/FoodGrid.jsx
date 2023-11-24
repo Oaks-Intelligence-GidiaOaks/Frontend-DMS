@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -17,17 +17,19 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const FoodGrid = ({ data: foodRowss }) => {
   const { user } = useAuth();
   const [prevFoodData, setPrevFoodData] = useState([]);
-
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
   let foodData = foodRowss.data;
-
 
   useEffect(() => {
     const getPrevFoodData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_food_product");
 
         const avgPrices = {};
@@ -49,18 +51,47 @@ const FoodGrid = ({ data: foodRowss }) => {
         }));
 
         setPrevFoodData(avgPriceArray);
+
+        // update transformedData here
+        setTransformedData(
+          foodData.length > 0 &&
+          foodData?.map((item, i) => {
+            const prevItem = avgPriceArray.find((prev) => prev.name === item.name);
+            const itemPrice = parseFloat(item.price);
+            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+              : 0;
+            return {
+              S_N: i + 1,
+              _id: item?._id,
+              Date: arrangeTime(item?.updated_at),
+              id: item.created_by?.id,
+              State: item?.state,
+              lga: item?.lga,
+              name: formatProductName(item?.name),
+              brand: item?.brand,
+              size: item?.size,
+              price: item?.price,
+              priceDifference,
+            };
+          })
+        );
       } catch (err) {
         console.error("Error fetching previous food data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     getPrevFoodData();
-  }, []);
+  }, [foodData]);
 
   const handleFlagButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
       try {
-        const response = await axios.patch(`form_response/flag_food_product/${rowData._id}`, { flagged: true });
+        const response = await axios.patch(`form_response/flag_food_product/${rowData._id}`,
+          { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
       } catch (error) {
         console.error(error);
@@ -72,7 +103,6 @@ const FoodGrid = ({ data: foodRowss }) => {
   }
 
 
-
   const formatProductName = (name) => {
     if (name.includes("_")) {
       name = name.replace("_", "(") + ")";
@@ -80,40 +110,37 @@ const FoodGrid = ({ data: foodRowss }) => {
     return name.replace(/-/g, "");
   };
 
-
-  const transformedData =
-    foodData.length > 0 &&
-    foodData?.map((item, i) => {
-      const prevItem = prevFoodData?.find((prev) => prev.name === item.name);
-      const itemPrice = parseFloat(item.price);
-      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-        : 0;
-      return {
-        S_N: i + 1,
-        _id: item?._id,
-        Date: arrangeTime(item?.updated_at),
-        id: item.created_by?.id,
-        State: item?.state,
-        lga: item?.lga,
-        name: formatProductName(item?.name),
-        brand: item?.brand,
-        size: item?.size,
-        price: item?.price,
-        priceDifference,
-      };
-    });
+  // const transformedData =
+  //   foodData.length > 0 &&
+  //   foodData?.map((item, i) => {
+  //     const prevItem = prevFoodData?.find((prev) => prev.name === item.name);
+  //     const itemPrice = parseFloat(item.price);
+  //     const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+  //     const priceDifference = prevItem
+  //       ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+  //       : 0;
+  //     return {
+  //       S_N: i + 1,
+  //       _id: item?._id,
+  //       Date: arrangeTime(item?.updated_at),
+  //       id: item.created_by?.id,
+  //       State: item?.state,
+  //       lga: item?.lga,
+  //       name: formatProductName(item?.name),
+  //       brand: item?.brand,
+  //       size: item?.size,
+  //       price: item?.price,
+  //       priceDifference,
+  //     };
+  //   });
 
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
     return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
   };
-
-
   const transformedColumns =
     foodData.length > 0 &&
-    [...Object.keys(transformedData?.[0])]
+    [...Object.keys(transformedData?.[0] || {})]
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -160,6 +187,22 @@ const FoodGrid = ({ data: foodRowss }) => {
     { type: "Cancel", buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" } },
   ];
 
+
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const groupSettings = { columns: ["State"] };
 
   const checkHeaderText = (field) => {
@@ -184,8 +227,12 @@ const FoodGrid = ({ data: foodRowss }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return foodRowss["data"].length > 0 ? (
-    <>
+  return loading ? (
+    <div className="h-32">
+    <Loading />
+  </div>
+  ) : foodRowss["data"].length > 0 ? (
+    <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -210,9 +257,7 @@ const FoodGrid = ({ data: foodRowss }) => {
         allowGrouping={true}
         height={350}
         queryCellInfo={handleQueryCellInfo}
-        actionComplete={handleSave }
-        
-
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {transformedColumns?.map(({ field, width }) => (
@@ -225,27 +270,29 @@ const FoodGrid = ({ data: foodRowss }) => {
               width={width}
             />
           ))}
+          {transformedColumns?.map(({ field, width }) => (
+            <ColumnDirective
+              key={field}
+              headerText={checkHeaderText(field)}
+              visible={field !== "_id"}
+              field={field}
+              allowEditing={field === "price" || field === "brand" || field === "size"}
+              width={width}
+            />
+          ))}
+          <ColumnDirective headerText="Action" width={100} commands={commands} />
+
           <ColumnDirective
             headerText="Flag"
             width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${
-                  !isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
+            template={gridTemplate}
             visible={user?.role === 'admin'}
           />
-          <ColumnDirective headerText="Action" width={100} commands={commands} />
+
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No Submissions received yet" />

@@ -19,15 +19,22 @@ import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const AccomodationGrid = ({ data }) => {
   const { user } = useAuth();
   const [accomodataData, setAccomodationData] = useState([]);
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  let dataCount = data.totalCount;
+
+  let accData = data.data;
 
 
   useEffect(() => {
     const getPrevAccData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_accomodation");
 
         const avgPrices = {};
@@ -41,22 +48,47 @@ const AccomodationGrid = ({ data }) => {
               count: 1,
             };
           }
-
         });
-
         const avgPriceArray = Object.entries(avgPrices).map(([type, data]) => ({
           type,
           avgPrice: data.totalPrice / data.count,
         }));
 
         setAccomodationData(avgPriceArray);
+
+        setTransformedData(
+          accData &&
+          accData.length > 0 &&
+          data.data.map((item, i) => {
+            const prevItem = accomodataData.find((prev) => prev.type === item.type);
+            const itemPrice = parseFloat(item.price);
+            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+              : 0;
+            return {
+              S_N: i + 1,
+              Date: arrangeTime(item.updated_at),
+              id: item.created_by?.id,
+              State: item.state,
+              LGA: item.lga,
+              type: item.type,
+              rooms: item.rooms,
+              price: item.price,
+              _id: item._id,
+              priceDifference
+            }
+          }))
+
       } catch (err) {
         console.error("Error fetching previous food data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     getPrevAccData();
-  }, []);
+  }, [accData]);
 
 
   const handleFlagButtonClick = async (rowData) => {
@@ -73,37 +105,6 @@ const AccomodationGrid = ({ data }) => {
     }
   }
 
-
-
-  let dataCount = data.totalCount;
-
-  let accData = data.data;
-
-  const transformedData =
-    accData &&
-    accData.length > 0 &&
-    data.data.map((item, i) => {
-      const prevItem = accomodataData.find((prev) => prev.type === item.type);
-      const itemPrice = parseFloat(item.price);
-      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-        : 0;
-      return {
-        S_N: i + 1,
-        Date: arrangeTime(item.updated_at),
-        id: item.created_by?.id,
-        State: item.state,
-        LGA: item.lga,
-        type: item.type,
-        rooms: item.rooms,
-        price: item.price,
-        _id: item._id,
-        priceDifference
-      }
-
-    })
-
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
     return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
@@ -111,7 +112,7 @@ const AccomodationGrid = ({ data }) => {
 
   const accColumns =
     accData.length > 0 &&
-    Object.keys(transformedData[0])
+    Object.keys(transformedData[0] || {})
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -150,6 +151,20 @@ const AccomodationGrid = ({ data }) => {
     },
   ];
 
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   const handleSave = async (args) => {
     const { data } = args;
@@ -198,7 +213,11 @@ const AccomodationGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return accData.length > 0 ? (
+  return loading ? (
+    <div className="h-32">
+      <Loading />
+    </div>
+  ) : accData.length > 0 ? (
     <>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -239,25 +258,16 @@ const AccomodationGrid = ({ data }) => {
           ))}
 
           <ColumnDirective
-            headerText="Flag"
-            width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                  }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
-            visible={user?.role === 'admin'}
-          />
-
-          <ColumnDirective
             headerText="Action"
             width={100}
             commands={commands}
+          />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === 'admin'}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Toolbar, Edit, CommandColumn]} />

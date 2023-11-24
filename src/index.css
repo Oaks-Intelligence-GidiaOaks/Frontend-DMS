@@ -261,10 +261,7 @@ td[aria-colindex="96"] {
 }
 
 .red-text {
+  color: red !important;
   border: 1px solid red !important;
 }
 
-.disabled {
-  cursor: not-allowed;
-  opacity: 0.5; 
-}

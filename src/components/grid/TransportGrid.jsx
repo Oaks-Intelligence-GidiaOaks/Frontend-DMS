@@ -20,11 +20,13 @@ import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const TransportGrid = ({ data }) => {
   const { user } = useAuth();
   const [prevTransportData, setPrevTransportData] = useState([]);
-
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   let dataCount = data.totalCount;
 
@@ -33,6 +35,7 @@ const TransportGrid = ({ data }) => {
   useEffect(() => {
     const getPrevTransportData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_transport");
         const avgCost = {};
         response.data.data.forEach((prev) => {
@@ -54,12 +57,35 @@ const TransportGrid = ({ data }) => {
         }));
         setPrevTransportData(avgCostArray)
 
+        setTransformedData(
+          transportData.length > 0 &&
+          transportData.map((item, i) => {
+            const prevItem = prevTransportData.find((prev) => prev.mode === item.mode);
+            const itemCost = parseFloat(item.cost);
+            const prevAvgCost = prevItem ? prevItem.itemCost : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
+            return {
+              S_N: i + 1,
+              Date: arrangeTime(item.updated_at),
+              id: item.created_by?.id,
+              State: item.state,
+              LGA: item.lga,
+              route: item.route,
+              mode: item.mode,
+              _id: item._id,
+              cost: item.cost,
+              priceDifference
+            }
+          }));
       } catch (err) {
         console.error("Error fetching previous food data:", err)
+      } finally {
+        setLoading(false);
       }
     }
     getPrevTransportData();
-  }, [])
+  }, [transportData])
 
   const handleFlagButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
@@ -76,27 +102,6 @@ const TransportGrid = ({ data }) => {
   }
 
 
-  const transformedData =
-    transportData.length > 0 &&
-    transportData.map((item, i) => {
-      const prevItem = prevTransportData.find((prev) => prev.mode === item.mode);
-      const itemCost = parseFloat(item.cost);
-      const prevAvgCost = prevItem ? prevItem.itemCost : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
-      return {
-        S_N: i + 1,
-        Date: arrangeTime(item.updated_at),
-        id: item.created_by?.id,
-        State: item.state,
-        LGA: item.lga,
-        route: item.route,
-        mode: item.mode,
-        _id: item._id,
-        cost: item.cost,
-        priceDifference
-      }
-    });
 
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
@@ -107,7 +112,7 @@ const TransportGrid = ({ data }) => {
 
   const transportColumns =
     transportData.length > 0 &&
-    Object.keys(transformedData[0])
+    Object.keys(transformedData[0] || {})
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -146,6 +151,21 @@ const TransportGrid = ({ data }) => {
       buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" },
     },
   ];
+
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
 
 
   const handleSave = async (args) => {
@@ -197,8 +217,12 @@ const TransportGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return transportData.length > 0 ? (
-    <>
+  return loading ? (
+    <div className="h-32">
+      <Loading />
+    </div>
+  ) : transportData.length > 0 ? (
+    <div>
       {user.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -238,30 +262,21 @@ const TransportGrid = ({ data }) => {
           ))}
 
           <ColumnDirective
-            headerText="Flag"
-            width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                  }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
-            visible={user?.role === 'admin'}
-          />
-
-          <ColumnDirective
             headerText="Action"
             width={100}
             commands={commands}
           />
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === 'admin'}
+          />
+
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

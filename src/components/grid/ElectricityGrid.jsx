@@ -17,12 +17,13 @@ import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const ElectricityGrid = ({ data }) => {
   const { user } = useAuth();
-
   const [prevElectricData, setPrevElectricData] = useState([]);
-
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   let dataCount = data.totalCount;
 
@@ -32,6 +33,7 @@ const ElectricityGrid = ({ data }) => {
   useEffect(() => {
     const getPrevElectricData = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_electricity");
         const avgHours = {};
         response.data.data.forEach((prev) => {
@@ -51,8 +53,31 @@ const ElectricityGrid = ({ data }) => {
         }));
         setPrevElectricData(avgHourArray)
 
+        setTransformedData(
+          elecData.length > 0 &&
+          data.data.map((item, i) => {
+            const prevItem = prevElectricData?.find((prev) => prev.state === item.state);
+            const itemHour = parseFloat(item.hours_per_week);
+            const prevAvgHour = prevItem ? prevItem.avgHour : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemHour - prevAvgHour) / prevAvgHour
+              : 0;
+            return {
+              S_N: i + 1,
+              Date: arrangeTime(item.updated_at),
+              id: item.created_by?.id,
+              State: item.state,
+              LGA: item.lga,
+              hours_per_week: item.hours_per_week,
+              _id: item._id,
+              priceDifference
+            }
+          }));
+
       } catch (err) {
         console.error("Error fetching previous food data:", err);
+      } finally {
+        setLoading(false);
       }
     }
     getPrevElectricData()
@@ -73,27 +98,7 @@ const ElectricityGrid = ({ data }) => {
   }
 
 
-  const transformedData =
-    elecData &&
-    elecData.length > 0 &&
-    data.data.map((item, i) => {
-      const prevItem = prevElectricData?.find((prev) => prev.state === item.state);
-      const itemHour = parseFloat(item.hours_per_week);
-      const prevAvgHour = prevItem ? prevItem.avgHour : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemHour - prevAvgHour) / prevAvgHour
-        : 0;
-      return {
-        S_N: i + 1,
-        Date: arrangeTime(item.updated_at),
-        id: item.created_by?.id,
-        State: item.state,
-        LGA: item.lga,
-        hours_per_week: item.hours_per_week,
-        _id: item._id,
-        priceDifference
-      }
-    });
+
 
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
@@ -103,7 +108,7 @@ const ElectricityGrid = ({ data }) => {
 
   const elecColumns =
     elecData.length > 0 &&
-    Object.keys(transformedData[0])
+    Object.keys(transformedData[0] || {})
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -149,6 +154,21 @@ const ElectricityGrid = ({ data }) => {
     },
   ];
 
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const handleSave = async (args) => {
 
     const { data } = args;
@@ -193,8 +213,12 @@ const ElectricityGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return elecData.length > 0 ? (
-    <>
+  return loading ? (
+    <div className="h-32">
+      <Loading />
+    </div>
+  ) : elecData.length > 0 ? (
+    <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -229,32 +253,22 @@ const ElectricityGrid = ({ data }) => {
               visible={field !== "_id"}
             />
           ))}
-
-          <ColumnDirective
-            headerText="Flag"
-            width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                  }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
-            visible={user?.role === 'admin'}
-          />
-
           <ColumnDirective
             headerText="Action"
             width={100}
             commands={commands}
           />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === 'admin'}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

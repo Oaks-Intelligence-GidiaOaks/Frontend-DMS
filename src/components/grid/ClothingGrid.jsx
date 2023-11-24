@@ -17,16 +17,21 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { toast } from 'react-toastify';
+import { Loading } from "../../components/reusable"
 
 const ClothingGrid = ({ data }) => {
   const { user } = useAuth();
   const [prevClothingData, setPrevClothingData] = useState([]);
+  const [transformedData, setTransformedData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   let clothingData = data["data"];
 
   useEffect(() => {
     const getPrevClothingData = async () => {
+
       try {
+        setLoading(true);
         const response = await axios.get("form_response/prev_clothings");
         const avgPrices = {};
         response.data.data.forEach((prev) => {
@@ -46,12 +51,40 @@ const ClothingGrid = ({ data }) => {
           avgPrice: data.totalPrice / data.count,
         }));
         setPrevClothingData(avgPriceArray)
+
+        setTransformedData(
+          clothingData.length > 0 &&
+          clothingData?.map((item, i) => {
+            const prevItem = prevClothingData?.find((prev) => prev.sub_category === item.sub_category);
+            const itemPrice = parseFloat(item.price);
+            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+            const priceDifference = prevItem
+              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
+              : 0;
+            return {
+              S_N: i + 1,
+              _id: item._id,
+              Date: arrangeTime(item.updated_at),
+              id: item.created_by?.id,
+              State: item.state,
+              lga: item.lga,
+              category: item.category,
+              sub_category: item.sub_category,
+              size: item.size,
+              price: item.price,
+              priceDifference
+            }
+
+          }));
+
       } catch (err) {
         console.error("Error fetching previous food data:", err);
+      } finally {
+        setLoading(false);
       }
     }
     getPrevClothingData()
-  }, [])
+  }, [clothingData])
 
 
   const handleFlagButtonClick = async (rowData) => {
@@ -68,32 +101,6 @@ const ClothingGrid = ({ data }) => {
     }
   }
 
-
-  const transformedData =
-    clothingData.length > 0 &&
-    clothingData?.map((item, i) => {
-      const prevItem = prevClothingData?.find((prev) => prev.sub_category === item.sub_category);
-      const itemPrice = parseFloat(item.price);
-      const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-      const priceDifference = prevItem
-        ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-        : 0;
-      return {
-        S_N: i + 1,
-        _id: item._id,
-        Date: arrangeTime(item.updated_at),
-        id: item.created_by?.id,
-        State: item.state,
-        lga: item.lga,
-        category: item.category,
-        sub_category: item.sub_category,
-        size: item.size,
-        price: item.price,
-        priceDifference
-      }
-
-    });
-
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
     return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
@@ -101,7 +108,7 @@ const ClothingGrid = ({ data }) => {
 
   const transformedColumns =
     clothingData.length > 0 &&
-    Object.keys(transformedData?.[0])
+    Object.keys(transformedData?.[0] || {})
       .filter((field) => field !== "priceDifference")
       .map((item) => ({
         field: item,
@@ -159,6 +166,21 @@ const ClothingGrid = ({ data }) => {
     },
   ];
 
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const groupSettings = {
     columns: ["State"],
   };
@@ -191,8 +213,12 @@ const ClothingGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return data["data"].length > 0 ? (
-    <>
+  return loading ? (
+    <div className="h-32">
+      <Loading />
+    </div>
+  ) : data["data"].length > 0 ? (
+    <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -229,32 +255,23 @@ const ClothingGrid = ({ data }) => {
               width={width}
             />
           ))}
-
-          <ColumnDirective
-            headerText="Flag"
-            width={100}
-            template={(rowData) => (
-              <button
-                onClick={() => handleFlagButtonClick(rowData)}
-                className={`bg-danger text-white px-2 rounded text-xs ${!isCellRed("price", rowData.priceDifference) ? 'disabled' : ''
-                  }`}
-                disabled={!isCellRed("price", rowData.priceDifference)}
-              >
-                Flag
-              </button>
-            )}
-            visible={user?.role === 'admin'}
-          />
-
           <ColumnDirective
             headerText="Action"
             width={100}
             commands={commands}
           />
+
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+             visible={user?.role === 'admin'}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />
