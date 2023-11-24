@@ -26,10 +26,8 @@ const AccomodationGrid = ({ data }) => {
   const [accomodataData, setAccomodationData] = useState([]);
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [accData, setAccData] = useState(data.data)
   let dataCount = data.totalCount;
-
-  let accData = data.data;
-
 
   useEffect(() => {
     const getPrevAccData = async () => {
@@ -96,6 +94,9 @@ const AccomodationGrid = ({ data }) => {
       try {
         const response = await axios.patch(`form_response/flag_accomodation/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+        setAccData((prev) =>
+        prev.filter((item) => item._id !== rowData._id)
+      );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -104,6 +105,23 @@ const AccomodationGrid = ({ data }) => {
       toast.error('Invalid data or _id. Unable to flag item.');
     }
   }
+
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/resubmit_accomodation/${rowData._id}`);
+        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
+        setAccData((prev) =>
+        prev.filter((item) => item._id !== rowData._id)
+      );
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to resubmit item.');
+    }
+  };
 
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
@@ -165,6 +183,21 @@ const AccomodationGrid = ({ data }) => {
       </div>
     );
   };
+
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleResubmitButtonClick(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSave = async (args) => {
     const { data } = args;
@@ -268,6 +301,13 @@ const AccomodationGrid = ({ data }) => {
             width={100}
             template={gridTemplate}
             visible={user?.role === 'admin'}
+          />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === 'team_lead'}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Toolbar, Edit, CommandColumn]} />

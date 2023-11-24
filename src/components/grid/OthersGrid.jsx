@@ -24,11 +24,9 @@ const OthersGrid = ({ data }) => {
   const [prevOthersData, setPrevOthersData] = useState([])
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [othersData, setOthersData] = useState(data.data)
 
   let dataCount = data?.totalCount;
-
-  let othersData = data.data;
-
 
   useEffect(() => {
     const getPrevOthersData = async () => {
@@ -58,7 +56,7 @@ const OthersGrid = ({ data }) => {
         setTransformedData(
           othersData &&
           othersData.length > 0 &&
-          data.data.map((item, i) => {
+          othersData.map((item, i) => {
             const prevItem = prevOthersData?.find((prev) => prev.name === item.name);
             const itemPrice = parseFloat(item.price);
             const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
@@ -93,6 +91,10 @@ const OthersGrid = ({ data }) => {
       try {
         const response = await axios.patch(`form_response/flag_other_products/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+        setOthersData((prevFoodData) =>
+        prevFoodData.filter((item) => item._id !== rowData._id)
+      );
+        
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -101,6 +103,23 @@ const OthersGrid = ({ data }) => {
       toast.error('Invalid data or _id. Unable to flag item.');
     }
   }
+
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/resubmit_other_products/${rowData._id}`);
+        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
+        setOthersData((prev) =>
+        prev.filter((item) => item._id !== rowData._id)
+      )
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to resubmit item.');
+    }
+  };
 
 
   const formatProductName = (name) => {
@@ -173,6 +192,21 @@ const OthersGrid = ({ data }) => {
       </div>
     );
   };
+
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleResubmitButtonClick(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
 
 
 
@@ -282,6 +316,13 @@ const OthersGrid = ({ data }) => {
             width={100}
             template={gridTemplate}
             visible={user?.role === 'admin'}
+          />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === 'team_lead'}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />

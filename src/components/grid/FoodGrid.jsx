@@ -24,7 +24,7 @@ const FoodGrid = ({ data: foodRowss }) => {
   const [prevFoodData, setPrevFoodData] = useState([]);
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
-  let foodData = foodRowss.data;
+  const [foodData, setFoodData] = useState(foodRowss.data);
 
   useEffect(() => {
     const getPrevFoodData = async () => {
@@ -83,7 +83,6 @@ const FoodGrid = ({ data: foodRowss }) => {
         setLoading(false);
       }
     };
-
     getPrevFoodData();
   }, [foodData]);
 
@@ -93,15 +92,36 @@ const FoodGrid = ({ data: foodRowss }) => {
         const response = await axios.patch(`form_response/flag_food_product/${rowData._id}`,
           { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+        // window.location.reload();
+        setFoodData((prevFoodData) =>
+        prevFoodData.filter((item) => item._id !== rowData._id)
+      );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      }
+      } 
     } else {
       toast.error('Invalid data or _id. Unable to flag item.');
-    }
+    } 
   }
 
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/resubmit_food_product/${rowData._id}`);
+        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
+        setFoodData((prevFoodData) =>
+        prevFoodData.filter((item) => item._id !== rowData._id)
+      );
+        
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
+      }  
+    } else {
+      toast.error('Invalid data or _id. Unable to resubmit item.');
+    }
+  };
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -110,34 +130,15 @@ const FoodGrid = ({ data: foodRowss }) => {
     return name.replace(/-/g, "");
   };
 
-  // const transformedData =
-  //   foodData.length > 0 &&
-  //   foodData?.map((item, i) => {
-  //     const prevItem = prevFoodData?.find((prev) => prev.name === item.name);
-  //     const itemPrice = parseFloat(item.price);
-  //     const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-  //     const priceDifference = prevItem
-  //       ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-  //       : 0;
-  //     return {
-  //       S_N: i + 1,
-  //       _id: item?._id,
-  //       Date: arrangeTime(item?.updated_at),
-  //       id: item.created_by?.id,
-  //       State: item?.state,
-  //       lga: item?.lga,
-  //       name: formatProductName(item?.name),
-  //       brand: item?.brand,
-  //       size: item?.size,
-  //       price: item?.price,
-  //       priceDifference,
-  //     };
-  //   });
-
-  const isCellRed = (field, priceDifference) => {
+  const isCellRed = (field, priceDifference, flagged) => {
     const threshold = 0.25;
-    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+    const userRole = user?.role;
+    return (
+      (field === 'price' && priceDifference >= threshold && (userRole === 'admin' || userRole === 'team_lead')) &&
+      (price && price === true) 
+    );
   };
+  
   const transformedColumns =
     foodData.length > 0 &&
     [...Object.keys(transformedData?.[0] || {})]
@@ -146,7 +147,7 @@ const FoodGrid = ({ data: foodRowss }) => {
         field: item,
         width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
         cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference)
+          isCellRed(props.column.field, props.data.priceDifference, props.data.price)
             ? "red-border"
             : "",
       }));
@@ -203,6 +204,21 @@ const FoodGrid = ({ data: foodRowss }) => {
     );
   };
 
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+        <button
+            onClick={() => handleResubmitButtonClick(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const groupSettings = { columns: ["State"] };
 
   const checkHeaderText = (field) => {
@@ -227,11 +243,11 @@ const FoodGrid = ({ data: foodRowss }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return loading ? (
+  return loading  ? (
     <div className="h-32">
-    <Loading />
-  </div>
-  ) : foodRowss["data"].length > 0 ? (
+      <Loading />
+    </div>
+  ) : foodData.length > 0 ? (
     <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -288,7 +304,12 @@ const FoodGrid = ({ data: foodRowss }) => {
             template={gridTemplate}
             visible={user?.role === 'admin'}
           />
-
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === 'team_lead'}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
       </GridComponent>

@@ -24,8 +24,7 @@ const ClothingGrid = ({ data }) => {
   const [prevClothingData, setPrevClothingData] = useState([]);
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  let clothingData = data["data"];
+  const [clothingData, setClothingData] = useState(data["data"])
 
   useEffect(() => {
     const getPrevClothingData = async () => {
@@ -92,6 +91,9 @@ const ClothingGrid = ({ data }) => {
       try {
         const response = await axios.patch(`form_response/flag_clothings/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
+        setClothingData((prev) =>
+        prev.filter((item) => item._id !== rowData._id)
+      );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -100,6 +102,23 @@ const ClothingGrid = ({ data }) => {
       toast.error('Invalid data or _id. Unable to flag item.');
     }
   }
+
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      try {
+        const response = await axios.patch(`form_response/resubmit_clothings/${rowData._id}`);
+        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
+        setClothingData((prev) =>
+        prev.filter((item) => item._id !== rowData._id)
+      );
+      } catch (error) {
+        console.error(error);
+        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
+      }
+    } else {
+      toast.error('Invalid data or _id. Unable to resubmit item.');
+    }
+  };
 
   const isCellRed = (field, priceDifference) => {
     const threshold = 0.25;
@@ -181,6 +200,21 @@ const ClothingGrid = ({ data }) => {
     );
   };
 
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleResubmitButtonClick(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const groupSettings = {
     columns: ["State"],
   };
@@ -217,7 +251,7 @@ const ClothingGrid = ({ data }) => {
     <div className="h-32">
       <Loading />
     </div>
-  ) : data["data"].length > 0 ? (
+  ) : clothingData.length > 0 ? (
     <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -260,13 +294,17 @@ const ClothingGrid = ({ data }) => {
             width={100}
             commands={commands}
           />
-
-
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={gridTemplate}
-             visible={user?.role === 'admin'}
+            visible={user?.role === 'admin'}
+          />
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === 'team_lead'}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
