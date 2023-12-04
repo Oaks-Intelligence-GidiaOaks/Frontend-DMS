@@ -33,6 +33,8 @@ const ClothingGrid = ({ data }) => {
         setLoading(true);
         const response = await axios.get("form_response/prev_clothings");
         const avgPrices = {};
+        const countByLga = {};
+
         response.data.data.forEach((prev) => {
           if (avgPrices[prev.sub_category]) {
             avgPrices[prev.sub_category].totalPrice += parseFloat(prev.price);
@@ -42,6 +44,14 @@ const ClothingGrid = ({ data }) => {
               totalPrice: parseFloat(prev.price),
               count: 1,
             }
+          }
+
+          if(countByLga[prev.sub_category]) {
+            if(!countByLga[prev.sub_category].includes(prev.lga)) {
+              countByLga[prev.sub_category].push(prev.lga);
+            }
+          } else {
+            countByLga[prev.sub_category] = [prev.lga]
           }
         })
 
@@ -60,6 +70,7 @@ const ClothingGrid = ({ data }) => {
             const priceDifference = prevItem
               ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
               : 0;
+              const lgasCount = countByLga[item.sub_category] ? countByLga[item.sub_category].length : 1;
             return {
               S_N: i + 1,
               _id: item._id,
@@ -71,7 +82,8 @@ const ClothingGrid = ({ data }) => {
               sub_category: item.sub_category,
               size: item.size,
               price: item.price,
-              priceDifference
+              priceDifference,
+              avgPriceByLga: prevAvgPrice / lgasCount,
             }
 
           }));
@@ -128,7 +140,7 @@ const ClothingGrid = ({ data }) => {
   const transformedColumns =
     clothingData.length > 0 &&
     Object.keys(transformedData?.[0] || {})
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga")
       .map((item) => ({
         field: item,
         // width: item.length < 4 ? 120 : item.length + 130,
@@ -161,7 +173,6 @@ const ClothingGrid = ({ data }) => {
           .patch(`form_response/clothings/${modifiedData._id}`, modifiedData)
           .then((res) => {
             alert(res.data.message);
-            // console.log(res.data);
           })
           .catch((err) => console.error(err));
       } catch (error) {

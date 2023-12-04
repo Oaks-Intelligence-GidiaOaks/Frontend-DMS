@@ -37,6 +37,7 @@ const TransportGrid = ({ data }) => {
         setLoading(true);
         const response = await axios.get("form_response/prev_transport");
         const avgCost = {};
+        const countByLga = {};
         response.data.data.forEach((prev) => {
           if (avgCost[prev.mode]) {
             avgCost[prev.mode].totalCost += parseFloat(prev.cost);
@@ -48,7 +49,15 @@ const TransportGrid = ({ data }) => {
               count: 1
             }
           }
+          if (countByLga[prev.mode]) {
+            if (!countByLga[prev.mode].includes(prev.lga)) {
+              countByLga[prev.mode].push(prev.lga);
+            }
+          } else {
+            countByLga[prev.mode] = [prev.lga]
+          }
         })
+
 
         const avgCostArray = Object.entries(avgCost).map(([mode, data]) => ({
           mode,
@@ -64,6 +73,7 @@ const TransportGrid = ({ data }) => {
             const prevAvgCost = prevItem ? prevItem.itemCost : 0;
             const priceDifference = prevItem
               ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
+              const lgasCount = countByLga[item.mode] ? countByLga[item.mode].length : 1
             return {
               S_N: i + 1,
               Date: arrangeTime(item.updated_at),
@@ -74,7 +84,8 @@ const TransportGrid = ({ data }) => {
               mode: item.mode,
               _id: item._id,
               cost: item.cost,
-              priceDifference
+              priceDifference,
+              avgCostByLga: prevAvgCost / lgasCount
             }
           }));
       } catch (err) {
@@ -92,8 +103,8 @@ const TransportGrid = ({ data }) => {
         const response = await axios.patch(`form_response/flag_transport/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
         setTransportData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
+          prev.filter((item) => item._id !== rowData._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -109,7 +120,7 @@ const TransportGrid = ({ data }) => {
         const response = await axios.patch(`form_response/resubmit_transport/${rowData._id}`);
         toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
         setTransportData((prev) =>
-        prev.filter((item) => item._id !== rowData._id));
+          prev.filter((item) => item._id !== rowData._id));
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
@@ -131,7 +142,7 @@ const TransportGrid = ({ data }) => {
   const transportColumns =
     transportData.length > 0 &&
     Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgCostByLga")
       .map((item) => ({
         field: item,
         width: item === "route" ? item.length + 200 : 130,

@@ -34,6 +34,8 @@ const ElectricityGrid = ({ data }) => {
         setLoading(true);
         const response = await axios.get("form_response/prev_electricity");
         const avgHours = {};
+        const countByLga = {};
+
         response.data.data.forEach((prev) => {
           if (avgHours[prev.state]) {
             avgHours[prev.state].totalHour += parseFloat(prev.hours_per_week);
@@ -43,6 +45,14 @@ const ElectricityGrid = ({ data }) => {
               totalHour: parseFloat(prev.hours_per_week),
               count: 1
             }
+          }
+
+          if (countByLga[prev.state]) {
+            if (!countByLga[prev.state].includes(prev.lga)) {
+              countByLga[prev.state].push(prev.lga)
+            }
+          } else {
+            countByLga[prev.state] = [prev.lga]
           }
         })
         const avgHourArray = Object.entries(avgHours).map(([state, data]) => ({
@@ -60,6 +70,7 @@ const ElectricityGrid = ({ data }) => {
             const priceDifference = prevItem
               ? Math.abs(itemHour - prevAvgHour) / prevAvgHour
               : 0;
+              const lgasCount = countByLga[item.state] ? countByLga[item.state].length : 1;
             return {
               S_N: i + 1,
               Date: arrangeTime(item.updated_at),
@@ -68,7 +79,8 @@ const ElectricityGrid = ({ data }) => {
               LGA: item.lga,
               hours_per_week: item.hours_per_week,
               _id: item._id,
-              priceDifference
+              priceDifference,
+              avgHourByLga: prevAvgHour / lgasCount
             }
           }));
 
@@ -87,8 +99,8 @@ const ElectricityGrid = ({ data }) => {
         const response = await axios.patch(`form_response/flag_electricity/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
         setElecData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
+          prev.filter((item) => item._id !== rowData._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -104,8 +116,8 @@ const ElectricityGrid = ({ data }) => {
         const response = await axios.patch(`form_response/resubmit_electricity/${rowData._id}`);
         toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
         setElecData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
+          prev.filter((item) => item._id !== rowData._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
@@ -128,7 +140,7 @@ const ElectricityGrid = ({ data }) => {
   const elecColumns =
     elecData.length > 0 &&
     Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgHourByLga")
       .map((item) => ({
         field: item,
         // width: item.length ? item.length + 150 : 100,

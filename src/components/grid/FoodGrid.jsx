@@ -25,14 +25,17 @@ const FoodGrid = ({ data: foodRowss }) => {
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [foodData, setFoodData] = useState(foodRowss.data);
-
   useEffect(() => {
     const getPrevFoodData = async () => {
       try {
         setLoading(true);
         const response = await axios.get("form_response/prev_food_product");
-
+    
+        // Initialize objects to track total price and count for each food product
         const avgPrices = {};
+        const countByLga = {};
+
+        // Loop through the response data to calculate total price and count
         response.data.data.forEach((prev) => {
           if (avgPrices[prev.name]) {
             avgPrices[prev.name].totalPrice += parseFloat(prev.price);
@@ -43,39 +46,53 @@ const FoodGrid = ({ data: foodRowss }) => {
               count: 1,
             };
           }
+
+          // Track count by lga
+          if (countByLga[prev.name]) {
+            if (!countByLga[prev.name].includes(prev.lga)) {
+              countByLga[prev.name].push(prev.lga);
+            }
+          } else {
+            countByLga[prev.name] = [prev.lga];
+          }
         });
 
+        // Calculate average prices for each food product
         const avgPriceArray = Object.entries(avgPrices).map(([name, data]) => ({
           name,
           avgPrice: data.totalPrice / data.count,
         }));
 
+        // Set the calculated average prices to state
         setPrevFoodData(avgPriceArray);
 
-        // update transformedData here
+        // Update transformedData with calculated values
         setTransformedData(
           foodData.length > 0 &&
-          foodData?.map((item, i) => {
-            const prevItem = avgPriceArray.find((prev) => prev.name === item.name);
-            const itemPrice = parseFloat(item.price);
-            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-            const priceDifference = prevItem
-              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-              : 0;
-            return {
-              S_N: i + 1,
-              _id: item?._id,
-              Date: arrangeTime(item?.updated_at),
-              id: item.created_by?.id,
-              State: item?.state,
-              lga: item?.lga,
-              name: formatProductName(item?.name),
-              brand: item?.brand,
-              size: item?.size,
-              price: item?.price,
-              priceDifference,
-            };
-          })
+            foodData?.map((item, i) => {
+              const prevItem = avgPriceArray.find((prev) => prev.name === item.name);
+              const itemPrice = parseFloat(item.price);
+              const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
+              const priceDifference = prevItem
+                ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice : 0;
+              // Calculate the number of local government areas for each food product
+              const lgasCount = countByLga[item.name] ? countByLga[item.name].length : 1;
+              return {
+                S_N: i + 1,
+                _id: item?._id,
+                Date: arrangeTime(item?.updated_at),
+                id: item.created_by?.id,
+                State: item?.state,
+                lga: item?.lga,
+                name: formatProductName(item?.name),
+                brand: item?.brand,
+                size: item?.size,
+                price: item?.price,
+                priceDifference,
+                avgPriceByLga: prevAvgPrice / lgasCount,
+           
+              };
+            })
         );
       } catch (err) {
         console.error("Error fetching previous food data:", err);
@@ -142,7 +159,7 @@ const FoodGrid = ({ data: foodRowss }) => {
   const transformedColumns =
     foodData.length > 0 &&
     [...Object.keys(transformedData?.[0] || {})]
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga" )
       .map((item) => ({
         field: item,
         width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,

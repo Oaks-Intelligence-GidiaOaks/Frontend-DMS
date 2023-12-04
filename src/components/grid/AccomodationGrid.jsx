@@ -36,6 +36,8 @@ const AccomodationGrid = ({ data }) => {
         const response = await axios.get("form_response/prev_accomodation");
 
         const avgPrices = {};
+        const countByLga = {};
+
         response.data.data.forEach((prev) => {
           if (avgPrices[prev.type]) {
             avgPrices[prev.type].totalPrice += parseFloat(prev.price);
@@ -45,6 +47,14 @@ const AccomodationGrid = ({ data }) => {
               totalPrice: parseFloat(prev.price),
               count: 1,
             };
+          }
+
+          if (countByLga[prev.type]) {
+            if (!countByLga[prev.type].includes(prev.lag)) {
+              countByLga[prev.type].push(prev.lga)
+            }
+          } else {
+            countByLga[prev.type] = [prev.lga];
           }
         });
         const avgPriceArray = Object.entries(avgPrices).map(([type, data]) => ({
@@ -64,6 +74,7 @@ const AccomodationGrid = ({ data }) => {
             const priceDifference = prevItem
               ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
               : 0;
+              const lgasCount = countByLga[item.type] ? countByLga[item.type].length : 1;
             return {
               S_N: i + 1,
               Date: arrangeTime(item.updated_at),
@@ -74,7 +85,8 @@ const AccomodationGrid = ({ data }) => {
               rooms: item.rooms,
               price: item.price,
               _id: item._id,
-              priceDifference
+              priceDifference,
+              avgAccByLga: prevAvgPrice / lgasCount,
             }
           }))
 
@@ -95,8 +107,8 @@ const AccomodationGrid = ({ data }) => {
         const response = await axios.patch(`form_response/flag_accomodation/${rowData._id}`, { flagged: true });
         toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
         setAccData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
+          prev.filter((item) => item._id !== rowData._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
@@ -112,8 +124,8 @@ const AccomodationGrid = ({ data }) => {
         const response = await axios.patch(`form_response/resubmit_accomodation/${rowData._id}`);
         toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
         setAccData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
+          prev.filter((item) => item._id !== rowData._id)
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
@@ -131,7 +143,7 @@ const AccomodationGrid = ({ data }) => {
   const accColumns =
     accData.length > 0 &&
     Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgAccByLga")
       .map((item) => ({
         field: item,
         // width: item.length === "type" ? item.length + 120 : 120,

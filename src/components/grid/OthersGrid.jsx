@@ -25,6 +25,7 @@ const OthersGrid = ({ data }) => {
   const [transformedData, setTransformedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [othersData, setOthersData] = useState(data.data)
+  console.log(prevOthersData);
 
   let dataCount = data?.totalCount;
 
@@ -34,6 +35,8 @@ const OthersGrid = ({ data }) => {
         setLoading(true);
         const response = await axios.get("form_response/prev_other_products");
         const avgPrices = {};
+        const countByLga = {};
+
         response.data.data.forEach((prev) => {
           if (avgPrices[prev.name]) {
             avgPrices[prev.name].totalPrice += parseFloat(prev.price);
@@ -44,6 +47,15 @@ const OthersGrid = ({ data }) => {
               count: 1,
             };
           }
+
+             // Track count by lga
+             if (countByLga[prev.name]) {
+              if (!countByLga[prev.name].includes(prev.lga)) {
+                countByLga[prev.name].push(prev.lga);
+              }
+            } else {
+              countByLga[prev.name] = [prev.lga];
+            }
         })
 
         const avgPriceArray = Object.entries(avgPrices).map(([name, data]) => ({
@@ -63,6 +75,7 @@ const OthersGrid = ({ data }) => {
             const priceDifference = prevItem
               ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
               : 0;
+              const lgasCount = countByLga[item.name] ? countByLga[item.name].length : 1;
             return {
               S_N: i + 1,
               Date: arrangeTime(item.updated_at),
@@ -74,7 +87,8 @@ const OthersGrid = ({ data }) => {
               brand: item.brand.length > 1 ? item.brand : "N/A",
               _id: item._id,
               size: item.size,
-              priceDifference
+              priceDifference,
+              avgPriceByLga: prevAvgPrice / lgasCount
             }
           }));
       } catch (err) {
@@ -140,7 +154,7 @@ const OthersGrid = ({ data }) => {
   const othersColumns =
     othersData.length > 0 &&
     Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference")
+      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga")
       .map((item) => ({
         field: item,
         // width: item.length ? item.length + 130 : 130,
