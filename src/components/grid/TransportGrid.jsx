@@ -12,149 +12,105 @@ import {
   Toolbar,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
-import { TransportRows, TransportColumns } from "../../data/formResponses";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
-import { toast } from 'react-toastify';
-import { Loading } from "../../components/reusable"
+import { toast } from "react-toastify";
+import { Loading } from "../../components/reusable";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const TransportGrid = ({ data }) => {
+const TransportGrid = ({ data, avgData }) => {
   const { user } = useAuth();
-  const [prevTransportData, setPrevTransportData] = useState([]);
-  const [transformedData, setTransformedData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [transportData, setTransportData] = useState(data.data)
 
-  let dataCount = data.totalCount;
+  let transportData = data;
 
-  useEffect(() => {
-    const getPrevTransportData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("form_response/prev_transport");
-        const avgCost = {};
-        const countByLga = {};
-        response.data.data.forEach((prev) => {
-          if (avgCost[prev.mode]) {
-            avgCost[prev.mode].totalCost += parseFloat(prev.cost);
-            avgCost[prev.mode].count += 1;
+  const editTransportPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/transport/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+    },
+    onError: (err) => {
+      toast.error("error editing value, try again!");
+    },
+  });
 
-          } else {
-            avgCost[prev.mode] = {
-              totalCost: parseFloat(prev.cost),
-              count: 1
-            }
-          }
-          if (countByLga[prev.mode]) {
-            if (!countByLga[prev.mode].includes(prev.lga)) {
-              countByLga[prev.mode].push(prev.lga);
-            }
-          } else {
-            countByLga[prev.mode] = [prev.lga]
-          }
-        })
+  // resubmit mutation
+  const resubmitProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_transport/${rowData._id}`),
+    onSuccess: ({ data }) => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+    },
+    onError: (err) => {
+      toast.error("could not submit data, try again!");
+    },
+  });
 
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_transport/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+      // queryClient.refetchQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-        const avgCostArray = Object.entries(avgCost).map(([mode, data]) => ({
-          mode,
-          avgCost: data.totalCost / data.count,
-        }));
-        setPrevTransportData(avgCostArray)
-
-        setTransformedData(
-          transportData.length > 0 &&
-          transportData.map((item, i) => {
-            const prevItem = prevTransportData.find((prev) => prev.mode === item.mode);
-            const itemCost = parseFloat(item.cost);
-            const prevAvgCost = prevItem ? prevItem.itemCost : 0;
-            const priceDifference = prevItem
-              ? Math.abs(itemCost - prevAvgCost) / prevAvgCost : 0;
-              const lgasCount = countByLga[item.mode] ? countByLga[item.mode].length : 1
-            return {
-              S_N: i + 1,
-              Date: arrangeTime(item.updated_at),
-              id: item.created_by?.id,
-              State: item.state,
-              LGA: item.lga,
-              route: item.route,
-              mode: item.mode,
-              _id: item._id,
-              cost: item.cost,
-              priceDifference,
-              avgCostByLga: prevAvgCost / lgasCount
-            }
-          }));
-      } catch (err) {
-        console.error("Error fetching previous food data:", err)
-      } finally {
-        setLoading(false);
-      }
-    }
-    getPrevTransportData();
-  }, [transportData])
-
-  const handleFlagButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/flag_transport/${rowData._id}`, { flagged: true });
-        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
-        setTransportData((prev) =>
-          prev.filter((item) => item._id !== rowData._id)
-        );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      }
-    } else {
-      toast.error('Invalid data or _id. Unable to flag item.');
-    }
-  }
-
-  const handleResubmitButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/resubmit_transport/${rowData._id}`);
-        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
-        setTransportData((prev) =>
-          prev.filter((item) => item._id !== rowData._id));
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
-      }
-    } else {
-      toast.error('Invalid data or _id. Unable to resubmit item.');
-    }
-  };
-
-
-
-  const isCellRed = (field, priceDifference) => {
-    const threshold = 0.25;
-    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
-  };
-
-
+  const transformedData =
+    transportData.length > 0 &&
+    transportData.map((item, i) => ({
+      S_N: i + 1,
+      Date: arrangeTime(item.updated_at),
+      id: item.created_by?.id,
+      State: item.state,
+      LGA: item.lga,
+      route: item.route,
+      mode: item.mode,
+      _id: item._id,
+      cost: item.cost,
+      flagged: item.flagged,
+    }));
 
   const transportColumns =
     transportData.length > 0 &&
-    Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference" && field !== "avgCostByLga")
-      .map((item) => ({
-        field: item,
-        width: item === "route" ? item.length + 200 : 130,
-        allowEditing: item === "cost",
-        cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference)
-            ? "red-border"
-            : "",
-      }));
+    Object.keys(transformedData[0]).map((item) => ({
+      field: item,
+      width: item === "route" ? item.length + 200 : 130,
+      allowEditing: item === "cost",
+    }));
+
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      await flagProduct.mutateAsync(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to flag item.");
+    }
+  };
 
   const handleQueryCellInfo = (args) => {
-    if (args.column.field === "cost" && args.data.priceDifference >= 0.25) {
+    if (
+      args.column.field === "cost" &&
+      isOutsideLimit(avgData, "transport", args.data)
+    ) {
       args.cell.classList.add("red-text");
     }
   };
@@ -201,7 +157,7 @@ const TransportGrid = ({ data }) => {
       <div>
         <div>
           <button
-            onClick={() => handleResubmitButtonClick(rowData)}
+            onClick={() => resubmitProduct.mutate(rowData)}
             className="text-white px-2 py-1 rounded text-xs bg-primary-green"
           >
             Submit
@@ -209,29 +165,19 @@ const TransportGrid = ({ data }) => {
         </div>
       </div>
     );
-  }
-
+  };
 
   const handleSave = async (args) => {
-
     const { data } = args;
     if (args.requestType === "save") {
       const modifiedData = {
         cost: data.cost,
-
+        _id: data._id,
+        route: data.route,
+        mode: data.mode,
       };
 
-      try {
-        await axios
-          .patch(`form_response/transport/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-            // console.log(res.data);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+      editTransportPrice.mutate(modifiedData);
     }
   };
 
@@ -239,16 +185,16 @@ const TransportGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-        ? "ID"
-        : field === "lga"
-          ? "LGA"
-          : field === "route"
-            ? "Route"
-            : field === "cost"
-              ? "Cost"
-              : field === "mode"
-                ? "Mode"
-                : field;
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "route"
+      ? "Route"
+      : field === "cost"
+      ? "Cost"
+      : field === "mode"
+      ? "Mode"
+      : field;
   };
 
   const handleDownload = () => {
@@ -261,11 +207,7 @@ const TransportGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return loading ? (
-    <div className="h-32">
-      <Loading />
-    </div>
-  ) : transportData.length > 0 ? (
+  return transportData.length > 0 ? (
     <div>
       {user.role !== "team_lead" && (
         <div className="my-3">
@@ -291,7 +233,7 @@ const TransportGrid = ({ data }) => {
         height={350}
         queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
-      // commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {transportColumns.map(({ field, width }) => (
@@ -300,7 +242,7 @@ const TransportGrid = ({ data }) => {
               field={field}
               headerText={checkHeaderText(field)}
               width={width}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
               allowEditing={field === "cost"}
             />
           ))}
@@ -314,16 +256,15 @@ const TransportGrid = ({ data }) => {
             headerText="Flag"
             width={100}
             template={gridTemplate}
-            visible={user?.role === 'admin'}
+            visible={user?.role === "admin"}
           />
 
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={resubmitTemplate}
-            visible={user?.role === 'team_lead'}
+            visible={user?.role === "team_lead"}
           />
-
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>

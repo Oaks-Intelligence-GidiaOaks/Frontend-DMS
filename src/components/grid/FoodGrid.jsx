@@ -13,130 +13,70 @@ import {
 import axios from "axios";
 import { useAuth } from "../../context";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
-import { toast } from 'react-toastify';
-import { Loading } from "../../components/reusable"
+import { toast } from "react-toastify";
+import { Loading } from "../../components/reusable";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const FoodGrid = ({ data: foodRowss }) => {
+const FoodGrid = ({ data: foodRowss, avgData }) => {
   const { user } = useAuth();
-  const [prevFoodData, setPrevFoodData] = useState([]);
-  const [transformedData, setTransformedData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [foodData, setFoodData] = useState(foodRowss.data);
-  useEffect(() => {
-    const getPrevFoodData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("form_response/prev_food_product");
-    
-        // Initialize objects to track total price and count for each food product
-        const avgPrices = {};
-        const countByLga = {};
 
-        // Loop through the response data to calculate total price and count
-        response.data.data.forEach((prev) => {
-          if (avgPrices[prev.name]) {
-            avgPrices[prev.name].totalPrice += parseFloat(prev.price);
-            avgPrices[prev.name].count += 1;
-          } else {
-            avgPrices[prev.name] = {
-              totalPrice: parseFloat(prev.price),
-              count: 1,
-            };
-          }
+  let foodData = foodRowss;
 
-          // Track count by lga
-          if (countByLga[prev.name]) {
-            if (!countByLga[prev.name].includes(prev.lga)) {
-              countByLga[prev.name].push(prev.lga);
-            }
-          } else {
-            countByLga[prev.name] = [prev.lga];
-          }
-        });
+  const editFoodPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/food_product/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+      queryClient.refetchQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.success(err.message);
+    },
+  });
 
-        // Calculate average prices for each food product
-        const avgPriceArray = Object.entries(avgPrices).map(([name, data]) => ({
-          name,
-          avgPrice: data.totalPrice / data.count,
-        }));
+  const resubmitFoodProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_food_product/${rowData._id}`),
+    onSuccess: (data) => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error("could not submit data, try again");
+    },
+  });
 
-        // Set the calculated average prices to state
-        setPrevFoodData(avgPriceArray);
-
-        // Update transformedData with calculated values
-        setTransformedData(
-          foodData.length > 0 &&
-            foodData?.map((item, i) => {
-              const prevItem = avgPriceArray.find((prev) => prev.name === item.name);
-              const itemPrice = parseFloat(item.price);
-              const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-              const priceDifference = prevItem
-                ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice : 0;
-              // Calculate the number of local government areas for each food product
-              const lgasCount = countByLga[item.name] ? countByLga[item.name].length : 1;
-              return {
-                S_N: i + 1,
-                _id: item?._id,
-                Date: arrangeTime(item?.updated_at),
-                id: item.created_by?.id,
-                State: item?.state,
-                lga: item?.lga,
-                name: formatProductName(item?.name),
-                brand: item?.brand,
-                size: item?.size,
-                price: item?.price,
-                priceDifference,
-                avgPriceByLga: prevAvgPrice / lgasCount,
-           
-              };
-            })
-        );
-      } catch (err) {
-        console.error("Error fetching previous food data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getPrevFoodData();
-  }, [foodData]);
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_food_product/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const handleFlagButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/flag_food_product/${rowData._id}`,
-          { flagged: true });
-        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
-        // window.location.reload();
-        setFoodData((prevFoodData) =>
-        prevFoodData.filter((item) => item._id !== rowData._id)
-      );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      } 
+      flagProduct.mutate(rowData);
     } else {
-      toast.error('Invalid data or _id. Unable to flag item.');
-    } 
-  }
-
-  const handleResubmitButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/resubmit_food_product/${rowData._id}`);
-        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
-        setFoodData((prevFoodData) =>
-        prevFoodData.filter((item) => item._id !== rowData._id)
-      );
-        
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
-      }  
-    } else {
-      toast.error('Invalid data or _id. Unable to resubmit item.');
+      toast.error("Invalid data or _id. Unable to flag item.");
     }
   };
 
@@ -147,35 +87,41 @@ const FoodGrid = ({ data: foodRowss }) => {
     return name.replace(/-/g, "");
   };
 
-  const isCellRed = (field, priceDifference, flagged) => {
-    const threshold = 0.25;
-    const userRole = user?.role;
-    return (
-      (field === 'price' && priceDifference >= threshold && (userRole === 'admin' || userRole === 'team_lead')) &&
-      (price && price === true) 
-    );
-  };
-  
+  const transformedData =
+    foodData?.length > 0 &&
+    foodData?.map((item, i) => ({
+      S_N: i + 1,
+      _id: item?._id,
+      Date: arrangeTime(item?.updated_at),
+      id: item.created_by?.id,
+      State: item?.state,
+      lga: item?.lga,
+      name: formatProductName(item?.name),
+      brand: item?.brand,
+      size: item?.size,
+      price: item?.price,
+      flagged: item?.flagged,
+    }));
+
   const transformedColumns =
-    foodData.length > 0 &&
-    [...Object.keys(transformedData?.[0] || {})]
-      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga" )
-      .map((item) => ({
-        field: item,
-        width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
-        cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference, props.data.price)
-            ? "red-border"
-            : "",
-      }));
+    foodData?.length > 0 &&
+    Object.keys(transformedData?.[0]).map((item) => ({
+      field: item,
+      width: item.length < 4 ? 120 : item.length + 130,
+    }));
+
   const handleQueryCellInfo = (args) => {
-    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+    if (
+      args.column.field === "price" &&
+      isOutsideLimit(avgData, "food", args.data)
+    ) {
       args.cell.classList.add("red-text");
     }
   };
 
   const pageSettings = { pageSize: 60 };
   const editSettings = { allowEditing: true };
+
   const handleSave = async (args) => {
     const { data } = args;
 
@@ -184,27 +130,28 @@ const FoodGrid = ({ data: foodRowss }) => {
         size: data.size,
         brand: data.brand,
         price: data.price,
+        name: data.name,
+        _id: data._id,
       };
 
-      try {
-        await axios
-          .patch(`form_response/food_product/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+      editFoodPrice.mutate(modifiedData);
     }
   };
 
   const commands = [
-    { type: "Edit", buttonOption: { cssClass: "e-flat", iconCss: "e-edit e-icons" } },
-    { type: "Save", buttonOption: { cssClass: "e-flat", iconCss: "e-update e-icons" } },
-    { type: "Cancel", buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" } },
+    {
+      type: "Edit",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-edit e-icons" },
+    },
+    {
+      type: "Save",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-update e-icons" },
+    },
+    {
+      type: "Cancel",
+      buttonOption: { cssClass: "e-flat", iconCss: "e-cancel-icon e-icons" },
+    },
   ];
-
 
   const gridTemplate = (rowData) => {
     return (
@@ -225,8 +172,8 @@ const FoodGrid = ({ data: foodRowss }) => {
     return (
       <div>
         <div>
-        <button
-            onClick={() => handleResubmitButtonClick(rowData)}
+          <button
+            onClick={() => resubmitFoodProduct.mutate(rowData)}
             className="text-white px-2 py-1 rounded text-xs bg-primary-green"
           >
             Submit
@@ -234,7 +181,7 @@ const FoodGrid = ({ data: foodRowss }) => {
         </div>
       </div>
     );
-  }
+  };
 
   const groupSettings = { columns: ["State"] };
 
@@ -247,6 +194,7 @@ const FoodGrid = ({ data: foodRowss }) => {
       price: "Price",
       size: "Size",
     };
+
     return headerMapping[field] || field;
   };
 
@@ -260,11 +208,15 @@ const FoodGrid = ({ data: foodRowss }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return loading  ? (
-    <div className="h-32">
-      <Loading />
-    </div>
-  ) : foodData.length > 0 ? (
+  if (!foodData) {
+    return (
+      <div className="h-32">
+        <Loading />
+      </div>
+    );
+  }
+
+  return foodData?.length > 0 ? (
     <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -297,35 +249,31 @@ const FoodGrid = ({ data: foodRowss }) => {
             <ColumnDirective
               key={field}
               headerText={checkHeaderText(field)}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
               field={field}
-              allowEditing={field === "price" || field === "brand" || field === "size"}
+              allowEditing={field === "price"}
               width={width}
+              cssClass="red-text"
             />
           ))}
-          {transformedColumns?.map(({ field, width }) => (
-            <ColumnDirective
-              key={field}
-              headerText={checkHeaderText(field)}
-              visible={field !== "_id"}
-              field={field}
-              allowEditing={field === "price" || field === "brand" || field === "size"}
-              width={width}
-            />
-          ))}
-          <ColumnDirective headerText="Action" width={100} commands={commands} />
+
+          <ColumnDirective
+            headerText="Action"
+            width={100}
+            commands={commands}
+          />
 
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={gridTemplate}
-            visible={user?.role === 'admin'}
+            visible={user?.role === "admin"}
           />
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={resubmitTemplate}
-            visible={user?.role === 'team_lead'}
+            visible={user?.role === "team_lead"}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
@@ -339,4 +287,3 @@ const FoodGrid = ({ data: foodRowss }) => {
 };
 
 export default FoodGrid;
-

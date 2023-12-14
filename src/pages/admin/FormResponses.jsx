@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CategoryTab from "../../components/CategoryTab";
 import {
   Restaurant,
@@ -23,23 +23,122 @@ import {
 import OaksSlider from "../../components/Slider";
 import axios from "axios";
 import { Loading } from "../../components/reusable";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
 const FormResponses = () => {
   const [activeTab, setActiveTab] = useState("food");
-  const [foodData, setFoodData] = useState(null);
-  const [transportData, setTransportData] = useState(null);
-  const [accomodationData, setAccomodationData] = useState(null);
-  const [electricityData, setElectricityData] = useState(null);
-  const [othersData, setOthersData] = useState(null);
-  const [notesData, setNotesData] = useState(null);
-  const [clothingData, setClothingData] = useState(null);
-  const [submissionData, setSubmissionData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   // styles
   const activeStyle = "bg-oaksgreen text-white";
   const nonActiveStyle = "bg-white";
 
+  // admin submission rate
+  const getSubRate = useQuery({
+    queryKey: ["getSubRateTl"],
+    queryFn: async () =>
+      await axios.get("form_response/admin_response_tracker"),
+  });
+
+  const getFoodData = useQuery({
+    queryKey: ["getFoodData"],
+    queryFn: async () => {
+      const res = await axios.get("form_response/food_product");
+
+      if (res.statusText == "OK") {
+        return res;
+      }
+    },
+  });
+
+  const getAvgFoodData = useQuery({
+    queryKey: ["getAvgFoodData"],
+    queryFn: async () => {
+      const res = await axios.get("form_response/prev_food_product");
+      return res;
+    },
+  });
+
+  const getTransData = useQuery({
+    queryKey: ["getTransData"],
+    queryFn: async () => {
+      const res = await axios.get("form_response/transport");
+      return res;
+    },
+  });
+
+  const getAvgTransData = useQuery({
+    queryKey: ["getAvgTransData"],
+    queryFn: async () => await axios.get("form_response/prev_transport"),
+  });
+
+  const getAccData = useQuery({
+    queryKey: ["getAccData"],
+    queryFn: async () => await axios.get("form_response/accomodation"),
+  });
+  const getAvgAccData = useQuery({
+    queryKey: ["getAvgAccData"],
+    queryFn: async () => await axios.get("form_response/prev_accomodation"),
+  });
+
+  const getElecData = useQuery({
+    queryKey: ["getElecData"],
+    queryFn: async () => await axios.get("form_response/electricity"),
+  });
+  const getAvgElecData = useQuery({
+    queryKey: ["getAvgElecData"],
+    queryFn: async () => await axios.get("form_response/prev_electricity"),
+  });
+
+  const getOthersData = useQuery({
+    queryKey: ["getOthersData"],
+    queryFn: async () => await axios.get("form_response/other_products"),
+  });
+  const getAvgOthersData = useQuery({
+    queryKey: ["getAvgOthersData"],
+    queryFn: async () => await axios.get("form_response/prev_other_products"),
+  });
+
+  const getNotesData = useQuery({
+    queryKey: ["getNotesData"],
+    queryFn: async () => await axios.get("form_response/questions"),
+  });
+
+  const getClothData = useQuery({
+    queryKey: ["getClothData"],
+    queryFn: async () => await axios.get("form_response/clothings"),
+  });
+
+  const getAvgClothData = useQuery({
+    queryKey: ["getAvgClothData"],
+    queryFn: async () => await axios.get("form_response/prev_clothings"),
+  });
+
+  // all data values
+  let submissionData = getSubRate?.data?.data || null;
+
+  let foodData = getFoodData?.data?.data?.data || null;
+  let avgFoodData = getAvgFoodData?.data?.data?.data || null;
+
+  let transportData = getTransData?.data?.data?.data || null;
+  let avgTransportData = getAvgTransData?.data?.data?.data || null;
+
+  let accomodationData = getAccData?.data?.data?.data || null;
+  let avgAccData = getAvgAccData?.data?.data?.data || null;
+
+  let electricityData = getElecData?.data?.data?.data || null;
+  let avgElecData = getAvgElecData?.data?.data?.data || null;
+
+  let othersData = getOthersData?.data?.data?.data || null;
+  let avgOthersData = getAvgOthersData?.data?.data?.data || null;
+
+  let notesData = getNotesData?.data?.data?.data || null;
+
+  let clothingData = getClothData?.data?.data?.data || null;
+  let avgClothingData = getAvgClothData?.data?.data?.data || null;
+
+  //  calculate submissions
   let expectedSubmission = submissionData ? submissionData.totalTeamLeads : 0;
 
   let submissions = submissionData
@@ -47,135 +146,53 @@ const FormResponses = () => {
     : 0;
   let noResponse = submissions ? expectedSubmission - submissions : 0;
 
-  useEffect(() => {
-    axios
-      .get("form_response/food_product")
-      .then((res) => {
-        setFoodData(res.data);
-        setIsLoading(false);
-      })
-      .catch((err) => console.log(err));
+  console.log(accomodationData, "accomodation data");
 
-    axios
-      .get("form_response/admin_response_tracker")
-      .then((res) => setSubmissionData(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+  // // if (avgFoodData || foodData) {
+  // console.log(foodData);
+  // console.log(avgFoodData);
+  // // }
 
   const getFood = async () => {
-    try {
-      setIsLoading(true);
-      await axios.get("form_response/food_product").then((res) => {
-        setFoodData(res.data);
-        setActiveTab("food");
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("food");
+    queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+    // queryClient.refetchQueries("getFoodData");
   };
 
   const getTransport = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/transport")
-        .then((res) => {
-          setTransportData(res.data);
-          setActiveTab("transport");
-        })
-        .catch((err) => console.error(err));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("transport");
+    queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+    // queryClient.refetchQueries("getTransData");
   };
 
   const getAccomodation = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/accomodation")
-        .then((res) => {
-          setAccomodationData(res.data);
-          setActiveTab("accomodation");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("accomodation");
+    queryClient.invalidateQueries({ queryKey: ["getAccData"] });
+    // queryClient.refetchQueries("getAccData");
   };
 
   const getElectricity = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/electricity")
-        .then((res) => {
-          setElectricityData(res.data);
-          setActiveTab("electricity");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("electricity");
+    queryClient.invalidateQueries({ queryKey: ["getElecData"] });
+    // queryClient.refetchQueries("getElecData");
   };
 
   const getOthers = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/other_products")
-        .then((res) => {
-          setOthersData(res.data);
-          setActiveTab("others");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("others");
+    queryClient.invalidateQueries({ queryKey: ["getOthersData"] });
+    // queryClient.refetchQueries("getOthersData");
   };
 
   const getNotes = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/questions")
-        .then((res) => {
-          setNotesData(res.data);
-          setActiveTab("notes");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("notes");
+    queryClient.invalidateQueries({ queryKey: ["getNotesData"] });
+    // queryClient.refetchQueries("getNotesData");
   };
 
   const getClothing = async () => {
-    try {
-      setIsLoading(true);
-      await axios
-        .get("form_response/clothings")
-        .then((res) => {
-          setClothingData(res.data);
-          setActiveTab("clothing");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    setActiveTab("clothing");
+    queryClient.invalidateQueries({ queryKey: ["getClothData"] });
+    // queryClient.refetchQueries("getClothData");
   };
 
   return (
@@ -197,8 +214,6 @@ const FormResponses = () => {
         </div>
       </div>
 
-      {/* categories */}
-      {/* <div className="flex items-center gap-3 overflow-x-scroll xs:scrollbar-hide md:scrollbar-default lg:scrollbar-hide "> */}
       <OaksSlider slideDefault={5} break1={3} break2={2} break3={2}>
         <div
           className={`rounded w-fit mr-3 ${
@@ -275,36 +290,33 @@ const FormResponses = () => {
           <CategoryTab text="Notes" Icon={Summarize} activeTab={activeTab} />
         </div>
       </OaksSlider>
-      {/* </div> */}
-
-      {/* table */}
 
       <div className="bg-white h-80 w-full">
-        {isLoading ? (
+        {getFood.isLoading ? (
           <div className="h-32">
             <Loading />
           </div>
         ) : (
           <>
-            {activeTab === "food" && <FoodGrid data={foodData} />}
+            {activeTab === "food" && (
+              <FoodGrid avgData={avgFoodData} data={foodData} />
+            )}
             {activeTab === "transport" && (
-              <TransportGrid data={transportData ?? transportData} />
+              <TransportGrid data={transportData} avgData={avgTransportData} />
             )}
             {activeTab === "accomodation" && (
-              <AccomodationGrid data={accomodationData ?? accomodationData} />
+              <AccomodationGrid data={accomodationData} avgData={avgAccData} />
             )}
             {activeTab === "clothing" && (
-              <ClothingGrid data={clothingData ?? clothingData} />
+              <ClothingGrid data={clothingData} avgData={avgClothingData} />
             )}
             {activeTab === "electricity" && (
-              <ElectricityGrid data={electricityData ?? electricityData} />
+              <ElectricityGrid data={electricityData} avgData={avgElecData} />
             )}
             {activeTab === "others" && (
-              <OthersGrid data={othersData ?? othersData} />
+              <OthersGrid data={othersData} avgData={avgOthersData} />
             )}
-            {activeTab === "notes" && (
-              <NotesGrid data={notesData ?? notesData} />
-            )}
+            {activeTab === "notes" && <NotesGrid data={notesData} />}
           </>
         )}
       </div>

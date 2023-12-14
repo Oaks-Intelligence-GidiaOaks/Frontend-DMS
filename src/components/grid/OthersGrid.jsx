@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -11,130 +10,67 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
-import { toast } from 'react-toastify';
-import { Loading } from "../../components/reusable"
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const OthersGrid = ({ data }) => {
+const OthersGrid = ({ data, avgData }) => {
   const { user } = useAuth();
-  const [prevOthersData, setPrevOthersData] = useState([])
-  const [transformedData, setTransformedData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [othersData, setOthersData] = useState(data.data)
-  console.log(prevOthersData);
 
-  let dataCount = data?.totalCount;
+  let othersData = data;
 
-  useEffect(() => {
-    const getPrevOthersData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("form_response/prev_other_products");
-        const avgPrices = {};
-        const countByLga = {};
+  // console.log(data);
 
-        response.data.data.forEach((prev) => {
-          if (avgPrices[prev.name]) {
-            avgPrices[prev.name].totalPrice += parseFloat(prev.price);
-            avgPrices[prev.name].count += 1;
-          } else {
-            avgPrices[prev.name] = {
-              totalPrice: parseFloat(prev.price),
-              count: 1,
-            };
-          }
-
-             // Track count by lga
-             if (countByLga[prev.name]) {
-              if (!countByLga[prev.name].includes(prev.lga)) {
-                countByLga[prev.name].push(prev.lga);
-              }
-            } else {
-              countByLga[prev.name] = [prev.lga];
-            }
-        })
-
-        const avgPriceArray = Object.entries(avgPrices).map(([name, data]) => ({
-          name,
-          avgPrice: data.totalPrice / data.count,
-        }));
-        setPrevOthersData(avgPriceArray)
-
-
-        setTransformedData(
-          othersData &&
-          othersData.length > 0 &&
-          othersData.map((item, i) => {
-            const prevItem = prevOthersData?.find((prev) => prev.name === item.name);
-            const itemPrice = parseFloat(item.price);
-            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-            const priceDifference = prevItem
-              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-              : 0;
-              const lgasCount = countByLga[item.name] ? countByLga[item.name].length : 1;
-            return {
-              S_N: i + 1,
-              Date: arrangeTime(item.updated_at),
-              id: item.created_by?.id,
-              State: item.state,
-              LGA: item.lga,
-              name: formatProductName(item?.name),
-              price: item.price === 0 ? "N/A" : item.price,
-              brand: item.brand.length > 1 ? item.brand : "N/A",
-              _id: item._id,
-              size: item.size,
-              priceDifference,
-              avgPriceByLga: prevAvgPrice / lgasCount
-            }
-          }));
-      } catch (err) {
-        console.error("Error fetching previous food data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    getPrevOthersData()
-  }, [])
-
-  const handleFlagButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/flag_other_products/${rowData._id}`, { flagged: true });
-        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
-        setOthersData((prevFoodData) =>
-        prevFoodData.filter((item) => item._id !== rowData._id)
+  const editOthersPrice = useMutation({
+    mutationFn: async (modifiedData) => {
+      // console.log(data, "data");
+      console.log(modifiedData, "modiifiedData");
+      return axios.patch(
+        `form_response/other_products/${modifiedData._id}`,
+        modifiedData
       );
-        
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      }
-    } else {
-      toast.error('Invalid data or _id. Unable to flag item.');
-    }
-  }
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getOthersData"] });
+    },
+  });
 
-  const handleResubmitButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/resubmit_other_products/${rowData._id}`);
-        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
-        setOthersData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      )
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
-      }
-    } else {
-      toast.error('Invalid data or _id. Unable to resubmit item.');
-    }
-  };
+  // resubmit mutation
+  const resubmitProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_other_products/${rowData._id}`),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getOthersData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_other_products/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getOthersData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -143,30 +79,51 @@ const OthersGrid = ({ data }) => {
     return name.replace(/-/g, "");
   };
 
-
-
-  const isCellRed = (field, priceDifference) => {
-    const threshold = 0.25;
-    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
-  };
-
+  const transformedData =
+    othersData &&
+    othersData.length > 0 &&
+    data.map((item, i) => ({
+      S_N: i + 1,
+      Date: arrangeTime(item?.updated_at),
+      id: item?.created_by?.id,
+      State: item?.state,
+      LGA: item?.lga,
+      name: formatProductName(item?.name),
+      brand: item?.brand.length > 1 ? item?.brand : "N/A",
+      _id: item?._id,
+      size: item?.size,
+      price: item?.price === 0 ? "N/A" : item?.price,
+      flagged: item?.flagged,
+    }));
 
   const othersColumns =
     othersData.length > 0 &&
-    Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga")
-      .map((item) => ({
-        field: item,
-        // width: item.length ? item.length + 130 : 130,
-        width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
-        cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference)
-            ? "red-border"
-            : "",
-      }));
+    Object.keys(transformedData[0]).map((item) => ({
+      field: item,
+      width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
+    }));
+
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      await flagProduct.mutateAsync(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to flag item.");
+    }
+  };
+
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      await resubmitProduct.mutateAsync(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to resubmit item.");
+    }
+  };
 
   const handleQueryCellInfo = (args) => {
-    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+    if (
+      args.column.field === "price" &&
+      isOutsideLimit(avgData, "others", args.data)
+    ) {
       args.cell.classList.add("red-text");
     }
   };
@@ -220,30 +177,21 @@ const OthersGrid = ({ data }) => {
         </div>
       </div>
     );
-  }
-
-
+  };
 
   const handleSave = async (args) => {
     const { data } = args;
 
     if (args.requestType === "save") {
       const modifiedData = {
+        name: data.name,
         size: data.size,
         brand: data.brand,
         price: data.price,
+        _id: data._id,
       };
 
-      try {
-        await axios
-          .patch(`form_response/other_products/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+      editOthersPrice.mutate(modifiedData);
     }
   };
 
@@ -261,25 +209,21 @@ const OthersGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-        ? "ID"
-        : field === "lga"
-          ? "LGA"
-          : field === "name"
-            ? "Name"
-            : field === "price"
-              ? "Price"
-              : field === "brand"
-                ? "Brand"
-                : field === "size"
-                  ? "Size"
-                  : field;
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "name"
+      ? "Name"
+      : field === "price"
+      ? "Price"
+      : field === "brand"
+      ? "Brand"
+      : field === "size"
+      ? "Size"
+      : field;
   };
 
-  return loading ? (
-    <div className="h-32">
-      <Loading />
-    </div>
-  ) : othersData.length > 0 ? (
+  return othersData.length > 0 ? (
     <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -301,6 +245,7 @@ const OthersGrid = ({ data }) => {
         pageSettings={pageSettings}
         allowEditing={true}
         editSettings={editSettings}
+        height={350}
         allowGrouping={true}
         queryCellInfo={handleQueryCellInfo}
         // commandClick={(args) => handleSave(args)}
@@ -310,7 +255,7 @@ const OthersGrid = ({ data }) => {
           {othersColumns.map(({ field, width }) => (
             <ColumnDirective
               key={field}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
               headerText={checkHeaderText(field)}
               allowEditing={
                 field === "price" || field === "brand" || field === "size"
@@ -329,14 +274,14 @@ const OthersGrid = ({ data }) => {
             headerText="Flag"
             width={100}
             template={gridTemplate}
-            visible={user?.role === 'admin'}
+            visible={user?.role === "admin"}
           />
 
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={resubmitTemplate}
-            visible={user?.role === 'team_lead'}
+            visible={user?.role === "team_lead"}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />

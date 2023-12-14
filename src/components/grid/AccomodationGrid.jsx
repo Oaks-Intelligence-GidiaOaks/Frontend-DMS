@@ -13,154 +13,116 @@ import {
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
-import { toast } from 'react-toastify';
-import { Loading } from "../../components/reusable"
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const AccomodationGrid = ({ data }) => {
+const AccomodationGrid = ({ data, avgData }) => {
   const { user } = useAuth();
-  const [accomodataData, setAccomodationData] = useState([]);
-  const [transformedData, setTransformedData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [accData, setAccData] = useState(data.data)
-  let dataCount = data.totalCount;
 
-  useEffect(() => {
-    const getPrevAccData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("form_response/prev_accomodation");
+  let accData = data;
 
-        const avgPrices = {};
-        const countByLga = {};
+  const editAccPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/accomodation/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getAccData"] });
+    },
+    onError: (err) => {
+      toast.error("could not update value, try again!");
+    },
+  });
 
-        response.data.data.forEach((prev) => {
-          if (avgPrices[prev.type]) {
-            avgPrices[prev.type].totalPrice += parseFloat(prev.price);
-            avgPrices[prev.type].count += 1;
-          } else {
-            avgPrices[prev.type] = {
-              totalPrice: parseFloat(prev.price),
-              count: 1,
-            };
-          }
+  // resubmit mutation
+  const resubmitProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_accomodation/${rowData._id}`),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getAccData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-          if (countByLga[prev.type]) {
-            if (!countByLga[prev.type].includes(prev.lag)) {
-              countByLga[prev.type].push(prev.lga)
-            }
-          } else {
-            countByLga[prev.type] = [prev.lga];
-          }
-        });
-        const avgPriceArray = Object.entries(avgPrices).map(([type, data]) => ({
-          type,
-          avgPrice: data.totalPrice / data.count,
-        }));
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_accomodation/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getAccData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-        setAccomodationData(avgPriceArray);
-
-        setTransformedData(
-          accData &&
-          accData.length > 0 &&
-          data.data.map((item, i) => {
-            const prevItem = accomodataData.find((prev) => prev.type === item.type);
-            const itemPrice = parseFloat(item.price);
-            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-            const priceDifference = prevItem
-              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-              : 0;
-              const lgasCount = countByLga[item.type] ? countByLga[item.type].length : 1;
-            return {
-              S_N: i + 1,
-              Date: arrangeTime(item.updated_at),
-              id: item.created_by?.id,
-              State: item.state,
-              LGA: item.lga,
-              type: item.type,
-              rooms: item.rooms,
-              price: item.price,
-              _id: item._id,
-              priceDifference,
-              avgAccByLga: prevAvgPrice / lgasCount,
-            }
-          }))
-
-      } catch (err) {
-        console.error("Error fetching previous food data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getPrevAccData();
-  }, [accData]);
-
+  const transformedData =
+    accData &&
+    accData.length > 0 &&
+    data.map((item, i) => ({
+      S_N: i + 1,
+      Date: arrangeTime(item?.updated_at),
+      id: item?.created_by?.id,
+      State: item?.state,
+      LGA: item?.lga,
+      type: item?.type,
+      rooms: item?.rooms,
+      price: item?.price,
+      _id: item?._id,
+      flagged: item?.flagged,
+    }));
 
   const handleFlagButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/flag_accomodation/${rowData._id}`, { flagged: true });
-        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
-        setAccData((prev) =>
-          prev.filter((item) => item._id !== rowData._id)
-        );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      }
+      await flagProduct.mutateAsync(rowData);
     } else {
-      toast.error('Invalid data or _id. Unable to flag item.');
-    }
-  }
-
-  const handleResubmitButtonClick = async (rowData) => {
-    if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/resubmit_accomodation/${rowData._id}`);
-        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
-        setAccData((prev) =>
-          prev.filter((item) => item._id !== rowData._id)
-        );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
-      }
-    } else {
-      toast.error('Invalid data or _id. Unable to resubmit item.');
+      toast.error("Invalid data or _id. Unable to flag item.");
     }
   };
 
-  const isCellRed = (field, priceDifference) => {
-    const threshold = 0.25;
-    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
+  const handleResubmitButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      await resubmitProduct.mutateAsync(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to resubmit item.");
+    }
   };
 
   const accColumns =
     accData.length > 0 &&
-    Object.keys(transformedData[0] || {})
-      .filter((field) => field !== "priceDifference" && field !== "avgAccByLga")
-      .map((item) => ({
-        field: item,
-        // width: item.length === "type" ? item.length + 120 : 120,
-        width: item === "price" ? 100 : item.length < 4 ? 120 : item.length + 130,
-        cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference)
-            ? "red-border"
-            : "",
-      }));
+    Object.keys(transformedData[0]).map((item) => ({
+      field: item,
+      width: item === "price" ? 100 : item.length < 4 ? 120 : item.length + 130,
+    }));
 
   const handleQueryCellInfo = (args) => {
-    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+    if (
+      args.column.field === "price" &&
+      false
+      // isOutsideLimit(avgData, "acc", args.data)
+    ) {
       args.cell.classList.add("red-text");
     }
   };
 
-  const pageSettings = { pageSize: 50 };
+  const pageSettings = { pageSize: 60 };
 
   const editSettings = {
     allowEditing: true,
@@ -209,26 +171,19 @@ const AccomodationGrid = ({ data }) => {
         </div>
       </div>
     );
-  }
+  };
 
   const handleSave = async (args) => {
     const { data } = args;
     if (args.requestType === "save") {
       const modifiedData = {
+        type: data.type,
         price: data.price,
-
+        rooms: data.rooms,
+        _id: data._id,
       };
-      try {
-        await axios
-          .patch(`form_response/accomodation/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-            // console.log(res.data);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+
+      editAccPrice.mutate(modifiedData);
     }
   };
 
@@ -236,16 +191,16 @@ const AccomodationGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-        ? "ID"
-        : field === "lga"
-          ? "LGA"
-          : field === "type"
-            ? "Type"
-            : field === "rooms"
-              ? "Rooms"
-              : field === "price"
-                ? "Price"
-                : field;
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "type"
+      ? "Type"
+      : field === "rooms"
+      ? "Rooms"
+      : field === "price"
+      ? "Price"
+      : field;
   };
 
   const handleDownload = () => {
@@ -258,11 +213,7 @@ const AccomodationGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return loading ? (
-    <div className="h-32">
-      <Loading />
-    </div>
-  ) : accData.length > 0 ? (
+  return accData.length > 0 ? (
     <>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -286,9 +237,10 @@ const AccomodationGrid = ({ data }) => {
         allowEditing={true}
         editSettings={editSettings}
         allowGrouping={true}
+        height={350}
         queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
-      // commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {accColumns.map(({ field, width }) => (
@@ -298,7 +250,7 @@ const AccomodationGrid = ({ data }) => {
               headerText={checkHeaderText(field)}
               allowEditing={field === "price"}
               width={width}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
             />
           ))}
 
@@ -312,14 +264,14 @@ const AccomodationGrid = ({ data }) => {
             headerText="Flag"
             width={100}
             template={gridTemplate}
-            visible={user?.role === 'admin'}
+            visible={user?.role === "admin"}
           />
 
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={resubmitTemplate}
-            visible={user?.role === 'team_lead'}
+            visible={user?.role === "team_lead"}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Toolbar, Edit, CommandColumn]} />

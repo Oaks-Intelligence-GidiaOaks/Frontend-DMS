@@ -1,3 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 export default function getCurrentYear() {
   return new Date().getFullYear();
 }
@@ -142,4 +146,90 @@ export const masterHeaderText = (header) => {
   }
 
   return headerText;
+};
+
+export const isOutsideLimit = (avgData, type, product) => {
+  const value = product.price || product.cost || product.hours_per_week;
+  let matchedCommodity;
+
+  if (type === "food") {
+    matchedCommodity = avgData?.filter(
+      (item) => item.name === product.name && item.lga === product.lga
+    );
+  }
+
+  if (type === "transport") {
+    matchedCommodity = avgData?.filter(
+      (item) => item.route === product.route && item.lga === product.lga
+    );
+  }
+
+  if (type === "acc") {
+    matchedCommodity = avgData?.filter(
+      (item) =>
+        item.type === product.type &&
+        item.lga === product.LGA &&
+        item.rooms === product.rooms
+    );
+  }
+
+  if (type === "cloth") {
+    matchedCommodity = avgData?.filter(
+      (item) => item.category === product.category && item.lga === product.lga
+    );
+  }
+
+  if (type === "elec") {
+    matchedCommodity = avgData?.filter((item) => item.lga === product.LGA);
+  }
+
+  if (type === "others") {
+    console.log(product, "average data");
+
+    matchedCommodity = avgData?.filter(
+      (item) => item.name === product.name && item.lga === product.LGA
+    );
+
+    console.log(matchedCommodity, "Others Matched");
+  }
+
+  let matchedObj;
+
+  if (type === "acc") {
+    matchedObj = matchedCommodity[0];
+  } else {
+    matchedObj = matchedCommodity?.reduce(
+      (acc, current) => ({ ...acc, ...current }),
+      {}
+    );
+  }
+
+  let preValue = matchedObj?.price || matchedObj.cost;
+  let commodityValue = parseInt(preValue);
+
+  let ratio = 0.25 * commodityValue;
+  let upperLimit = ratio + commodityValue;
+  let lowerLimit = commodityValue - ratio;
+
+  return value >= upperLimit || product.flagged
+    ? true
+    : value <= lowerLimit
+    ? true
+    : false;
+};
+
+export const resubmitProduct = (rowData, url, invalidateKey, queryClient) => {
+  const prodMutation = useMutation({
+    mutationFn: async (rowData) => await axios.patch(`${url}${rowData._id}`),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: [invalidateKey] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  prodMutation.mutate(rowData);
 };

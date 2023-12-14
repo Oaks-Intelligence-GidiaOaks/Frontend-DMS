@@ -13,147 +13,103 @@ import {
 import axios from "axios";
 import { useAuth } from "../../context";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
-import { toast } from 'react-toastify';
-import { Loading } from "../../components/reusable"
+import { toast } from "react-toastify";
+import { Loading } from "../../components/reusable";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const ClothingGrid = ({ data }) => {
+const ClothingGrid = ({ data, avgData }) => {
   const { user } = useAuth();
-  const [prevClothingData, setPrevClothingData] = useState([]);
-  const [transformedData, setTransformedData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [clothingData, setClothingData] = useState(data["data"])
 
-  useEffect(() => {
-    const getPrevClothingData = async () => {
+  let clothingData = data;
 
-      try {
-        setLoading(true);
-        const response = await axios.get("form_response/prev_clothings");
-        const avgPrices = {};
-        const countByLga = {};
+  const editClothPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      axios.patch(`form_response/clothings/${modifiedData._id}`, modifiedData),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getClothData"] });
+    },
+  });
 
-        response.data.data.forEach((prev) => {
-          if (avgPrices[prev.sub_category]) {
-            avgPrices[prev.sub_category].totalPrice += parseFloat(prev.price);
-            avgPrices[prev.sub_category].count += 1;
-          } else {
-            avgPrices[prev.sub_category] = {
-              totalPrice: parseFloat(prev.price),
-              count: 1,
-            }
-          }
+  // resubmit mutation
+  const resubmitProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_clothings/${rowData._id}`),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getClothData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-          if(countByLga[prev.sub_category]) {
-            if(!countByLga[prev.sub_category].includes(prev.lga)) {
-              countByLga[prev.sub_category].push(prev.lga);
-            }
-          } else {
-            countByLga[prev.sub_category] = [prev.lga]
-          }
-        })
-
-        const avgPriceArray = Object.entries(avgPrices).map(([sub_category, data]) => ({
-          sub_category,
-          avgPrice: data.totalPrice / data.count,
-        }));
-        setPrevClothingData(avgPriceArray)
-
-        setTransformedData(
-          clothingData.length > 0 &&
-          clothingData?.map((item, i) => {
-            const prevItem = prevClothingData?.find((prev) => prev.sub_category === item.sub_category);
-            const itemPrice = parseFloat(item.price);
-            const prevAvgPrice = prevItem ? prevItem.avgPrice : 0;
-            const priceDifference = prevItem
-              ? Math.abs(itemPrice - prevAvgPrice) / prevAvgPrice
-              : 0;
-              const lgasCount = countByLga[item.sub_category] ? countByLga[item.sub_category].length : 1;
-            return {
-              S_N: i + 1,
-              _id: item._id,
-              Date: arrangeTime(item.updated_at),
-              id: item.created_by?.id,
-              State: item.state,
-              lga: item.lga,
-              category: item.category,
-              sub_category: item.sub_category,
-              size: item.size,
-              price: item.price,
-              priceDifference,
-              avgPriceByLga: prevAvgPrice / lgasCount,
-            }
-
-          }));
-
-      } catch (err) {
-        console.error("Error fetching previous food data:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    getPrevClothingData()
-  }, [clothingData])
-
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_clothings/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getClothData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const handleFlagButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/flag_clothings/${rowData._id}`, { flagged: true });
-        toast.success(response.data.message || `Item "${rowData.name}" flagged successfully`);
-        setClothingData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error flagging item "${rowData.name}"`);
-      }
+      await flagProduct.mutateAsync(rowData);
     } else {
-      toast.error('Invalid data or _id. Unable to flag item.');
+      toast.error("Invalid data or _id. Unable to flag item.");
     }
-  }
+  };
 
   const handleResubmitButtonClick = async (rowData) => {
     if (rowData && rowData._id) {
-      try {
-        const response = await axios.patch(`form_response/resubmit_clothings/${rowData._id}`);
-        toast.success(response.data.message || `Item "${rowData.name}" resubmitted successfully`);
-        setClothingData((prev) =>
-        prev.filter((item) => item._id !== rowData._id)
-      );
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || `Error resubmitting item "${rowData.name}"`);
-      }
+      await resubmitProduct.mutateAsync(rowData);
     } else {
-      toast.error('Invalid data or _id. Unable to resubmit item.');
+      toast.error("Invalid data or _id. Unable to resubmit item.");
     }
   };
 
-  const isCellRed = (field, priceDifference) => {
-    const threshold = 0.25;
-    return field === "price" && (priceDifference >= threshold || priceDifference <= -threshold);
-  };
+  const transformedData =
+    clothingData.length > 0 &&
+    clothingData?.map((item, i) => ({
+      S_N: i + 1,
+      _id: item?._id,
+      Date: arrangeTime(item?.updated_at),
+      id: item.created_by?.id,
+      State: item?.state,
+      lga: item?.lga,
+      category: item?.category,
+      sub_category: item?.sub_category,
+      size: item?.size,
+      price: item?.price,
+      flagged: item?.flagged,
+    }));
 
   const transformedColumns =
     clothingData.length > 0 &&
-    Object.keys(transformedData?.[0] || {})
-      .filter((field) => field !== "priceDifference" && field !== "avgPriceByLga")
-      .map((item) => ({
-        field: item,
-        // width: item.length < 4 ? 120 : item.length + 130,
-        width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
-        cssClass: (props) =>
-          isCellRed(props.column.field, props.data.priceDifference)
-            ? "red-border"
-            : "",
-      }));
-
+    Object.keys(transformedData?.[0]).map((item) => ({
+      field: item,
+      width: item === "price" ? 90 : item.length < 4 ? 120 : item.length + 130,
+    }));
 
   const handleQueryCellInfo = (args) => {
-    if (args.column.field === "price" && args.data.priceDifference >= 0.25) {
+    if (
+      args.column.field === "price" &&
+      isOutsideLimit(avgData, "cloth", args.data)
+    ) {
       args.cell.classList.add("red-text");
     }
   };
@@ -165,19 +121,17 @@ const ClothingGrid = ({ data }) => {
   };
 
   const handleSave = async (args) => {
-    // console.log(args);
-    const modifiedData = args.rowData;
-    if (args.commandColumn.type === "Save") {
-      try {
-        await axios
-          .patch(`form_response/clothings/${modifiedData._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+    const { data } = args;
+
+    if (args.requestType === "save") {
+      const modifiedData = {
+        category: data.category,
+        sub_category: data.sub_category,
+        size: data.size,
+        price: data.price,
+        _id: data._id,
+      };
+      await editClothPrice.mutateAsync(modifiedData);
     }
   };
 
@@ -224,7 +178,7 @@ const ClothingGrid = ({ data }) => {
         </div>
       </div>
     );
-  }
+  };
 
   const groupSettings = {
     columns: ["State"],
@@ -234,18 +188,18 @@ const ClothingGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-        ? "ID"
-        : field === "lga"
-          ? "LGA"
-          : field === "category"
-            ? "Category"
-            : field === "sub_category"
-              ? "Sub Category"
-              : field === "price"
-                ? "Price"
-                : field === "size"
-                  ? "Size"
-                  : field;
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "category"
+      ? "Category"
+      : field === "sub_category"
+      ? "Sub Category"
+      : field === "price"
+      ? "Price"
+      : field === "size"
+      ? "Size"
+      : field;
   };
 
   const handleDownload = () => {
@@ -258,11 +212,7 @@ const ClothingGrid = ({ data }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return loading ? (
-    <div className="h-32">
-      <Loading />
-    </div>
-  ) : clothingData.length > 0 ? (
+  return clothingData.length > 0 ? (
     <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
@@ -287,14 +237,15 @@ const ClothingGrid = ({ data }) => {
         allowGrouping={true}
         height={350}
         queryCellInfo={handleQueryCellInfo}
-        commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
+        actionComplete={handleSave}
       >
         <ColumnsDirective>
           {transformedColumns?.map(({ field, width }) => (
             <ColumnDirective
               key={field}
               headerText={checkHeaderText(field)}
-              visible={field === "_id" ? false : true}
+              visible={field !== "_id" && field !== "flagged"}
               field={field}
               allowEditing={field === "price"}
               width={width}
@@ -309,13 +260,13 @@ const ClothingGrid = ({ data }) => {
             headerText="Flag"
             width={100}
             template={gridTemplate}
-            visible={user?.role === 'admin'}
+            visible={user?.role === "admin"}
           />
           <ColumnDirective
             headerText="Flag"
             width={100}
             template={resubmitTemplate}
-            visible={user?.role === 'team_lead'}
+            visible={user?.role === "team_lead"}
           />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
