@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import Pie from "../../components/charts/Pie";
-import { data } from "../../data/chartData";
 import { useLocation, useParams } from "react-router-dom";
-import { TeamLeadGrid } from "../../components/grid";
 import { NoData } from "../../components/reusable";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EnumeratorGrid from "../../components/grid/EnumeratorGrid";
 import { IoIosArrowBack } from "react-icons/io";
 

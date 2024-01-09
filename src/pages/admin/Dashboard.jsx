@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [yearDropdown, setYearDropdown] = useState("");
 
   const [totalLgas, setTotalLgas] = useState(null);
+  const [getLgaCount, setGetLgaCount] = useState(null);
   const [enumeratorsCount, setEnumeratorsCount] = useState(null);
   const [teamLeadsCount, setTeamLeadsCount] = useState(null);
   const [submissionRate, setSubmissionRate] = useState(null);
@@ -76,6 +77,7 @@ const Dashboard = () => {
               guide="No response"
               legendOne="Submission"
               data={submissionRate ?? submissionRate}
+              getLgaCount={getLgaCount ?? getLgaCount}
               legendTwo="No response"
             />
           ) : (

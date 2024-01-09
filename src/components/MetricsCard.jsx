@@ -10,12 +10,13 @@ const MetricsCard = ({
   legendOne,
   legendTwo,
   data,
+  getLgaCount,
 }) => {
   // team_lead
   let totalEnumerators = data?.totalEnumerators;
   let submitted = data.submited;
   // let totalLga = data.totalLga;
-  let totalLgas = data.assignedLga;
+  let totalLgas = getLgaCount || 113;
 
   // admin
   let totalTeamLeads = data.totalTeamLead;

@@ -14,12 +14,27 @@ import { arrangeTime } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
+import { toast } from "react-toastify";
 
 const NotesGrid = ({ data }) => {
   const { user } = useAuth();
 
-  let dataCount = data?.totalCount;
-  let noteData = data.data;
+  let noteData = data;
+
+  const editNotes = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/questions/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getNotesData"] });
+    },
+  });
 
   const transformedData =
     noteData &&
@@ -52,7 +67,7 @@ const NotesGrid = ({ data }) => {
   const editSettings = {
     allowEditing: true,
     allowEditOnDblClick: false,
-    mode: "Dialog",
+    // mode: "Dialog",
     allowDeleting: false,
   };
 
@@ -69,22 +84,15 @@ const NotesGrid = ({ data }) => {
   const handleSave = async (args) => {
     const { data } = args;
 
+    console.log(data);
+
     if (args.requestType === "save") {
       const modifiedData = {
         note: data.notes,
+        _id: data._id,
       };
 
-      try {
-        console.log(modifiedData, data);
-        await axios
-          .patch(`form_response/questions/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+      editNotes.mutate(modifiedData);
     }
   };
 
@@ -120,6 +128,7 @@ const NotesGrid = ({ data }) => {
         pageSettings={pageSettings}
         allowEditing={true}
         allowGrouping={true}
+        height={350}
         editSettings={editSettings}
         actionComplete={handleSave}
       >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
@@ -12,20 +12,68 @@ import {
   Toolbar,
   CommandColumn,
 } from "@syncfusion/ej2-react-grids";
-import { TransportRows, TransportColumns } from "../../data/formResponses";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
 import { useAuth } from "../../context";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { Loading } from "../../components/reusable";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const TransportGrid = ({ data }) => {
+const TransportGrid = ({ data, avgData }) => {
   const { user } = useAuth();
 
-  let dataCount = data.totalCount;
+  let transportData = data;
 
-  let transportData = data.data;
+  const editTransportPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/transport/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+    },
+    onError: (err) => {
+      toast.error("error editing value, try again!");
+    },
+  });
+
+  // resubmit mutation
+  const resubmitProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_transport/${rowData._id}`),
+    onSuccess: ({ data }) => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+    },
+    onError: (err) => {
+      toast.error("could not submit data, try again!");
+    },
+  });
+
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_transport/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getTransData"] });
+      // queryClient.refetchQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const transformedData =
     transportData.length > 0 &&
@@ -39,7 +87,9 @@ const TransportGrid = ({ data }) => {
       mode: item.mode,
       _id: item._id,
       cost: item.cost,
+      flagged: item.flagged,
     }));
+
   const transportColumns =
     transportData.length > 0 &&
     Object.keys(transformedData[0]).map((item) => ({
@@ -48,6 +98,22 @@ const TransportGrid = ({ data }) => {
       allowEditing: item === "cost",
     }));
 
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      await flagProduct.mutateAsync(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to flag item.");
+    }
+  };
+
+  const handleQueryCellInfo = (args) => {
+    if (
+      args.column.field === "cost" &&
+      isOutsideLimit(avgData, "transport", args.data)
+    ) {
+      args.cell.classList.add("red-text");
+    }
+  };
 
   const pageSettings = { pageSize: 60 };
   const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
@@ -71,27 +137,47 @@ const TransportGrid = ({ data }) => {
     },
   ];
 
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => resubmitProduct.mutate(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   const handleSave = async (args) => {
-
     const { data } = args;
     if (args.requestType === "save") {
       const modifiedData = {
         cost: data.cost,
-
+        _id: data._id,
+        route: data.route,
+        mode: data.mode,
       };
 
-      try {
-        await axios
-        .patch(`form_response/transport/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-            // console.log(res.data);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+      editTransportPrice.mutate(modifiedData);
     }
   };
 
@@ -99,16 +185,16 @@ const TransportGrid = ({ data }) => {
     return field === "S_N"
       ? "S/N"
       : field === "id"
-        ? "ID"
-        : field === "lga"
-          ? "LGA"
-          : field === "route"
-            ? "Route"
-            : field === "cost"
-              ? "Cost"
-              : field === "mode"
-                ? "Mode"
-                : field;
+      ? "ID"
+      : field === "lga"
+      ? "LGA"
+      : field === "route"
+      ? "Route"
+      : field === "cost"
+      ? "Cost"
+      : field === "mode"
+      ? "Mode"
+      : field;
   };
 
   const handleDownload = () => {
@@ -122,7 +208,7 @@ const TransportGrid = ({ data }) => {
   };
 
   return transportData.length > 0 ? (
-    <>
+    <div>
       {user.role !== "team_lead" && (
         <div className="my-3">
           <button
@@ -145,8 +231,9 @@ const TransportGrid = ({ data }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
+        queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
-      // commandClick={(args) => handleSave(args)}
+        // commandClick={(args) => handleSave(args)}
       >
         <ColumnsDirective>
           {transportColumns.map(({ field, width }) => (
@@ -155,7 +242,7 @@ const TransportGrid = ({ data }) => {
               field={field}
               headerText={checkHeaderText(field)}
               width={width}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
               allowEditing={field === "cost"}
             />
           ))}
@@ -165,10 +252,23 @@ const TransportGrid = ({ data }) => {
             width={100}
             commands={commands}
           />
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === "admin"}
+          />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === "team_lead"}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Filter, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No submissions received yet" />

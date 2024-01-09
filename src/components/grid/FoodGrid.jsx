@@ -1,31 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ColumnDirective,
   ColumnsDirective,
   GridComponent,
-  Filter,
   Inject,
   Page,
   Edit,
   Sort,
   Group,
-  beginEdit,
-  Toolbar,
   CommandColumn,
-  Column,
 } from "@syncfusion/ej2-react-grids";
-import { FoodRows, FoodColumns } from "../../data/formResponses";
 import axios from "axios";
 import { useAuth } from "../../context";
 import { NoData } from "../reusable";
-import { arrangeTime } from "../../lib/helpers";
+import { arrangeTime, isOutsideLimit } from "../../lib/helpers";
 import * as XLSX from "xlsx";
 import { BiDownload } from "react-icons/bi";
+import { toast } from "react-toastify";
+import { Loading } from "../../components/reusable";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App";
 
-const FoodGrid = ({ data: foodRowss }) => {
+const FoodGrid = ({ data: foodRowss, avgData }) => {
   const { user } = useAuth();
 
-  let foodData = foodRowss.data;
+  let foodData = foodRowss;
+
+  const editFoodPrice = useMutation({
+    mutationFn: async (modifiedData) =>
+      await axios.patch(
+        `form_response/food_product/${modifiedData._id}`,
+        modifiedData
+      ),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+      queryClient.refetchQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.success(err.message);
+    },
+  });
+
+  const resubmitFoodProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/resubmit_food_product/${rowData._id}`),
+    onSuccess: (data) => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error("could not submit data, try again");
+    },
+  });
+
+  // admin flag product
+  const flagProduct = useMutation({
+    mutationFn: async (rowData) =>
+      await axios.patch(`form_response/flag_food_product/${rowData._id}`, {
+        flagged: true,
+      }),
+    onSuccess: () => {
+      // Invalidate and refetch
+      toast.success("successful");
+      queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const handleFlagButtonClick = async (rowData) => {
+    if (rowData && rowData._id) {
+      flagProduct.mutate(rowData);
+    } else {
+      toast.error("Invalid data or _id. Unable to flag item.");
+    }
+  };
 
   const formatProductName = (name) => {
     if (name.includes("_")) {
@@ -35,7 +88,7 @@ const FoodGrid = ({ data: foodRowss }) => {
   };
 
   const transformedData =
-    foodData.length > 0 &&
+    foodData?.length > 0 &&
     foodData?.map((item, i) => ({
       S_N: i + 1,
       _id: item?._id,
@@ -43,51 +96,48 @@ const FoodGrid = ({ data: foodRowss }) => {
       id: item.created_by?.id,
       State: item?.state,
       lga: item?.lga,
-      name:formatProductName(item?.name),
+      name: formatProductName(item?.name),
       brand: item?.brand,
       size: item?.size,
       price: item?.price,
+      flagged: item?.flagged,
     }));
 
-  console.log(transformedData[0]?.size);
-
   const transformedColumns =
-    foodData.length > 0 &&
+    foodData?.length > 0 &&
     Object.keys(transformedData?.[0]).map((item) => ({
       field: item,
       width: item.length < 4 ? 120 : item.length + 130,
     }));
 
-  const pageSettings = { pageSize: 60 };
-  const sortSettings = { colums: [{ field: "state", direction: "Ascending" }] };
-
-  const editSettings = {
-    allowEditing: true,
+  const handleQueryCellInfo = (args) => {
+    if (
+      args.column.field === "price" &&
+      isOutsideLimit(avgData, "food", args.data)
+    ) {
+      args.cell.classList.add("red-text");
+    }
   };
+
+  const pageSettings = { pageSize: 60 };
+  const editSettings = { allowEditing: true };
+
   const handleSave = async (args) => {
     const { data } = args;
-  
+
     if (args.requestType === "save") {
       const modifiedData = {
         size: data.size,
         brand: data.brand,
         price: data.price,
+        name: data.name,
+        _id: data._id,
       };
-  
-      try {
-        await axios
-          .patch(`form_response/food_product/${data._id}`, modifiedData)
-          .then((res) => {
-            alert(res.data.message);
-            // console.log(res.data);
-          })
-          .catch((err) => console.error(err));
-      } catch (error) {
-        console.log(error);
-      }
+
+      editFoodPrice.mutate(modifiedData);
     }
   };
-  
+
   const commands = [
     {
       type: "Edit",
@@ -103,24 +153,49 @@ const FoodGrid = ({ data: foodRowss }) => {
     },
   ];
 
-  const groupSettings = {
-    columns: ["State"],
+  const gridTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => handleFlagButtonClick(rowData)}
+            className="bg-danger text-white px-2 py-1 rounded text-xs"
+          >
+            Flag
+          </button>
+        </div>
+      </div>
+    );
   };
 
+  const resubmitTemplate = (rowData) => {
+    return (
+      <div>
+        <div>
+          <button
+            onClick={() => resubmitFoodProduct.mutate(rowData)}
+            className="text-white px-2 py-1 rounded text-xs bg-primary-green"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const groupSettings = { columns: ["State"] };
+
   const checkHeaderText = (field) => {
-    return field === "S_N"
-      ? "S/N"
-      : field === "id"
-      ? "ID"
-      : field === "lga"
-      ? "LGA"
-      : field === "name"
-      ? "Name"
-      : field === "price"
-      ? "Price"
-      : field === "size"
-      ? "Size"
-      : field;
+    const headerMapping = {
+      S_N: "S/N",
+      id: "ID",
+      lga: "LGA",
+      name: "Name",
+      price: "Price",
+      size: "Size",
+    };
+
+    return headerMapping[field] || field;
   };
 
   const handleDownload = () => {
@@ -133,13 +208,21 @@ const FoodGrid = ({ data: foodRowss }) => {
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
   };
 
-  return foodRowss["data"].length > 0 ? (
-    <>
+  if (!foodData) {
+    return (
+      <div className="h-32">
+        <Loading />
+      </div>
+    );
+  }
+
+  return foodData?.length > 0 ? (
+    <div>
       {user?.role !== "team_lead" && (
         <div className="my-3">
           <button
             onClick={handleDownload}
-            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm bg-white hover:bg-oaksyellow hover:text-white"
           >
             <div className="w-fit p-1 rounded text-black bg-gray-100">
               <BiDownload />
@@ -158,7 +241,7 @@ const FoodGrid = ({ data: foodRowss }) => {
         editSettings={editSettings}
         allowGrouping={true}
         height={350}
-        // commandClick={(args) => handleSave(args)}
+        queryCellInfo={handleQueryCellInfo}
         actionComplete={handleSave}
       >
         <ColumnsDirective>
@@ -166,13 +249,11 @@ const FoodGrid = ({ data: foodRowss }) => {
             <ColumnDirective
               key={field}
               headerText={checkHeaderText(field)}
-              // visible={field === "_id" ? false : true}
-              visible={field !== "_id"}
+              visible={field !== "_id" && field !== "flagged"}
               field={field}
-              allowEditing={
-                field === "price" || field === "brand" || field === "size"
-              }
+              allowEditing={field === "price"}
               width={width}
+              cssClass="red-text"
             />
           ))}
 
@@ -181,10 +262,23 @@ const FoodGrid = ({ data: foodRowss }) => {
             width={100}
             commands={commands}
           />
+
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={gridTemplate}
+            visible={user?.role === "admin"}
+          />
+          <ColumnDirective
+            headerText="Flag"
+            width={100}
+            template={resubmitTemplate}
+            visible={user?.role === "team_lead"}
+          />
         </ColumnsDirective>
         <Inject services={[Page, Sort, Group, Edit, CommandColumn]} />
       </GridComponent>
-    </>
+    </div>
   ) : (
     <div className="h-32">
       <NoData text="No Submissions received yet" />
