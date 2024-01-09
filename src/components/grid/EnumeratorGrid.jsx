@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   GridComponent,
   ColumnsDirective,
@@ -18,19 +18,18 @@ const EnumeratorGrid = ({ data }) => {
   const [tableModal, setTableModal] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-  const [isEditing, setIsEditing] = useState(false);
   const [tableData, setTableData] = useState(data ?? data);
 
-  const customStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-    },
-  };
+  // const customStyles = {
+  //   content: {
+  //     top: "50%",
+  //     left: "50%",
+  //     right: "auto",
+  //     bottom: "auto",
+  //     marginRight: "-50%",
+  //     transform: "translate(-50%, -50%)",
+  //   },
+  // };
 
   const editOptions = {
     allowEditing: true,
@@ -140,21 +139,32 @@ const EnumeratorGrid = ({ data }) => {
     // console.log(args);
   };
 
-  const onActionComplete = (args) => {
+  const onActionComplete = async (args) => {
     // console.log(args);
     if (args.requestType === "save") {
-      const { LGA, email, firstName, identity, identityType, lastName, id } =
-        args.data;
+      const {
+        LGA,
+        email,
+        firstName,
+        identity,
+        identityType,
+        lastName,
+        id,
+        phoneNumber,
+      } = args.data;
 
       const editedEnum = {
         firstName,
         lastName,
         identity,
         identityType,
+        phoneNumber,
         id,
         email,
         LGA: LGA.split(","),
       };
+
+      console.log(args.data);
 
       axios
         .put(`admin/enumerator/${args.data._id}`, editedEnum)
@@ -191,7 +201,7 @@ const EnumeratorGrid = ({ data }) => {
           <ColumnDirective isPrimaryKey={true} field="id" width={120} />
           <ColumnDirective width={150} field="firstName" />
           <ColumnDirective width={150} field="lastName" />
-          <ColumnDirective width={150} field="email" />
+          <ColumnDirective width={150} field="email" allowEditing={false} />
           <ColumnDirective width={150} field="phoneNumber" />
           <ColumnDirective
             width={150}
