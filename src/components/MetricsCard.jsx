@@ -64,7 +64,7 @@ const MetricsCard = ({
         <p className="font-bold flex gap-1">
           <span>{lead}: </span>
           <span>
-            {getValue1(totalEnumerators, submitted, totalLgas, totalTeamLeads)}
+            {getValue1(totalEnumerators, submitted, totalTeamLeads, totalLgas)}
           </span>
         </p>
 

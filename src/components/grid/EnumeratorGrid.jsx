@@ -140,7 +140,6 @@ const EnumeratorGrid = ({ data }) => {
   };
 
   const onActionComplete = async (args) => {
-    // console.log(args);
     if (args.requestType === "save") {
       const {
         LGA,
@@ -164,7 +163,7 @@ const EnumeratorGrid = ({ data }) => {
         LGA: LGA.split(","),
       };
 
-      console.log(args.data);
+      console.log(editedEnum, "edited enum");
 
       axios
         .put(`admin/enumerator/${args.data._id}`, editedEnum)
