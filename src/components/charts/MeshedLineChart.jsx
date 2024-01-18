@@ -47,7 +47,6 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
     MeshedLineD.map((item) => {
       let id = item.lga;
 
-      // console.log(item, "ITEM");
       let data = item.weeklyValues
         .map((obj) => {
           return {
@@ -56,10 +55,13 @@ const MeshedLineChart = ({ data: MeshedLineD }) => {
             y: new Date(obj.submissionTime),
           };
         })
+        .filter((it) => it.y.getFullYear() !== 2023)
         .sort((a, b) => (a.x > b.x ? 1 : -1));
 
       return { id, data };
     });
+
+  console.log(transformedData);
 
   return MeshedLineD?.length > 0 ? (
     <ResponsiveLine

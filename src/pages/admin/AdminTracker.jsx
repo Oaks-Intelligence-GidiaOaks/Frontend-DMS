@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import TrackerGrid from "../../components/grid/TrackerGrid";
 import MeshedLineChart from "../../components/charts/MeshedLineChart";
-import {
-  allLgasChidinma,
-  allLgasAkunna,
-  allLgasChinyere,
-  allLgasTimi,
-  allLgasToju,
-} from "../../data/charts";
 import axios from "axios";
 import { Loading } from "../../components/reusable";
+import { parseDate } from "../../lib/helpers";
 
 const AdminTracker = () => {
   const [trackerData, setTrackerData] = useState(null);
@@ -32,7 +26,23 @@ const AdminTracker = () => {
           lga: lead.firstName,
         }))[0];
 
-        transChartTime.push(newLeadData);
+        const sortedWeeklyValues = newLeadData.weeklyValues.sort((a, b) => {
+          const dateA = new Date(a.submissionTime);
+          const dateB = new Date(b.submissionTime);
+
+          if (dateA.getFullYear() !== dateB.getFullYear()) {
+            return dateA.getFullYear() - dateB.getFullYear();
+          }
+
+          return dateA - dateB;
+        });
+
+        let sortedNewLeadData = {
+          ...newLeadData,
+          weeklyValues: sortedWeeklyValues,
+        };
+
+        transChartTime.push(sortedNewLeadData);
       }
     });
   }
@@ -50,7 +60,7 @@ const AdminTracker = () => {
       .then((res) => {
         setTrackerData(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
 
     axios
       .get("form_response/all_submission_time")

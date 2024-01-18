@@ -233,3 +233,37 @@ export const resubmitProduct = (rowData, url, invalidateKey, queryClient) => {
 
   prodMutation.mutate(rowData);
 };
+
+export const parseDate = (dateStr) => {
+  // Manually parse the date string
+  const parts = dateStr.match(
+    /\w+ (\w+) (\d+) (\d+) (\d+):(\d+):(\d+) GMT([+-])(\d{2})(\d{2})/
+  );
+  const months = {
+    Jan: 0,
+    Feb: 1,
+    Mar: 2,
+    Apr: 3,
+    May: 4,
+    Jun: 5,
+    Jul: 6,
+    Aug: 7,
+    Sep: 8,
+    Oct: 9,
+    Nov: 10,
+    Dec: 11,
+  };
+  const date = new Date(
+    Date.UTC(parts[3], months[parts[1]], parts[2], parts[4], parts[5], parts[6])
+  );
+
+  // Adjust for the timezone
+  const tzOffset = (parseInt(parts[8]) * 60 + parseInt(parts[9])) * 60000; // convert timezone offset to milliseconds
+  if (parts[7] === "+") {
+    date.setTime(date.getTime() - tzOffset);
+  } else {
+    date.setTime(date.getTime() + tzOffset);
+  }
+
+  return date;
+};

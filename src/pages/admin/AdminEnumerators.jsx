@@ -14,7 +14,6 @@ const AdminEnumerators = () => {
   let teamLeadData = location.state;
 
   const [tableData, setTableData] = useState(null);
-  const [isloading, setIsLoading] = useState(true);
 
   let totalEnumerators = tableData && tableData.enumerators.length;
 
