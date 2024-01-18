@@ -12,6 +12,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { TableModal } from "../reusable";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const EnumeratorGrid = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -163,18 +164,17 @@ const EnumeratorGrid = ({ data }) => {
         LGA: LGA.split(","),
       };
 
-      console.log(editedEnum, "edited enum");
-
       axios
         .put(`admin/enumerator/${args.data._id}`, editedEnum)
         .then((res) => {
+          toast.success("Enumerator details sucessfully changed");
           setTableData((prev) =>
             prev.map((item) =>
               item._id === res.data.user._id ? res.data.user : item
             )
           );
         })
-        .catch((err) => console.error(err));
+        .catch((err) => toast.error(err.message));
     }
   };
 
