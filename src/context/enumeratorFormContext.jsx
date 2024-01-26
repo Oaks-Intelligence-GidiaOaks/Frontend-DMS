@@ -161,7 +161,19 @@ export function EnumeratorFormProvider({ children }) {
           ],
         },
         "Palm oil": {
+          "0.75(75cl)-Litre": [
+            {
+              price: "",
+              type: "",
+            },
+          ],
           "1-Litre": [
+            {
+              price: "",
+              type: "",
+            },
+          ],
+          "1.5(150cl)-Litre": [
             {
               price: "",
               type: "",
@@ -169,7 +181,19 @@ export function EnumeratorFormProvider({ children }) {
           ],
         },
         "Groundnut oil": {
+          "0.75(75cl)-Litre": [
+            {
+              price: "",
+              type: "",
+            },
+          ],
           "1-Litre": [
+            {
+              price: "",
+              type: "",
+            },
+          ],
+          "1.5(150cl)-Litre": [
             {
               price: "",
               type: "",
@@ -353,7 +377,14 @@ export function EnumeratorFormProvider({ children }) {
     [user.LGA]
   );
 
-  const savedState = JSON.parse(secureLocalStorage.getItem("oaks-enum-form"));
+  // NOTE: To anyone reading this always change the version of oaks-enum-form anytime you make changes or additions to the form to reflect changes on the user's end because of their saves stored in local storage. Also remember to change the version number of the enum form in the code below so as to delete it from the local storage.
+
+  // This version must always be the version number of the previous enum form
+  secureLocalStorage.removeItem("oaks-enum-form");
+
+  const savedState = JSON.parse(
+    secureLocalStorage.getItem("oaks-enum-form-v0.0.0")
+  );
 
   // check if commodity fields to fill are complete
   if (
@@ -367,6 +398,31 @@ export function EnumeratorFormProvider({ children }) {
   }
 
   // If user has saved changes use changes else use initial state
+
+  // const verifyIfNewFieldsHaveBeenAdded = () => {
+  //   if (
+  //     countEmptyStringFields({
+  //       foodSectionStructure: initialState.foodSectionStructure,
+  //       commoditySectionStructure: initialState.commoditySectionStructure,
+  //       transportSectionStructure: initialState.transportSectionStructure,
+  //       accomodationSectionStructure: initialState.accomodationSectionStructure,
+  //       reportsSectionStructure: initialState.reportsSectionStructure,
+  //       clothingSectionStructure: initialState.clothingSectionStructure,
+  //     }) ===
+  //     countEmptyStringFields({
+  //       foodSectionStructure: savedState.foodSectionStructure,
+  //       commoditySectionStructure: savedState.commoditySectionStructure,
+  //       transportSectionStructure: savedState.transportSectionStructure,
+  //       accomodationSectionStructure: savedState.accomodationSectionStructure,
+  //       reportsSectionStructure: savedState.reportsSectionStructure,
+  //       clothingSectionStructure: savedState.clothingSectionStructure,
+  //     })
+  //   ) {
+  //     return savedState;
+  //   }
+  //   return initialState;
+  // };
+
   const [state, setState] = useState(
     user.LGA.includes(savedState?.currentLGA) ? savedState : initialState
   );
@@ -396,14 +452,14 @@ export function EnumeratorFormProvider({ children }) {
     }));
   };
   const saveFormChanges = () => {
-    secureLocalStorage.setItem("oaks-enum-form", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form-v0.0.0", JSON.stringify(state));
     setState((prev) => ({
       ...prev,
       showSavedNotification: true,
     }));
   };
   const backgroundSave = () => {
-    secureLocalStorage.setItem("oaks-enum-form", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form-v0.0.0", JSON.stringify(state));
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
@@ -1208,7 +1264,7 @@ export function EnumeratorFormProvider({ children }) {
     return object;
   };
   const resetState = () => {
-    localStorage.removeItem("oaks-enum-form");
+    localStorage.removeItem("oaks-enum-form-v0.0.0");
     secureLocalStorage.removeItem("tp");
     setState(initialState);
   };
@@ -1266,6 +1322,14 @@ export function EnumeratorFormProvider({ children }) {
     clothingSectionStructure,
   } = state;
 
+  const totalNumOfInitialFields = countEmptyStringFields({
+    foodSectionStructure: initialState.foodSectionStructure,
+    commoditySectionStructure: initialState.commoditySectionStructure,
+    transportSectionStructure: initialState.transportSectionStructure,
+    accomodationSectionStructure: initialState.accomodationSectionStructure,
+    reportsSectionStructure: initialState.reportsSectionStructure,
+    clothingSectionStructure: initialState.clothingSectionStructure,
+  });
   const totalNumOfFields = useMemo(
     () =>
       countEmptyStringFields({
