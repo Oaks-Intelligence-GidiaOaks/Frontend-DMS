@@ -78,7 +78,7 @@ export const masterHeaderText = (header) => {
   }
 
   if (header === "Price of Garri_50-kg") {
-    headerText = "Price of Garri (1 Cup)";
+    headerText = "Price of Garri (50 kg)";
   }
 
   if (header === "Brand of Garri_50-kg") {

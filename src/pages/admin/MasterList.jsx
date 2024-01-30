@@ -9,14 +9,12 @@ import { BiDownload } from "react-icons/bi";
 import { arrangeTime } from "../../lib/helpers";
 
 const MasterList = () => {
-  const [activeTab, setActiveTab] = useState("food");
   const [masterList, setMasterList] = useState(null);
   const [newMaster, setNewMaster] = useState(null);
   const [startDateValue, setStartDateValue] = useState("");
   const [endDateValue, setEndDateValue] = useState("");
   let [totalDataCount, setTotalDataCount] = useState(null);
   let [pageNo, setPageNo] = useState(1);
-
 
   const minDate = new Date(new Date().getFullYear(), new Date().getMonth(), 7);
   const maxDate = new Date(new Date().getFullYear(), new Date().getMonth(), 27);
