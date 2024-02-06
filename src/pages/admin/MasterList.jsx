@@ -159,7 +159,6 @@ const MasterList = () => {
             return transformedObj;
           })
         );
-
         setNewMaster(waitedData);
       } catch (err) {
         console.error(err);
@@ -214,14 +213,6 @@ const MasterList = () => {
     setPageNo(no);
   };
 
-  const handleDownload = () => {
-    var wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.json_to_sheet(newMaster);
-
-    XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
-    XLSX.writeFile(wb, "Excel-sheet.xlsx");
-  };
-
   return (
     <div className="flex text-xs flex-col gap-6 h-full sm:mx-6 lg:mx-auto lg:w-[90%] mt-3">
       <div className="flex flex-col space-y-6 lg:flex-row  items-end justify-between">
@@ -249,18 +240,6 @@ const MasterList = () => {
               />
             </div>
           </div>
-        </div>
-
-        <div className="">
-          <button
-            onClick={handleDownload}
-            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm  bg-white hover:bg-oaksyellow hover:text-white"
-          >
-            <div className="w-fit p-1 rounded text-black bg-gray-100">
-              <BiDownload />
-            </div>
-            <span className="pr-6 text-xs">Download</span>
-          </button>
         </div>
       </div>
 
