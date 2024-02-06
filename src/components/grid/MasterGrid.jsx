@@ -65,8 +65,23 @@ const MasterGrid = ({ data: masterRow }) => {
   };
 
   const handleDownload = () => {
+    const columnHeaders = Object.keys(getTableColumnData(downloadData));
+
     var wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.json_to_sheet(downloadData);
+    var ws = XLSX.utils.aoa_to_sheet([]);
+
+    XLSX.utils.sheet_add_aoa(ws, [columnHeaders], { origin: "A1" });
+
+    if (Array.isArray(downloadData)) {
+      let rowData = downloadData.map((obj) =>
+        columnHeaders.map((header) => obj[header])
+      );
+
+      XLSX.utils.sheet_add_aoa(ws, rowData, { origin: "A2" });
+    } else {
+      let rowData = columnHeaders.map((header) => [downloadData[header]]);
+      XLSX.utils.sheet_add_aoa(ws, rowData, { origin: "A2" });
+    }
 
     XLSX.utils.book_append_sheet(wb, ws, "EXCEL-SHEET");
     XLSX.writeFile(wb, "Excel-sheet.xlsx");
@@ -78,6 +93,19 @@ const MasterGrid = ({ data: masterRow }) => {
 
   return masterRow ? (
     <div className="">
+      {user?.role === "admin" && (
+        <div className="my-3">
+          <button
+            onClick={handleDownload}
+            className="px-3 ml-auto p-2 flex items-center space-x-3 rounded-md drop-shadow-lg text-sm bg-white hover:bg-oaksyellow hover:text-white"
+          >
+            <div className="w-fit p-1 rounded text-black bg-gray-100">
+              <BiDownload />
+            </div>
+            <span className="pr-6 text-xs">Download</span>
+          </button>
+        </div>
+      )}
       <div className="text-[7px]">
         <GridComponent
           dataSource={masterRow}
