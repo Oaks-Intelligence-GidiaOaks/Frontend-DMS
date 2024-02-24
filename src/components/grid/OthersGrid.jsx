@@ -18,18 +18,15 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
+import { revertFormatProductName } from "../../lib";
 
 const OthersGrid = ({ data, avgData }) => {
   const { user } = useAuth();
 
   let othersData = data;
 
-  // console.log(data);
-
   const editOthersPrice = useMutation({
     mutationFn: async (modifiedData) => {
-      // console.log(data, "data");
-      console.log(modifiedData, "modiifiedData");
       return axios.patch(
         `form_response/other_products/${modifiedData._id}`,
         modifiedData
@@ -180,11 +177,11 @@ const OthersGrid = ({ data, avgData }) => {
   };
 
   const handleSave = async (args) => {
-    const { data } = args;
-
     if (args.requestType === "save") {
+      const { data } = args;
+
       const modifiedData = {
-        name: data.name,
+        name: revertFormatProductName(data.name),
         size: data.size,
         brand: data.brand,
         price: data.price,

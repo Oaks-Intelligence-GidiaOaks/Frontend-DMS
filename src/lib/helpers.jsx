@@ -184,13 +184,9 @@ export const isOutsideLimit = (avgData, type, product) => {
   }
 
   if (type === "others") {
-    console.log(product, "average data");
-
     matchedCommodity = avgData?.filter(
       (item) => item.name === product.name && item.lga === product.LGA
     );
-
-    console.log(matchedCommodity, "Others Matched");
   }
 
   let matchedObj;

@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { Loading } from "../../components/reusable";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
+import { revertFormatProductName } from "../../lib";
 
 const FoodGrid = ({ data: foodRowss, avgData }) => {
   const { user } = useAuth();
@@ -123,16 +124,17 @@ const FoodGrid = ({ data: foodRowss, avgData }) => {
   const editSettings = { allowEditing: true };
 
   const handleSave = async (args) => {
-    const { data } = args;
-
     if (args.requestType === "save") {
+      const { data } = args;
+
       const modifiedData = {
         size: data.size,
         brand: data.brand,
         price: data.price,
-        name: data.name,
+        name: revertFormatProductName(data.name),
         _id: data._id,
       };
+      console.log("modified", modifiedData);
 
       editFoodPrice.mutate(modifiedData);
     }
