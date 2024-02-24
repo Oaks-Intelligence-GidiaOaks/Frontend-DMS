@@ -146,13 +146,6 @@ const FormResponses = () => {
     : 0;
   let noResponse = submissions ? expectedSubmission - submissions : 0;
 
-  console.log(accomodationData, "accomodation data");
-
-  // // if (avgFoodData || foodData) {
-  // console.log(foodData);
-  // console.log(avgFoodData);
-  // // }
-
   const getFood = async () => {
     setActiveTab("food");
     queryClient.invalidateQueries({ queryKey: ["getFoodData"] });
