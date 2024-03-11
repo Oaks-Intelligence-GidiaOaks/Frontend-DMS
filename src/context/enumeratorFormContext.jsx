@@ -377,13 +377,14 @@ export function EnumeratorFormProvider({ children }) {
     [user.LGA]
   );
 
-  // NOTE: To anyone reading this always change the version of oaks-enum-form anytime you make changes or additions to the form to reflect changes on the user's end because of their saves stored in local storage. Also remember to change the version number of the enum form in the code below so as to delete it from the local storage.
+  // NOTE: To anyone reading this always change the version of all instances of the oaks-enum-form in this file anytime you make changes or additions to the form to reflect changes on the user's end because of their saves stored in local storage. Also remember to change the version number of the enum form in the code below so as to delete it from the local storage.
+  //NOTE: There are about four instances of the version latest version number
 
   // This version must always be the version number of the previous enum form
-  secureLocalStorage.removeItem("oaks-enum-form");
+  secureLocalStorage.removeItem("oaks-enum-form-v0.0.0");
 
   const savedState = JSON.parse(
-    secureLocalStorage.getItem("oaks-enum-form-v0.0.0")
+    secureLocalStorage.getItem("oaks-enum-form-v0.0.1")
   );
 
   // check if commodity fields to fill are complete
@@ -452,14 +453,14 @@ export function EnumeratorFormProvider({ children }) {
     }));
   };
   const saveFormChanges = () => {
-    secureLocalStorage.setItem("oaks-enum-form-v0.0.0", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form-v0.0.1", JSON.stringify(state));
     setState((prev) => ({
       ...prev,
       showSavedNotification: true,
     }));
   };
   const backgroundSave = () => {
-    secureLocalStorage.setItem("oaks-enum-form-v0.0.0", JSON.stringify(state));
+    secureLocalStorage.setItem("oaks-enum-form-v0.0.1", JSON.stringify(state));
   };
   const submitForm = async (token) => {
     const formSubmission = prepareFormSubmission();
@@ -1264,7 +1265,7 @@ export function EnumeratorFormProvider({ children }) {
     return object;
   };
   const resetState = () => {
-    localStorage.removeItem("oaks-enum-form-v0.0.0");
+    localStorage.removeItem("oaks-enum-form-v0.0.1");
     secureLocalStorage.removeItem("tp");
     setState(initialState);
   };
