@@ -62,7 +62,7 @@ const revertFormatProductName = (name) => {
     case "Kerosene(1Litre)":
       return "Kerosene_1-Litre";
     case "Cement(50kg)":
-      return "Cement_50kg";
+      return "Cement_50-kg";
     case "Diesel/AGO(1Litre)":
       return "Diesel/AGO_1-Litre";
     case "Petrol/PMS(1Litre)":
