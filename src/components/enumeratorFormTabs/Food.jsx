@@ -506,10 +506,10 @@ function Food() {
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} (
-                            {Object.keys(foodForm[item][type][0])[1]
+                            {/* {Object.keys(foodForm[item][type][0])[1]
                               .split("-")
-                              .join(" ")}
-                            )
+                              .join(" ")} */}
+                            4 pieces )
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
                             <span className="block px-[6px] rounded bg-light-gray absolute left-0 bottom-[50%] translate-x-[2px] translate-y-[50%]">
