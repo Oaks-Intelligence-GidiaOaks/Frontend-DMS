@@ -73,4 +73,12 @@ const revertFormatProductName = (name) => {
   }
 };
 
-export { countEmptyStringFields, countValidFields, revertFormatProductName };
+const handleTomatoLabel = (val) => {
+  console.log(val);
+  if(val.toLowerCase().includes("4 seeds")) {
+    return "4 pieces"
+  }
+  return val;
+}
+
+export { countEmptyStringFields, countValidFields, revertFormatProductName, handleTomatoLabel };

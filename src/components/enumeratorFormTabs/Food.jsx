@@ -26,6 +26,7 @@ import {
 import DropDownMenu from "../DropDownMenu";
 import EnumeratorFormContext from "../../context/enumeratorFormContext";
 import { useEffect } from "react";
+import { handleTomatoLabel } from "../../lib";
 
 function Food() {
   const {
@@ -506,9 +507,9 @@ function Food() {
                         <div className="flex flex-col gap-4">
                           <p>
                             Price of {item} (
-                            {Object.keys(foodForm[item][type][0])[1]
+                            {handleTomatoLabel(Object.keys(foodForm[item][type][0])[1]
                               .split("-")
-                              .join(" ")}
+                              .join(" "))}
                             )
                           </p>
                           <div className="flex gap-2 relative border-b border-solid border-mid-gray">
@@ -534,7 +535,7 @@ function Food() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-4">
-                          <p>Specify size of seeds</p>
+                          <p>Specify size of tomato pieces</p>
                           <DropDownMenu
                             list={tomatoSeedSizes}
                             handleChange={handleChange}
